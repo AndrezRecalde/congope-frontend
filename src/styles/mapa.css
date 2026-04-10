@@ -1,0 +1,35 @@
+/* Estilos MapLibre GL JS integrados con Mantine */
+.maplibregl-map {
+  font-family: var(--font-inter), Inter, sans-serif;
+}
+
+.maplibregl-popup-content {
+  border-radius: 8px;
+  padding:       12px 16px;
+  font-family:   var(--font-inter), Inter, sans-serif;
+  font-size:     13px;
+  line-height:   1.5;
+  box-shadow:    0 10px 15px rgba(0,0,0,0.06),
+                 0 4px 6px rgba(0,0,0,0.04);
+  border:        1px solid var(--mantine-color-gray-3);
+}
+
+.maplibregl-popup-tip {
+  border-top-color: var(--mantine-color-gray-3);
+}
+
+.maplibregl-ctrl-group {
+  border-radius: 8px;
+  overflow:      hidden;
+  box-shadow:    0 1px 3px rgba(0,0,0,0.07);
+  border:        1px solid var(--mantine-color-gray-3);
+}
+
+.maplibregl-ctrl-group button {
+  font-size: 18px;
+}
+
+.maplibregl-ctrl-attrib {
+  font-size:   11px;
+  font-family: var(--font-inter), Inter, sans-serif;
+}

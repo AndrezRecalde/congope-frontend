@@ -1,0 +1,66 @@
+/* Variables CSS globales del sistema CONGOPE */
+:root {
+  --color-primary:   #1A3A5C;
+  --color-secondary: #2E6DA4;
+  --color-accent:    #E8A020;
+  --color-success:   #059669;
+  --color-warning:   #D97706;
+  --color-error:     #DC2626;
+  --color-bg-page:   #FAFAFA;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Scrollbar personalizado — sutil y limpio */
+::-webkit-scrollbar {
+  width:  6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background:    var(--mantine-color-gray-4);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--mantine-color-gray-5);
+}
+
+/* Orden de capas CSS — crítico para que
+   mantine-datatable y contextmenu no pisen a Mantine */
+@layer mantine, mantine-datatable, mantine-contextmenu;
+
+/* Transición suave para cambios de tema */
+* {
+  transition-property: background-color, border-color;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
+
+/* Excluir transiciones en elementos interactivos
+   para que no se sientan lentos */
+button,
+a,
+input,
+select,
+textarea {
+  transition: none;
+}
+
+/* Mantine 8 Global Patches for Active States (Theme Override) */
+.mantine-Tabs-tab[data-active],
+.mantine-NavLink-root[data-active] {
+  font-weight: 600 !important;
+}

@@ -1,0 +1,62 @@
+/* Integración de FullCalendar con el tema Mantine CONGOPE */
+.fc {
+  --fc-border-color:           var(--mantine-color-gray-3);
+  --fc-today-bg-color:         var(--mantine-color-congope-0);
+  --fc-event-bg-color:         var(--mantine-color-congope-8);
+  --fc-event-border-color:     var(--mantine-color-congope-9);
+  --fc-button-bg-color:        var(--mantine-color-congope-8);
+  --fc-button-border-color:    var(--mantine-color-congope-9);
+  --fc-button-hover-bg-color:  var(--mantine-color-congope-9);
+  --fc-button-active-bg-color: var(--mantine-color-congope-9);
+  --fc-page-bg-color:          transparent;
+  font-family: var(--font-inter), Inter, sans-serif;
+  font-size:   13px;
+}
+
+.fc .fc-button {
+  border-radius: 8px;
+  font-weight:   500;
+  font-size:     13px;
+  padding:       6px 14px;
+  box-shadow:    none;
+}
+
+.fc .fc-button:focus {
+  box-shadow: none;
+  outline: 2px solid var(--mantine-color-congope-6);
+  outline-offset: 2px;
+}
+
+.fc .fc-toolbar-title {
+  font-size:   16px;
+  font-weight: 600;
+  color:       var(--mantine-color-congope-8);
+}
+
+.fc .fc-event {
+  border-radius: 4px;
+  font-size:     12px;
+  font-weight:   500;
+  padding:       2px 6px;
+  cursor:        pointer;
+  border:        none;
+}
+
+.fc .fc-col-header-cell {
+  font-size:   11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--mantine-color-gray-6);
+  padding: 8px 0;
+}
+
+.fc .fc-daygrid-day-number {
+  font-size:   13px;
+  font-weight: 500;
+  color:       var(--mantine-color-gray-7);
+}
+
+.fc .fc-list-event:hover td {
+  background-color: var(--mantine-color-congope-0);
+}
