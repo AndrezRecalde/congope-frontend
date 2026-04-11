@@ -68,6 +68,12 @@ export const queryKeys = {
     list:   ['provincias', 'list'] as const,
     detail: (id: string) => ['provincias', id] as const,
   },
+  cantones: {
+    list:   (p: object) => ['cantones', 'list', p] as const,
+  },
+  parroquias: {
+    list:   (p: object) => ['parroquias', 'list', p] as const,
+  },
   ods: {
     list:   ['ods', 'list'] as const,
     detail: (id: number) => ['ods', id] as const,

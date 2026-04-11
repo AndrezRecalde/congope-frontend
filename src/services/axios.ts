@@ -431,6 +431,20 @@ export interface Provincia {
   capital: string;
 }
 
+export interface Canton {
+  id: string;
+  nombre: string;
+  codigo: string;
+  provincia_id: string;
+}
+
+export interface Parroquia {
+  id: string;
+  nombre: string;
+  codigo: string;
+  canton_id: string;
+}
+
 export interface Ods {
   id: number;              // INTEGER (1-17, es el número del ODS)
   numero: number;
