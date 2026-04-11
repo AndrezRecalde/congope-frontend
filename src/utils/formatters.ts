@@ -18,21 +18,33 @@ export const formatFecha = (
   formato = 'DD/MM/YYYY'
 ): string => {
   if (!fecha) return '—';
-  return dayjs(fecha).format(formato);
+  let d = dayjs(fecha, ['DD/MM/YYYY', 'YYYY-MM-DD', 'DD/MM/YYYY HH:mm']);
+  if (!d.isValid()) {
+    d = dayjs(fecha);
+  }
+  return d.isValid() ? d.format(formato) : 'Invalid Date';
 };
 
 export const formatFechaHora = (
   fecha: string | null | undefined
 ): string => {
   if (!fecha) return '—';
-  return dayjs(fecha).format('DD/MM/YYYY HH:mm');
+  let d = dayjs(fecha, ['DD/MM/YYYY', 'YYYY-MM-DD', 'DD/MM/YYYY HH:mm']);
+  if (!d.isValid()) {
+    d = dayjs(fecha);
+  }
+  return d.isValid() ? d.format('DD/MM/YYYY HH:mm') : 'Invalid Date';
 };
 
 export const formatFechaRelativa = (
   fecha: string | null | undefined
 ): string => {
   if (!fecha) return '—';
-  return dayjs(fecha).fromNow();
+  let d = dayjs(fecha, ['DD/MM/YYYY', 'YYYY-MM-DD', 'DD/MM/YYYY HH:mm']);
+  if (!d.isValid()) {
+    d = dayjs(fecha);
+  }
+  return d.isValid() ? d.fromNow() : 'Invalid Date';
 };
 
 /**
