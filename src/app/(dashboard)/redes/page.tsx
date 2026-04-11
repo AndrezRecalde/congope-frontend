@@ -32,6 +32,40 @@ const FILTROS_INICIALES: RedFiltros = {
   page:        1,
 };
 
+function CrearRedModal() {
+  const { mutate: crearRed, isPending: creando } = useCrearRed();
+
+  return (
+    <RedForm
+      onSubmit={(datos) =>
+        crearRed(datos, {
+          onSuccess: () => modals.closeAll(),
+        })
+      }
+      onCancel={() => modals.closeAll()}
+      isLoading={creando}
+    />
+  );
+}
+
+function EditarRedModal({ red }: { red: Red }) {
+  const { mutate: actualizarRed, isPending: actualizando } = useActualizarRed();
+
+  return (
+    <RedForm
+      red={red}
+      onSubmit={(datos) =>
+        actualizarRed(
+          { id: red.id, datos },
+          { onSuccess: () => modals.closeAll() }
+        )
+      }
+      onCancel={() => modals.closeAll()}
+      isLoading={actualizando}
+    />
+  );
+}
+
 export default function RedesPage() {
   const [filtros, setFiltros] =
     useState<RedFiltros>(FILTROS_INICIALES);
@@ -41,7 +75,7 @@ export default function RedesPage() {
   const puedeEditar   = can('redes.editar');
   const puedeEliminar = can('redes.eliminar');
 
-  const { data, isLoading } = useRedes({
+  const { data, isLoading, isFetching } = useRedes({
     search:      filtros.search,
     tipo:        filtros.tipo,
     rol_congope: filtros.rol_congope,
@@ -49,9 +83,7 @@ export default function RedesPage() {
     per_page:    15,
   });
 
-  const { mutateAsync: crearRed } = useCrearRed();
-  const { mutateAsync: actualizarRed } = useActualizarRed();
-  const { mutate: eliminarRed }  = useEliminarRed();
+  const { mutate: eliminarRed, isPending: eliminando } = useEliminarRed();
   const { confirmar } = useConfirm();
 
   const redes    = data?.data  ?? [];
@@ -62,15 +94,7 @@ export default function RedesPage() {
     modals.open({
       title: 'Nueva red de articulación',
       size:  'lg',
-      children: (
-        <RedForm
-          onSubmit={async (datos) => {
-            await crearRed(datos);
-            modals.closeAll();
-          }}
-          onCancel={() => modals.closeAll()}
-        />
-      ),
+      children: <CrearRedModal />,
     });
   };
 
@@ -78,16 +102,7 @@ export default function RedesPage() {
     modals.open({
       title: 'Editar red de articulación',
       size:  'lg',
-      children: (
-        <RedForm
-          red={red}
-          onSubmit={async (datos) => {
-            await actualizarRed({ id: red.id, datos });
-            modals.closeAll();
-          }}
-          onCancel={() => modals.closeAll()}
-        />
-      ),
+      children: <EditarRedModal red={red} />,
     });
   };
 
@@ -156,7 +171,7 @@ export default function RedesPage() {
           total={total}
           page={filtros.page ?? 1}
           perPage={15}
-          isLoading={isLoading}
+          isLoading={isLoading || isFetching || eliminando}
           onPageChange={(p) =>
             setFiltros((prev) => ({ ...prev, page: p }))
           }

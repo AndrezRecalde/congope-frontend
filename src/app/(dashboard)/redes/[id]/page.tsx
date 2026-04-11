@@ -54,6 +54,24 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+function EditarRedModal({ red, id }: { red: any, id: string }) {
+  const { mutate: actualizarRed, isPending: actualizando } = useActualizarRed();
+
+  return (
+    <RedForm
+      red={red}
+      onSubmit={(datos) =>
+        actualizarRed(
+          { id, datos },
+          { onSuccess: () => modals.closeAll() }
+        )
+      }
+      onCancel={() => modals.closeAll()}
+      isLoading={actualizando}
+    />
+  );
+}
+
 export default function RedDetallePage(props: PageProps) {
   const { id } = use(props.params);
   const router  = useRouter();
@@ -66,7 +84,6 @@ export default function RedDetallePage(props: PageProps) {
     isError,
   } = useRed(id);
 
-  const { mutateAsync: actualizarRed } = useActualizarRed();
   const { mutate: eliminarRed } = useEliminarRed();
 
   const abrirModalEditar = () => {
@@ -74,16 +91,7 @@ export default function RedDetallePage(props: PageProps) {
     modals.open({
       title: 'Editar red de articulación',
       size:  'lg',
-      children: (
-        <RedForm
-          red={red}
-          onSubmit={async (datos) => {
-            await actualizarRed({ id, datos });
-            modals.closeAll();
-          }}
-          onCancel={() => modals.closeAll()}
-        />
-      ),
+      children: <EditarRedModal red={red} id={id} />,
     });
   };
 

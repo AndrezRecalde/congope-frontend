@@ -1,10 +1,8 @@
 'use client'
 
-import { useState } from 'react';
 import {
   Stack, TextInput, Select, Textarea,
   Button, Group, MultiSelect, Divider, Text,
-  Box, LoadingOverlay,
 } from '@mantine/core';
 import { useForm, isNotEmpty } from '@mantine/form';
 import { useActores } from '@/queries/actores.queries';
@@ -27,17 +25,18 @@ const ROLES_CONGOPE = [
 
 interface RedFormProps {
   red?:        Red;
-  onSubmit:    (datos: CreateRedDto) => Promise<void> | void;
+  onSubmit:    (datos: CreateRedDto) => void;
   onCancel:    () => void;
+  isLoading?:  boolean;
 }
 
 export function RedForm({
   red,
   onSubmit,
   onCancel,
+  isLoading = false,
 }: RedFormProps) {
   const esEdicion = !!red;
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Actores disponibles para agregar como miembros
   // (solo al crear — al editar se usa el panel de miembros)
@@ -69,8 +68,7 @@ export function RedForm({
     },
   });
 
-  const handleSubmit = async (values: RedFormValues) => {
-    setIsSubmitting(true);
+  const handleSubmit = (values: RedFormValues) => {
     const dto: CreateRedDto = {
       nombre:         values.nombre,
       tipo:           values.tipo,
@@ -83,26 +81,11 @@ export function RedForm({
       dto.actor_ids  = values.actor_ids;
       dto.rol_miembro = values.rol_miembro || null;
     }
-    
-    try {
-      await onSubmit(dto);
-    } catch {
-      // 
-    } finally {
-      if (typeof window !== 'undefined') {
-        setIsSubmitting(false);
-      }
-    }
+    onSubmit(dto);
   };
 
   return (
-    <Box pos="relative">
-      <LoadingOverlay
-        visible={isSubmitting}
-        zIndex={1000}
-        overlayProps={{ radius: 'sm', blur: 2 }}
-      />
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+    <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="md">
           <TextInput
             label="Nombre de la red"
@@ -178,17 +161,16 @@ export function RedForm({
 
           <Group justify="flex-end" gap="sm" pt="xs">
             <Button variant="subtle" color="gray"
-              onClick={onCancel} disabled={isSubmitting}>
+              onClick={onCancel} disabled={isLoading}>
               Cancelar
             </Button>
             <Button type="submit" color="congope"
-              loading={isSubmitting}>
+              loading={isLoading}>
               {esEdicion ? 'Guardar cambios' : 'Crear red'}
             </Button>
           </Group>
         </Stack>
       </form>
-    </Box>
   );
 }
 
