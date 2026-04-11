@@ -1,41 +1,52 @@
-'use client'
+"use client";
 
-import { use }       from 'react';
-import { useRouter } from 'next/navigation';
+import { use } from "react";
+import { useRouter } from "next/navigation";
 import {
-  Grid, Paper, Stack, Title, Text, Badge,
-  Group, Button, Skeleton, Divider,
-  Anchor, Alert, ThemeIcon, SimpleGrid,
-} from '@mantine/core';
+  Grid,
+  Paper,
+  Stack,
+  Title,
+  Text,
+  Badge,
+  Group,
+  Button,
+  Skeleton,
+  Divider,
+  Anchor,
+  Alert,
+  ThemeIcon,
+  SimpleGrid,
+} from "@mantine/core";
 import {
-  IconArrowLeft, IconEdit, IconTrash,
-  IconStar, IconStarFilled, IconMapPin,
-  IconFolderOpen, IconAlertCircle,
+  IconArrowLeft,
+  IconEdit,
+  IconTrash,
+  IconStar,
+  IconStarFilled,
+  IconMapPin,
+  IconFolderOpen,
+  IconAlertCircle,
   IconUser,
-} from '@tabler/icons-react';
-import Link    from 'next/link';
-import { modals } from '@mantine/modals';
-import { notifications } from '@mantine/notifications';
-import { PageHeader }     from
-  '@/components/ui/PageHeader/PageHeader';
-import { EstrellaRating } from
-  '@/components/modulos/practicas/EstrellaRating';
-import { ValoracionModal } from
-  '@/components/modulos/practicas/ValoracionModal';
-import { PracticaForm }   from
-  '@/components/modulos/practicas/PracticaForm';
+} from "@tabler/icons-react";
+import Link from "next/link";
+import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
+import { PageHeader } from "@/components/ui/PageHeader/PageHeader";
+import { EstrellaRating } from "@/components/modulos/practicas/EstrellaRating";
+import { ValoracionModal } from "@/components/modulos/practicas/ValoracionModal";
+import { PracticaForm } from "@/components/modulos/practicas/PracticaForm";
 import {
   usePractica,
   useActualizarPractica,
   useEliminarPractica,
   useDestacarPractica,
-} from '@/queries/practicas.queries';
-import { practicasService } from
-  '@/services/practicas.service';
-import { usePermisos } from '@/hooks/usePermisos';
-import { useConfirm }  from '@/hooks/useConfirm';
-import { formatFecha } from '@/utils/formatters';
-import { COLOR_REPLICABILIDAD } from '@/types/practica.types';
+} from "@/queries/practicas.queries";
+import { practicasService } from "@/services/practicas.service";
+import { usePermisos } from "@/hooks/usePermisos";
+import { useConfirm } from "@/hooks/useConfirm";
+import { formatFecha } from "@/utils/formatters";
+import { COLOR_REPLICABILIDAD } from "@/types/practica.types";
 
 function CampoTexto({
   titulo,
@@ -46,11 +57,16 @@ function CampoTexto({
 }) {
   return (
     <Stack gap="xs">
-      <Text size="xs" fw={600} c="dimmed" tt="uppercase"
-        style={{ letterSpacing: '0.05em' }}>
+      <Text
+        size="xs"
+        fw={600}
+        c="dimmed"
+        tt="uppercase"
+        style={{ letterSpacing: "0.05em" }}
+      >
         {titulo}
       </Text>
-      <Text size="sm" lh={1.7} style={{ whiteSpace: 'pre-wrap' }}>
+      <Text size="sm" lh={1.7} style={{ whiteSpace: "pre-wrap" }}>
         {contenido}
       </Text>
     </Stack>
@@ -63,31 +79,30 @@ interface PageProps {
 
 export default function PracticaDetallePage(props: PageProps) {
   const { id } = use(props.params);
-  const router  = useRouter();
+  const router = useRouter();
   const { can } = usePermisos();
   const { confirmar } = useConfirm();
 
-  const {
-    data: practica,
-    isLoading,
-    isError,
-  } = usePractica(id);
+  const { data: practica, isLoading, isError } = usePractica(id);
 
   const { mutateAsync: actualizarPracticaAsync } = useActualizarPractica();
   const { mutate: eliminarPractica } = useEliminarPractica();
-  const { mutate: destacar }         = useDestacarPractica();
+  const { mutate: destacar } = useDestacarPractica();
 
   const calificacion = practica
-    ? parseFloat(practica.calificacion_promedio ?? '0')
+    ? parseFloat(practica.calificacion_promedio ?? "0")
     : 0;
-  
-  const isDestacada = practica?.es_destacada === true || String(practica?.es_destacada) === '1' || String(practica?.es_destacada).toLowerCase() === 'true';
+
+  const isDestacada =
+    practica?.es_destacada === true ||
+    String(practica?.es_destacada) === "1" ||
+    String(practica?.es_destacada).toLowerCase() === "true";
 
   const abrirModalEditar = () => {
     if (!practica) return;
     modals.open({
-      title: 'Editar buena práctica',
-      size:  'xl',
+      title: "Editar buena práctica",
+      size: "xl",
       children: (
         <PracticaForm
           practica={practica}
@@ -104,8 +119,8 @@ export default function PracticaDetallePage(props: PageProps) {
   const abrirModalValorar = () => {
     if (!practica) return;
     modals.open({
-      title:    `Valorar: ${practica.titulo}`,
-      size:     'md',
+      title: `Valorar: ${practica.titulo}`,
+      size: "md",
       children: (
         <ValoracionModal
           practica={practica}
@@ -121,9 +136,9 @@ export default function PracticaDetallePage(props: PageProps) {
         <PageHeader
           titulo="Práctica no encontrada"
           breadcrumbs={[
-            { label: 'Inicio', href: '/dashboard' },
-            { label: 'Buenas Prácticas', href: '/buenas-practicas' },
-            { label: 'Detalle' },
+            { label: "Inicio", href: "/dashboard" },
+            { label: "Buenas Prácticas", href: "/buenas-practicas" },
+            { label: "Detalle" },
           ]}
         />
         <Alert
@@ -132,8 +147,13 @@ export default function PracticaDetallePage(props: PageProps) {
           title="No se pudo cargar la buena práctica"
         >
           La práctica solicitada no existe o fue eliminada.
-          <Anchor component={Link} href="/buenas-practicas"
-            size="sm" display="block" mt="xs">
+          <Anchor
+            component={Link}
+            href="/buenas-practicas"
+            size="sm"
+            display="block"
+            mt="xs"
+          >
             ← Volver al listado
           </Anchor>
         </Alert>
@@ -147,9 +167,9 @@ export default function PracticaDetallePage(props: PageProps) {
         <PageHeader
           titulo="Cargando..."
           breadcrumbs={[
-            { label: 'Inicio', href: '/dashboard' },
-            { label: 'Buenas Prácticas', href: '/buenas-practicas' },
-            { label: 'Detalle' },
+            { label: "Inicio", href: "/dashboard" },
+            { label: "Buenas Prácticas", href: "/buenas-practicas" },
+            { label: "Detalle" },
           ]}
         />
         <Grid>
@@ -175,38 +195,43 @@ export default function PracticaDetallePage(props: PageProps) {
       <PageHeader
         titulo={practica.titulo}
         breadcrumbs={[
-          { label: 'Inicio', href: '/dashboard' },
-          { label: 'Buenas Prácticas', href: '/buenas-practicas' },
+          { label: "Inicio", href: "/dashboard" },
+          { label: "Buenas Prácticas", href: "/buenas-practicas" },
           { label: practica.titulo },
         ]}
         acciones={
           <Group gap="sm">
-            <Button variant="subtle" color="gray" size="sm"
+            <Button
+              variant="subtle"
+              color="gray"
+              size="sm"
               leftSection={<IconArrowLeft size={15} />}
-              component={Link} href="/buenas-practicas">
+              component={Link}
+              href="/buenas-practicas"
+            >
               Volver
             </Button>
 
             {/* Toggle destacar */}
-            {can('practicas.destacar') && (
+            {can("practicas.destacar") && (
               <Button
-                variant={isDestacada ? 'filled' : 'outline'}
+                variant={isDestacada ? "filled" : "outline"}
                 color="yellow"
                 size="sm"
                 leftSection={
-                  isDestacada
-                    ? <IconStarFilled size={15} />
-                    : <IconStar size={15} />
+                  isDestacada ? (
+                    <IconStarFilled size={15} />
+                  ) : (
+                    <IconStar size={15} />
+                  )
                 }
                 onClick={() => destacar({ id, es_destacada: !isDestacada })}
               >
-                {isDestacada
-                  ? 'Destacada'
-                  : 'Destacar'}
+                {isDestacada ? "Destacada" : "Destacar"}
               </Button>
             )}
 
-            {can('practicas.valorar') && (
+            {can("practicas.valorar") && (
               <Button
                 variant="light"
                 color="teal"
@@ -216,34 +241,41 @@ export default function PracticaDetallePage(props: PageProps) {
               >
                 {practica.mi_valoracion
                   ? `Mi valoración: ${practica.mi_valoracion.puntuacion}★`
-                  : 'Valorar'}
+                  : "Valorar"}
               </Button>
             )}
 
-            {can('practicas.editar') && (
-              <Button variant="outline" color="congope" size="sm"
+            {can("practicas.editar") && (
+              <Button
+                variant="outline"
+                color="congope"
+                size="sm"
                 leftSection={<IconEdit size={15} />}
-                onClick={abrirModalEditar}>
+                onClick={abrirModalEditar}
+              >
                 Editar
               </Button>
             )}
 
-            {can('practicas.eliminar') && (
-              <Button color="red" variant="light" size="sm"
+            {can("practicas.eliminar") && (
+              <Button
+                color="red"
+                variant="light"
+                size="sm"
                 leftSection={<IconTrash size={15} />}
                 onClick={() =>
                   confirmar({
-                    titulo:     'Eliminar práctica',
-                    mensaje:    `¿Eliminar "${practica.titulo}"?`,
-                    textoBoton: 'Eliminar',
-                    colorBoton: 'red',
+                    titulo: "Eliminar práctica",
+                    mensaje: `¿Eliminar "${practica.titulo}"?`,
+                    textoBoton: "Eliminar",
+                    colorBoton: "red",
                     onConfirmar: () =>
                       eliminarPractica(id, {
-                        onSuccess: () =>
-                          router.push('/buenas-practicas'),
+                        onSuccess: () => router.push("/buenas-practicas"),
                       }),
                   })
-                }>
+                }
+              >
                 Eliminar
               </Button>
             )}
@@ -255,10 +287,12 @@ export default function PracticaDetallePage(props: PageProps) {
         {/* ── Columna principal ── */}
         <Grid.Col span={{ base: 12, md: 8 }}>
           <Stack gap="md">
-
             {/* Descripción del problema */}
-            <Paper p="lg" radius="lg"
-              style={{ border: '1px solid var(--mantine-color-gray-3)' }}>
+            <Paper
+              p="lg"
+              radius="lg"
+              style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+            >
               <CampoTexto
                 titulo="Descripción del problema"
                 contenido={practica.descripcion_problema}
@@ -266,8 +300,11 @@ export default function PracticaDetallePage(props: PageProps) {
             </Paper>
 
             {/* Metodología */}
-            <Paper p="lg" radius="lg"
-              style={{ border: '1px solid var(--mantine-color-gray-3)' }}>
+            <Paper
+              p="lg"
+              radius="lg"
+              style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+            >
               <CampoTexto
                 titulo="Metodología aplicada"
                 contenido={practica.metodologia}
@@ -275,8 +312,11 @@ export default function PracticaDetallePage(props: PageProps) {
             </Paper>
 
             {/* Resultados */}
-            <Paper p="lg" radius="lg"
-              style={{ border: '1px solid var(--mantine-color-gray-3)' }}>
+            <Paper
+              p="lg"
+              radius="lg"
+              style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+            >
               <CampoTexto
                 titulo="Resultados obtenidos"
                 contenido={practica.resultados}
@@ -288,24 +328,28 @@ export default function PracticaDetallePage(props: PageProps) {
         {/* ── Columna lateral ── */}
         <Grid.Col span={{ base: 12, md: 4 }}>
           <Stack gap="md">
-
             {/* Info rápida */}
-            <Paper p="lg" radius="lg"
-              style={{ border: '1px solid var(--mantine-color-gray-3)' }}>
+            <Paper
+              p="lg"
+              radius="lg"
+              style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+            >
               <Title order={5} c="gray.7" mb="md">
                 Información
               </Title>
               <Stack gap="md">
                 <Stack gap={4}>
-                  <Text size="xs" fw={600} c="dimmed"
+                  <Text
+                    size="xs"
+                    fw={600}
+                    c="dimmed"
                     tt="uppercase"
-                    style={{ letterSpacing: '0.05em' }}>
+                    style={{ letterSpacing: "0.05em" }}
+                  >
                     Replicabilidad
                   </Text>
                   <Badge
-                    color={
-                      COLOR_REPLICABILIDAD[practica.replicabilidad]
-                    }
+                    color={COLOR_REPLICABILIDAD[practica.replicabilidad]}
                     variant="light"
                   >
                     {practica.replicabilidad}
@@ -314,17 +358,21 @@ export default function PracticaDetallePage(props: PageProps) {
 
                 {practica.provincia && (
                   <Stack gap={4}>
-                    <Text size="xs" fw={600} c="dimmed"
+                    <Text
+                      size="xs"
+                      fw={600}
+                      c="dimmed"
                       tt="uppercase"
-                      style={{ letterSpacing: '0.05em' }}>
+                      style={{ letterSpacing: "0.05em" }}
+                    >
                       Provincia
                     </Text>
                     <Group gap="xs">
-                      <IconMapPin size={14}
-                        color="var(--mantine-color-gray-5)" />
-                      <Text size="sm">
-                        {practica.provincia.nombre}
-                      </Text>
+                      <IconMapPin
+                        size={14}
+                        color="var(--mantine-color-gray-5)"
+                      />
+                      <Text size="sm">{practica.provincia.nombre}</Text>
                     </Group>
                   </Stack>
                 )}
@@ -332,14 +380,20 @@ export default function PracticaDetallePage(props: PageProps) {
                 {/* Campo proyecto — solo en detalle */}
                 {practica.proyecto && (
                   <Stack gap={4}>
-                    <Text size="xs" fw={600} c="dimmed"
+                    <Text
+                      size="xs"
+                      fw={600}
+                      c="dimmed"
                       tt="uppercase"
-                      style={{ letterSpacing: '0.05em' }}>
+                      style={{ letterSpacing: "0.05em" }}
+                    >
                       Proyecto relacionado
                     </Text>
                     <Group gap="xs">
-                      <IconFolderOpen size={14}
-                        color="var(--mantine-color-gray-5)" />
+                      <IconFolderOpen
+                        size={14}
+                        color="var(--mantine-color-gray-5)"
+                      />
                       <Anchor
                         component={Link}
                         href={`/proyectos/${practica.proyecto.id}`}
@@ -352,51 +406,56 @@ export default function PracticaDetallePage(props: PageProps) {
                 )}
 
                 <Stack gap={4}>
-                  <Text size="xs" fw={600} c="dimmed"
+                  <Text
+                    size="xs"
+                    fw={600}
+                    c="dimmed"
                     tt="uppercase"
-                    style={{ letterSpacing: '0.05em' }}>
+                    style={{ letterSpacing: "0.05em" }}
+                  >
                     Registrado por
                   </Text>
                   <Group gap="xs">
-                    <IconUser size={14}
-                      color="var(--mantine-color-gray-5)" />
+                    <IconUser size={14} color="var(--mantine-color-gray-5)" />
                     <Text size="sm">
-                      {practica.registrado_por?.name ?? '—'}
+                      {practica.registrado_por?.name ?? "—"}
                     </Text>
                   </Group>
                 </Stack>
 
                 <Stack gap={4}>
-                  <Text size="xs" fw={600} c="dimmed"
+                  <Text
+                    size="xs"
+                    fw={600}
+                    c="dimmed"
                     tt="uppercase"
-                    style={{ letterSpacing: '0.05em' }}>
+                    style={{ letterSpacing: "0.05em" }}
+                  >
                     Fecha de registro
                   </Text>
-                  <Text size="sm">
-                    {formatFecha(practica.created_at)}
-                  </Text>
+                  <Text size="sm">{formatFecha(practica.created_at)}</Text>
                 </Stack>
               </Stack>
             </Paper>
 
             {/* Calificación */}
-            <Paper p="lg" radius="lg"
-              style={{ border: '1px solid var(--mantine-color-gray-3)' }}>
+            <Paper
+              p="lg"
+              radius="lg"
+              style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+            >
               <Title order={5} c="gray.7" mb="md">
                 Calificación comunitaria
               </Title>
               <Stack gap="sm">
                 <Group gap="md">
-                  <EstrellaRating
-                    valor={calificacion}
-                    readonly
-                    size={22}
-                  />
+                  <EstrellaRating valor={calificacion} readonly size={22} />
                   {calificacion > 0 ? (
                     <Text size="xl" fw={700}>
                       {calificacion.toFixed(1)}
                       <Text span size="sm" c="dimmed" fw={400}>
-                        {' '}/ 5
+                        {" "}
+                        / 5
                       </Text>
                     </Text>
                   ) : (
@@ -414,13 +473,13 @@ export default function PracticaDetallePage(props: PageProps) {
                     </Text>
                     {practica.mi_valoracion.comentario && (
                       <Text size="xs" c="dimmed" fs="italic">
-                        "{practica.mi_valoracion.comentario}"
+                        {practica.mi_valoracion.comentario}
                       </Text>
                     )}
                   </Stack>
                 )}
 
-                {can('practicas.valorar') && (
+                {can("practicas.valorar") && (
                   <Button
                     variant="light"
                     color="teal"
@@ -429,8 +488,8 @@ export default function PracticaDetallePage(props: PageProps) {
                     onClick={abrirModalValorar}
                   >
                     {practica.mi_valoracion
-                      ? 'Actualizar mi valoración'
-                      : 'Valorar esta práctica'}
+                      ? "Actualizar mi valoración"
+                      : "Valorar esta práctica"}
                   </Button>
                 )}
               </Stack>
