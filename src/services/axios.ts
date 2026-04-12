@@ -147,6 +147,7 @@ export interface Proyecto {
   parroquias: ParroquiaResumen[];
   ubicaciones: UbicacionProyecto[];
   ods: OdsResumen[];
+  hitos?: HitoProyecto[];
   hitos_count?: number;
   created_at: string;      // formato: "DD/MM/YYYY HH:mm"
 }
@@ -557,6 +558,15 @@ export function extractErrors(
 export function getErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as ApiResponse | undefined;
+    
+    // Si es un 422 y hay errores de validación, concatenarlos para depuración real
+    if (error.response?.status === 422 && data?.errors) {
+      const fieldErrors = Object.entries(data.errors)
+        .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
+        .join(' | ');
+      return `${data?.message ?? 'Error de validación'} -> Detalles: ${fieldErrors}`;
+    }
+
     return (
       data?.message ??
       error.message ??
