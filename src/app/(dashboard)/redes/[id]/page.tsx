@@ -27,6 +27,7 @@ import {
 import { usePermisos } from '@/hooks/usePermisos';
 import { useConfirm }  from '@/hooks/useConfirm';
 import { formatFecha } from '@/utils/formatters';
+import type { Red } from '@/services/axios';
 import {
   COLOR_TIPO_RED,
   COLOR_ROL_CONGOPE,
@@ -54,7 +55,7 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-function EditarRedModal({ red, id }: { red: any, id: string }) {
+function EditarRedModal({ red, id }: { red: Red, id: string }) {
   const { mutate: actualizarRed, isPending: actualizando } = useActualizarRed();
 
   return (

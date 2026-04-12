@@ -120,24 +120,68 @@ export function ProyectosTable({
           render:   (p) => {
             if (p.provincias.length === 0)
               return <Text size="xs" c="dimmed">—</Text>;
-            const avance = p.provincias.find(
-              (prov) => prov.porcentaje_avance !== null
-            )?.porcentaje_avance;
+
+            // Filtrar provincias que SÍ tienen registrado un porcentaje
+            const provinciasConAvance = p.provincias.filter(
+              (prov) => prov.porcentaje_avance !== null && prov.porcentaje_avance !== undefined
+            );
+
+            // Calcular el promedio general
+            let avancePromedio: number | undefined = undefined;
+            if (provinciasConAvance.length > 0) {
+              const suma = provinciasConAvance.reduce(
+                (acc, prov) => acc + (prov.porcentaje_avance || 0),
+                0
+              );
+              avancePromedio = Math.round(suma / provinciasConAvance.length);
+            }
+
             return (
               <Stack gap={4}>
-                <Text size="xs" truncate>
+                <Text size="xs" truncate
+                  title={p.provincias.map((pv) => pv.nombre).join(', ')} // Tooltip nativo rápido de texto
+                >
                   {p.provincias.map((pv) => pv.nombre).join(', ')}
                 </Text>
-                {avance !== undefined && avance !== null && (
-                  <Group gap={4}>
-                    <Progress
-                      value={avance}
-                      size="xs"
-                      color="congope"
-                      style={{ flex: 1 }}
-                    />
-                    <Text size="xs" fw={500}>{avance}%</Text>
-                  </Group>
+
+                {avancePromedio !== undefined && (
+                  <Tooltip
+                    color="dark"
+                    disabled={provinciasConAvance.length <= 1} // Solo mostrar si hay desglose útil
+                    label={
+                      <Stack gap={4} py={2}>
+                        <Text size="xs" fw={700} c="dimmed" mb={2}>
+                          Desglose por provincia:
+                        </Text>
+                        {provinciasConAvance.map((prov, i) => (
+                          <Group key={i} justify="space-between" miw={180} wrap="nowrap">
+                            <Text size="xs">{prov.nombre}</Text>
+                            <Group gap={6} style={{ flex: 1 }} justify="flex-end">
+                              <Progress
+                                value={prov.porcentaje_avance!}
+                                size="sm"
+                                color="congope"
+                                style={{ flex: 1, minWidth: 60 }}
+                              />
+                              <Text size="xs" fw={500} w={28} ta="right">
+                                {prov.porcentaje_avance}%
+                              </Text>
+                            </Group>
+                          </Group>
+                        ))}
+                      </Stack>
+                    }
+                  >
+                    <Group gap={4} style={{ cursor: provinciasConAvance.length > 1 ? 'help' : 'default' }}>
+                      <Progress
+                        value={avancePromedio}
+                        size="xs"
+                        color={avancePromedio === 100 ? "green" : "congope"}
+                        style={{ flex: 1 }}
+                      />
+                      <Text size="xs" fw={500}>{avancePromedio}%</Text>
+                    </Group>
+                  </Tooltip>
                 )}
               </Stack>
             );
