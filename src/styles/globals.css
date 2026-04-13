@@ -64,3 +64,62 @@ textarea {
 .mantine-NavLink-root[data-active] {
   font-weight: 600 !important;
 }
+
+/* ── Portal Público ── */
+:root {
+  --portal-navy:    #0B1F3A;
+  --portal-blue:    #1E4D8C;
+  --portal-gold:    #C9A84C;
+  --portal-gold-lt: #F0D080;
+  --portal-white:   #FAFAFA;
+  --portal-cream:   #F5F0E8;
+  --portal-slate:   #4A5568;
+
+  --portal-map-0:   #E2E8F0;  /* sin proyectos */
+  --portal-map-1:   #DBEAFE;  /* 1 proyecto */
+  --portal-map-2:   #93C5FD;  /* pocos */
+  --portal-map-3:   #3B82F6;  /* varios */
+  --portal-map-4:   #1E4D8C;  /* muchos */
+  --portal-map-5:   #0B1F3A;  /* máximo */
+
+  --portal-font-display: 'Playfair Display', Georgia,
+    serif;
+  --portal-font-body:    'DM Sans', system-ui,
+    sans-serif;
+}
+
+/* Animaciones de entrada */
+@keyframes portalFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes portalFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.portal-animate-up {
+  opacity: 0;
+  animation: portalFadeUp 0.6s ease forwards;
+}
+
+.portal-animate-up.visible {
+  /* Activado por IntersectionObserver */
+}
+
+/* Línea decorativa dorada */
+.portal-gold-line {
+  display: block;
+  width: 48px;
+  height: 3px;
+  background: var(--portal-gold);
+  border-radius: 2px;
+  margin-bottom: 12px;
+}
