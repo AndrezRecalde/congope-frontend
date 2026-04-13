@@ -18,7 +18,9 @@ export interface ActorFiltros {
 
 // Valores iniciales del formulario
 export interface ActorFormValues {
+  identificador_institucional: string;
   nombre:            string;
+  logo:              File | null;
   tipo:              TipoActor | '';
   pais_origen:       string;
   estado:            EstadoActor;

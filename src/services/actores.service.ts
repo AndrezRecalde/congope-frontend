@@ -52,19 +52,48 @@ export const actoresService = {
   crear: async (
     datos: CreateActorDto
   ): Promise<ActorCooperacion> => {
-    const res = await apiClient.post('/actores', datos);
+    const formData = new FormData();
+    Object.entries(datos).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        if (key === 'areas_tematicas' && Array.isArray(value)) {
+          value.forEach((v) => formData.append(`${key}[]`, v));
+        } else {
+          formData.append(key, value as string | Blob);
+        }
+      }
+    });
+
+    const res = await apiClient.post('/actores', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return extractData<ActorCooperacion>(res);
   },
 
   /**
    * PUT /api/v1/actores/:id
    * Actualiza un actor existente. Todos los campos son opcionales.
+   * NOTA: Laravel requiere enviar multipart/form-data vía POST con _method='PUT'
    */
   actualizar: async (
     id: string,
     datos: UpdateActorDto
   ): Promise<ActorCooperacion> => {
-    const res = await apiClient.put(`/actores/${id}`, datos);
+    const formData = new FormData();
+    formData.append('_method', 'PUT');
+
+    Object.entries(datos).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        if (key === 'areas_tematicas' && Array.isArray(value)) {
+          value.forEach((v) => formData.append(`${key}[]`, v));
+        } else {
+          formData.append(key, value as string | Blob);
+        }
+      }
+    });
+
+    const res = await apiClient.post(`/actores/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return extractData<ActorCooperacion>(res);
   },
 

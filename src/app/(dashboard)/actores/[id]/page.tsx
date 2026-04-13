@@ -6,7 +6,7 @@ import {
   Grid, Paper, Stack, Title, Text, Badge,
   Group, Button, Skeleton, ThemeIcon,
   Divider, SimpleGrid, Anchor, Alert,
-  LoadingOverlay, Box,
+  LoadingOverlay, Box, Image,
 } from '@mantine/core';
 import {
   IconArrowLeft, IconEdit, IconTrash,
@@ -268,14 +268,34 @@ export default function ActorDetallePage(props: PageProps) {
                 border: '1px solid var(--mantine-color-gray-3)',
               }}
             >
-              <Title order={5} mb="md" c="gray.7">
-                Información general
-              </Title>
+              <Group align="center" justify="space-between" mb="md">
+                <Title order={5} c="gray.7">
+                  Información general
+                </Title>
+                {actor.logo && (
+                  <Box style={{ border: '1px solid var(--mantine-color-gray-2)', borderRadius: '8px', padding: '4px', backgroundColor: '#fff' }}>
+                    <Image
+                      src={actor.logo}
+                      alt={`Logo de ${actor.nombre}`}
+                      h={60}
+                      w="auto"
+                      fit="contain"
+                      radius="md"
+                    />
+                  </Box>
+                )}
+              </Group>
 
               <SimpleGrid
                 cols={{ base: 1, sm: 2 }}
                 spacing="lg"
               >
+                {actor.identificador_institucional && (
+                  <CampoInfo
+                    label="Identificador"
+                    valor={actor.identificador_institucional}
+                  />
+                )}
                 <CampoInfo
                   label="Tipo de actor"
                   valor={

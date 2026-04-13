@@ -81,6 +81,8 @@ export type Rol =
 // NOTA: areas_tematicas es string[] directamente (no array de objetos)
 export interface ActorCooperacion {
   id: string;           // UUID
+  identificador_institucional?: string | null;
+  logo?: string | null;
   nombre: string;
   tipo: TipoActor;
   pais_origen: string;
@@ -106,7 +108,9 @@ export type TipoActor =
 export type EstadoActor = 'Activo' | 'Inactivo' | 'Potencial';
 
 export interface CreateActorDto {
+  identificador_institucional?: string | null;
   nombre: string;
+  logo?: File | null;
   tipo: TipoActor;
   pais_origen: string;
   estado?: EstadoActor;

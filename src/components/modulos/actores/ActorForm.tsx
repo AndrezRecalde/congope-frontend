@@ -1,7 +1,7 @@
 'use client'
 
 import {
-  Stack, TextInput, Select, Textarea,
+  Stack, TextInput, Select, Textarea, FileInput,
   Button, Group, TagsInput, Divider, Text,
   SimpleGrid,
 } from '@mantine/core';
@@ -43,7 +43,9 @@ export function ActorForm({
 
   const form = useForm<ActorFormValues>({
     initialValues: {
+      identificador_institucional: actor?.identificador_institucional ?? '',
       nombre:            actor?.nombre            ?? '',
+      logo:              null,
       tipo:              actor?.tipo              ?? '',
       pais_origen:       actor?.pais_origen       ?? '',
       estado:            actor?.estado            ?? 'Activo',
@@ -78,7 +80,9 @@ export function ActorForm({
   const handleSubmit = (values: ActorFormValues) => {
     // Construir el DTO limpiando campos vacíos opcionales
     const dto: CreateActorDto = {
+      identificador_institucional: values.identificador_institucional || null,
       nombre:      values.nombre,
+      logo:        values.logo,
       tipo:        values.tipo as CreateActorDto['tipo'],
       pais_origen: values.pais_origen,
       estado:      values.estado,
@@ -107,11 +111,27 @@ export function ActorForm({
       <Stack gap="md">
 
         {/* Datos principales */}
-        <TextInput
-          label="Nombre del actor"
-          placeholder="Ej: Banco Interamericano de Desarrollo (BID)"
-          required
-          {...form.getInputProps('nombre')}
+        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+          <TextInput
+            label="Identificador Institucional"
+            placeholder="Ej: 1768153530001"
+            maxLength={25}
+            {...form.getInputProps('identificador_institucional')}
+          />
+          <TextInput
+            label="Nombre del actor"
+            placeholder="Ej: Banco Interamericano de Desarrollo (BID)"
+            required
+            {...form.getInputProps('nombre')}
+          />
+        </SimpleGrid>
+
+        <FileInput
+          label="Logo del actor"
+          placeholder={esEdicion && actor?.logo ? 'Subir nuevo logo para reemplazar el actual' : 'Subir imagen (máx 2MB)'}
+          accept="image/png,image/jpeg,image/svg+xml,image/webp,image/gif"
+          clearable
+          {...form.getInputProps('logo')}
         />
 
         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
