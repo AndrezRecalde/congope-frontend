@@ -128,7 +128,7 @@ export type UpdateActorDto = Partial<CreateActorDto>;
 // NOTA: Campos adicionales revelados en el OpenAPI:
 //   descripcion, color_marcador, monto_formateado,
 //   flujo_direccion, modalidad_cooperacion,
-//   cantones, parroquias, ubicaciones
+//   ubicaciones (con canton_id), ubicaciones_por_canton
 export interface Proyecto {
   id: string;              // UUID
   codigo: string;
@@ -147,9 +147,8 @@ export interface Proyecto {
   modalidad_cooperacion: ModalidadCooperacion[];
   actor: ActorResumen | null;
   provincias: ProvinciaProyecto[];
-  cantones: CantomResumen[];
-  parroquias: ParroquiaResumen[];
   ubicaciones: UbicacionProyecto[];
+  ubicaciones_por_canton?: UbicacionesPorCanton[];
   ods: OdsResumen[];
   hitos?: HitoProyecto[];
   hitos_count?: number;
@@ -209,11 +208,23 @@ export interface ParroquiaResumen {
 
 export interface UbicacionProyecto {
   id: string;
+  canton_id: string;
   nombre: string;
   coordenadas: {
     lat: number;
     lng: number;
   };
+}
+
+// Ubicaciones agrupadas por cantón — devueltas por GET /proyectos/:id
+export interface UbicacionesPorCanton {
+  canton_id: string;
+  canton_nombre: string;
+  ubicaciones: Array<{
+    id: string;
+    nombre: string;
+    coordenadas: { lat: number; lng: number };
+  }>;
 }
 
 export interface OdsResumen {
@@ -244,9 +255,9 @@ export interface CreateProyectoDto {
     beneficiarios_directos?: number | null;
     beneficiarios_indirectos?: number | null;
   }>;
-  canton_ids?: string[];
-  parroquia_ids?: string[];
+  // canton_ids y parroquia_ids eliminados — el cantón va embebido en cada ubicación
   ubicaciones?: Array<{
+    canton_id: string;
     nombre?: string | null;
     lat: number;
     lng: number;

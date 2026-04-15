@@ -16,14 +16,10 @@ import {
   Badge,
   ActionIcon,
   Paper,
-  Checkbox,
   Divider,
-  rem,
 } from "@mantine/core";
-import { DateInput } from "@mantine/dates";
 import { useForm, isNotEmpty } from "@mantine/form";
-import { IconX, IconPlus } from "@tabler/icons-react";
-import dayjs from "dayjs";
+import { IconX, IconPlus, IconMapPin } from "@tabler/icons-react";
 import { useActores } from "@/queries/actores.queries";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-client";
@@ -34,7 +30,6 @@ import type {
   Provincia,
   Ods,
   Canton,
-  Parroquia,
 } from "@/services/axios";
 import type {
   ProyectoFormValues,
@@ -100,7 +95,7 @@ export function ProyectoForm({
   const { data: provinciasData } = useQuery({
     queryKey: queryKeys.provincias.list,
     queryFn: async () => {
-      const res = await apiClient.get("/provincias");
+      const res = await apiClient.get("/publico/provincias");
       return extractData<Provincia[]>(res);
     },
     staleTime: Infinity, // catálogo estático
@@ -116,20 +111,10 @@ export function ProyectoForm({
   const { data: cantonesDataRaw } = useQuery({
     queryKey: queryKeys.cantones.list({ per_page: 1000 }),
     queryFn: async () => {
-      const res = await apiClient.get("/cantones", {
+      const res = await apiClient.get("/publico/cantones", {
         params: { per_page: 1000 },
       });
       return extractData<Canton[]>(res);
-    },
-    staleTime: Infinity,
-  });
-  const { data: parroquiasDataRaw } = useQuery({
-    queryKey: queryKeys.parroquias.list({ per_page: 1000 }),
-    queryFn: async () => {
-      const res = await apiClient.get("/parroquias", {
-        params: { per_page: 1000 },
-      });
-      return extractData<Parroquia[]>(res);
     },
     staleTime: Infinity,
   });
@@ -185,10 +170,9 @@ export function ProyectoForm({
       fecha_fin_real: proyecto?.fecha_fin_real ?? "",
       provincias: [],
       ods_ids: proyecto?.ods?.map((o) => o.id) ?? [],
-      canton_ids: proyecto?.cantones?.map((c) => c.id) ?? [],
-      parroquia_ids: proyecto?.parroquias?.map((p) => p.id) ?? [],
       ubicaciones:
         proyecto?.ubicaciones?.map((u) => ({
+          canton_id: u.canton_id ?? "",
           nombre: u.nombre ?? "",
           lat: u.coordenadas?.lat ?? "",
           lng: u.coordenadas?.lng ?? "",
@@ -236,67 +220,28 @@ export function ProyectoForm({
   };
 
   const cantonesArr = cantonesDataRaw ?? [];
-  const parroquiasArr = parroquiasDataRaw ?? [];
 
-  // OPTIMIZACIÓN DE RENDIMIENTO EXTREMO: 
-  // 1. Pre-calcular el sort y los diccionarios O(1) una sola vez (evita iterar millones de veces al tipear).
-  const todosCantonesMapeados = useMemo(() => {
-    const diccProvincias = new Map((provinciasData ?? []).map(p => [p.id, p.nombre]));
-    return cantonesArr
-      .map((c) => {
-        const provNombre = diccProvincias.get(c.provincia_id) ?? "";
-        const prefix = provNombre ? `[${provNombre}]: ` : "";
-        return { ...c, provNombre, mappedValue: { value: c.id, label: `${prefix}${c.nombre}` } };
-      })
-      .sort((a, b) => {
-        const provCompare = a.provNombre.localeCompare(b.provNombre);
-        if (provCompare !== 0) return provCompare;
-        return a.nombre.localeCompare(b.nombre);
-      });
-  }, [cantonesArr, provinciasData]);
-
-  const todasParroquiasMapeadas = useMemo(() => {
-    const diccCantones = new Map(cantonesArr.map(c => [c.id, c.nombre]));
-    return parroquiasArr
-      .map((p) => {
-        const cantonNombre = diccCantones.get(p.canton_id) ?? "";
-        const prefix = cantonNombre ? `[${cantonNombre}]: ` : "";
-        return { ...p, cantonNombre, mappedValue: { value: p.id, label: `${prefix}${p.nombre}` } };
-      })
-      .sort((a, b) => {
-        const cantCompare = a.cantonNombre.localeCompare(b.cantonNombre);
-        if (cantCompare !== 0) return cantCompare;
-        return a.nombre.localeCompare(b.nombre);
-      });
-  }, [parroquiasArr, cantonesArr]);
-
-  // Usamos strings de dependencias (join) para garantizar validación por valor (evita referencias inestables del useForm)
-  const provIdsJoin = provinciasSeleccionadas.map(p => p.id).join(',');
-  const cantonIdsJoin = form.values.canton_ids.join(',');
-
-  const opcionesCantones = useMemo(() => {
-    const provIds = provIdsJoin ? provIdsJoin.split(',') : [];
-    return todosCantonesMapeados
-      .filter((c) => {
-        if (!c.provincia_id || provIds.length === 0) return true;
-        return provIds.includes(c.provincia_id);
-      })
-      .map(c => c.mappedValue);
-  }, [todosCantonesMapeados, provIdsJoin]);
-
-  const opcionesParroquias = useMemo(() => {
-    const cantIds = cantonIdsJoin ? cantonIdsJoin.split(',') : [];
-    return todasParroquiasMapeadas
-      .filter((p) => {
-        if (!p.canton_id || cantIds.length === 0) return true;
-        return cantIds.includes(p.canton_id);
-      })
-      .map(p => p.mappedValue);
-  }, [todasParroquiasMapeadas, cantonIdsJoin]);
+  // Mapa O(1): canton_id → Canton (para lookups en el render)
+  const cantonPorId = useMemo(
+    () => new Map(cantonesArr.map((c) => [c.id, c])),
+    [cantonesArr],
+  );
+  // Suprimir warning de lint — cantonPorId se usa indirectamente en el JSX via cantonesArr
+  void cantonPorId;
 
   const quitarProvincia = (provinciaId: string) => {
     setProvinciasSeleccionadas((prev) =>
       prev.filter((p) => p.id !== provinciaId),
+    );
+    // Limpiar ubicaciones cuyo cantón pertenece a esta provincia
+    const cantonIdsDeEsta = new Set(
+      cantonesArr
+        .filter((c) => c.provincia_id === provinciaId)
+        .map((c) => c.id),
+    );
+    form.setFieldValue(
+      "ubicaciones",
+      form.values.ubicaciones.filter((u) => !cantonIdsDeEsta.has(u.canton_id)),
     );
   };
 
@@ -354,14 +299,12 @@ export function ProyectoForm({
               beneficiarios_indirectos: p.beneficiarios_indirectos ?? undefined,
             }))
           : undefined,
-      canton_ids: values.canton_ids?.length > 0 ? values.canton_ids : undefined,
-      parroquia_ids:
-        values.parroquia_ids?.length > 0 ? values.parroquia_ids : undefined,
       ubicaciones:
         values.ubicaciones?.length > 0
           ? values.ubicaciones
-              .filter((u) => u.lat !== "" && u.lng !== "")
+              .filter((u) => u.canton_id && u.lat !== "" && u.lng !== "")
               .map((u) => ({
+                canton_id: u.canton_id,
                 nombre: u.nombre || undefined,
                 lat: Number(u.lat),
                 lng: Number(u.lng),
@@ -537,213 +480,304 @@ export function ProyectoForm({
           </Stack>
         </Tabs.Panel>
 
-        {/* ── TAB 2: Provincias ── */}
+        {/* ── TAB 2: Ubicación Geográfica — Provincia → Cantones → Ubicaciones ── */}
         <Tabs.Panel value="provincias" pt="md">
           <Stack gap="md">
+            {/* Selector de provincia */}
             <Select
-              label="Agregar provincia"
-              placeholder="Buscar y seleccionar provincia"
+              label="Añadir provincia participante"
+              placeholder="Buscar y seleccionar provincia..."
               data={opcionesProvincias.filter(
                 (op) => !provinciasSeleccionadas.find((p) => p.id === op.value),
               )}
               searchable
               clearable
+              value={null}
               onChange={(val) => {
                 if (val) agregarProvincia(val);
               }}
-              value={null}
             />
 
             {provinciasSeleccionadas.length === 0 && (
               <Text size="sm" c="dimmed" ta="center" py="md">
-                Agrega las provincias que participan en el proyecto
+                Agrega las provincias que participan en el proyecto. Para cada
+                provincia podrás seleccionar cantones y añadir ubicaciones
+                específicas.
               </Text>
             )}
 
-            {provinciasSeleccionadas.map((prov) => (
-              <Paper
-                key={prov.id}
-                p="md"
-                radius="md"
-                style={{
-                  border: "1px solid var(--mantine-color-gray-3)",
-                }}
-              >
-                <Group justify="space-between" mb="sm">
-                  <Text fw={600} size="md">
-                    {prov.nombre}
-                  </Text>
-                  <ActionIcon
-                    variant="subtle"
-                    color="red"
-                    size="sm"
-                    onClick={() => quitarProvincia(prov.id)}
-                  >
-                    <IconX size={14} />
-                  </ActionIcon>
-                </Group>
+            {/* ── Tarjeta por provincia ── */}
+            {provinciasSeleccionadas.map((prov) => {
+              // Cantones disponibles de esta provincia
+              const cantonesDeProv = cantonesArr
+                .filter((c) => c.provincia_id === prov.id)
+                .sort((a, b) => a.nombre.localeCompare(b.nombre));
 
-                <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
-                  <Select
-                    label="Rol en el proyecto"
-                    size="sm"
-                    data={ROLES_PROVINCIA}
-                    value={prov.rol}
-                    onChange={(val) =>
-                      actualizarProvincia(prov.id, "rol", val ?? "Beneficiaria")
-                    }
-                  />
-                  <NumberInput
-                    label="% Avance"
-                    size="sm"
-                    min={0}
-                    max={100}
-                    suffix="%"
-                    value={prov.porcentaje_avance ?? ""}
-                    onChange={(val) =>
-                      actualizarProvincia(
-                        prov.id,
-                        "porcentaje_avance",
-                        val === "" ? null : Number(val),
-                      )
-                    }
-                  />
-                  <NumberInput
-                    label="Beneficiarios directos"
-                    size="sm"
-                    min={0}
-                    thousandSeparator=","
-                    value={prov.beneficiarios_directos ?? ""}
-                    onChange={(val) =>
-                      actualizarProvincia(
-                        prov.id,
-                        "beneficiarios_directos",
-                        val === "" ? null : Number(val),
-                      )
-                    }
-                  />
-                  <NumberInput
-                    label="Beneficiarios indirectos"
-                    size="sm"
-                    min={0}
-                    thousandSeparator=","
-                    value={prov.beneficiarios_indirectos ?? ""}
-                    onChange={(val) =>
-                      actualizarProvincia(
-                        prov.id,
-                        "beneficiarios_indirectos",
-                        val === "" ? null : Number(val),
-                      )
-                    }
-                  />
-                </SimpleGrid>
-              </Paper>
-            ))}
-
-            <Divider
-              my="md"
-              label={
-                <Text
-                  size="xs"
-                  fw={600}
-                  c="dimmed"
-                  tt="uppercase"
-                  style={{ letterSpacing: "0.05em" }}
-                >
-                  Cantones y Parroquias
-                </Text>
-              }
-              labelPosition="left"
-            />
-            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-              <MultiSelect
-                label="Cantones"
-                placeholder="Selecciona cantones..."
-                data={opcionesCantones}
-                searchable
-                clearable
-                {...form.getInputProps("canton_ids")}
-              />
-              <MultiSelect
-                label="Parroquias"
-                placeholder="Selecciona parroquias..."
-                data={opcionesParroquias}
-                searchable
-                clearable
-                {...form.getInputProps("parroquia_ids")}
-              />
-            </SimpleGrid>
-
-            <Divider
-              my="md"
-              label={
-                <Text
-                  size="xs"
-                  fw={600}
-                  c="dimmed"
-                  tt="uppercase"
-                  style={{ letterSpacing: "0.05em" }}
-                >
-                  Ubicaciones Específicas / Georreferenciación
-                </Text>
-              }
-              labelPosition="left"
-            />
-            <Stack gap="xs">
-              {form.values.ubicaciones.map((ub, idx) => (
-                <Group key={idx} align="flex-end" mb="xs" wrap="nowrap">
-                  <TextInput
-                    label="Nombre / Recinto"
-                    placeholder="Ej: Comunidad X"
-                    style={{ flex: 2 }}
-                    withAsterisk={false}
-                    {...form.getInputProps(`ubicaciones.${idx}.nombre`)}
-                  />
-                  <NumberInput
-                    label="Latitud"
-                    placeholder="-1.234567"
-                    decimalScale={6}
-                    style={{ flex: 1 }}
-                    withAsterisk={false}
-                    {...form.getInputProps(`ubicaciones.${idx}.lat`)}
-                  />
-                  <NumberInput
-                    label="Longitud"
-                    placeholder="-78.123456"
-                    decimalScale={6}
-                    style={{ flex: 1 }}
-                    withAsterisk={false}
-                    {...form.getInputProps(`ubicaciones.${idx}.lng`)}
-                  />
-                  <ActionIcon
-                    color="red"
-                    variant="subtle"
-                    size="lg"
-                    mb={4}
-                    onClick={() => form.removeListItem("ubicaciones", idx)}
-                  >
-                    <IconX size={18} />
-                  </ActionIcon>
-                </Group>
-              ))}
-            </Stack>
-            <Group justify="flex-start" mt="xs">
-              <Button
-                variant="outline"
-                color="congope"
-                size="xs"
-                leftSection={<IconPlus size={14} />}
-                onClick={() =>
-                  form.insertListItem("ubicaciones", {
-                    nombre: "",
-                    lat: "",
-                    lng: "",
-                  })
+              // Agrupar ubicaciones por cantón (solo cantones de esta provincia)
+              type GrupoCantonItem = {
+                canton: (typeof cantonesArr)[0];
+                items: { idx: number }[];
+              };
+              const gruposCanton = new Map<string, GrupoCantonItem>();
+              form.values.ubicaciones.forEach((ub, idx) => {
+                const canton = cantonesArr.find((c) => c.id === ub.canton_id);
+                if (!canton || canton.provincia_id !== prov.id) return;
+                if (!gruposCanton.has(canton.id)) {
+                  gruposCanton.set(canton.id, { canton, items: [] });
                 }
-              >
-                Añadir Ubicación
-              </Button>
-            </Group>
+                gruposCanton.get(canton.id)!.items.push({ idx });
+              });
+
+              // Cantones disponibles para agregar (los que aún no tienen ubicaciones)
+              const cantonesParaAgregar = cantonesDeProv
+                .filter((c) => !gruposCanton.has(c.id))
+                .map((c) => ({ value: c.id, label: c.nombre }));
+
+              return (
+                <Paper
+                  key={prov.id}
+                  p="md"
+                  radius="md"
+                  style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+                >
+                  {/* ── Cabecera de provincia ── */}
+                  <Group justify="space-between" mb="sm">
+                    <Group gap="sm">
+                      <IconMapPin
+                        size={16}
+                        color="var(--mantine-color-gray-6)"
+                      />
+                      <Text fw={700} size="md">
+                        {prov.nombre}
+                      </Text>
+                    </Group>
+                    <ActionIcon
+                      variant="subtle"
+                      color="red"
+                      size="sm"
+                      onClick={() => quitarProvincia(prov.id)}
+                      title={`Eliminar provincia ${prov.nombre}`}
+                    >
+                      <IconX size={14} />
+                    </ActionIcon>
+                  </Group>
+
+                  {/* Datos de la provincia: rol, avance, beneficiarios */}
+                  <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm" mb="md">
+                    <Select
+                      label="Rol en el proyecto"
+                      size="sm"
+                      data={ROLES_PROVINCIA}
+                      value={prov.rol}
+                      onChange={(val) =>
+                        actualizarProvincia(
+                          prov.id,
+                          "rol",
+                          val ?? "Beneficiaria",
+                        )
+                      }
+                    />
+                    <NumberInput
+                      label="% Avance"
+                      size="sm"
+                      min={0}
+                      max={100}
+                      suffix="%"
+                      value={prov.porcentaje_avance ?? ""}
+                      onChange={(val) =>
+                        actualizarProvincia(
+                          prov.id,
+                          "porcentaje_avance",
+                          val === "" ? null : Number(val),
+                        )
+                      }
+                    />
+                    <NumberInput
+                      label="Beneficiarios directos"
+                      size="sm"
+                      min={0}
+                      thousandSeparator=","
+                      value={prov.beneficiarios_directos ?? ""}
+                      onChange={(val) =>
+                        actualizarProvincia(
+                          prov.id,
+                          "beneficiarios_directos",
+                          val === "" ? null : Number(val),
+                        )
+                      }
+                    />
+                    <NumberInput
+                      label="Beneficiarios indirectos"
+                      size="sm"
+                      min={0}
+                      thousandSeparator=","
+                      value={prov.beneficiarios_indirectos ?? ""}
+                      onChange={(val) =>
+                        actualizarProvincia(
+                          prov.id,
+                          "beneficiarios_indirectos",
+                          val === "" ? null : Number(val),
+                        )
+                      }
+                    />
+                  </SimpleGrid>
+
+                  {/* ── Cantones y Ubicaciones ── */}
+                  <Divider
+                    my="sm"
+                    label={
+                      <Text
+                        size="xs"
+                        fw={600}
+                        c="dimmed"
+                        tt="uppercase"
+                        style={{ letterSpacing: "0.05em" }}
+                      >
+                        Cantones y Ubicaciones
+                      </Text>
+                    }
+                    labelPosition="left"
+                  />
+
+                  {gruposCanton.size === 0 && (
+                    <Text size="xs" c="dimmed" ta="center" py="xs">
+                      Selecciona un cantón abajo para comenzar a georreferenciar
+                      ubicaciones
+                    </Text>
+                  )}
+
+                  {/* Sub-tarjetas por cantón */}
+                  <Stack gap="sm">
+                    {Array.from(gruposCanton.values()).map(
+                      ({ canton, items }) => (
+                        <Paper
+                          key={canton.id}
+                          p="sm"
+                          radius="md"
+                          style={{
+                            border: "1px solid var(--mantine-color-blue-2)",
+                            background: "var(--mantine-color-blue-0)",
+                          }}
+                        >
+                          {/* Cabecera del cantón */}
+                          <Group justify="space-between" mb="xs">
+                            <Group gap="xs">
+                              <IconMapPin
+                                size={13}
+                                color="var(--mantine-color-blue-7)"
+                              />
+                              <Text size="sm" fw={600} c="blue.8">
+                                {canton.nombre}
+                              </Text>
+                              <Badge size="xs" variant="light" color="blue">
+                                {items.length}
+                              </Badge>
+                            </Group>
+                            <ActionIcon
+                              variant="light"
+                              color="blue"
+                              size="sm"
+                              title={`Añadir ubicación en ${canton.nombre}`}
+                              onClick={() =>
+                                form.insertListItem("ubicaciones", {
+                                  canton_id: canton.id,
+                                  nombre: "",
+                                  lat: "",
+                                  lng: "",
+                                })
+                              }
+                            >
+                              <IconPlus size={13} />
+                            </ActionIcon>
+                          </Group>
+
+                          {/* Filas de ubicaciones de este cantón */}
+                          <Stack gap="xs">
+                            {items.map(({ idx }) => (
+                              <Group
+                                key={idx}
+                                align="flex-end"
+                                gap="xs"
+                                wrap="nowrap"
+                              >
+                                <TextInput
+                                  placeholder="Nombre / Recinto"
+                                  size="xs"
+                                  style={{ flex: 2 }}
+                                  {...form.getInputProps(
+                                    `ubicaciones.${idx}.nombre`,
+                                  )}
+                                />
+                                <NumberInput
+                                  placeholder="Latitud"
+                                  size="xs"
+                                  decimalScale={6}
+                                  style={{ flex: 1 }}
+                                  {...form.getInputProps(
+                                    `ubicaciones.${idx}.lat`,
+                                  )}
+                                />
+                                <NumberInput
+                                  placeholder="Longitud"
+                                  size="xs"
+                                  decimalScale={6}
+                                  style={{ flex: 1 }}
+                                  {...form.getInputProps(
+                                    `ubicaciones.${idx}.lng`,
+                                  )}
+                                />
+                                <ActionIcon
+                                  color="red"
+                                  variant="subtle"
+                                  size="sm"
+                                  title="Eliminar ubicación"
+                                  onClick={() =>
+                                    form.removeListItem("ubicaciones", idx)
+                                  }
+                                >
+                                  <IconX size={13} />
+                                </ActionIcon>
+                              </Group>
+                            ))}
+                          </Stack>
+                        </Paper>
+                      ),
+                    )}
+                  </Stack>
+
+                  {/* Selector para agregar un nuevo cantón a esta provincia */}
+                  {cantonesParaAgregar.length > 0 && (
+                    <Select
+                      mt="sm"
+                      size="sm"
+                      placeholder={`+ Añadir cantón de ${prov.nombre}...`}
+                      data={cantonesParaAgregar}
+                      searchable
+                      clearable
+                      value={null}
+                      leftSection={<IconPlus size={13} />}
+                      onChange={(cantonId) => {
+                        if (cantonId) {
+                          form.insertListItem("ubicaciones", {
+                            canton_id: cantonId,
+                            nombre: "",
+                            lat: "",
+                            lng: "",
+                          });
+                        }
+                      }}
+                    />
+                  )}
+                  {cantonesParaAgregar.length === 0 &&
+                    cantonesDeProv.length > 0 && (
+                      <Text size="xs" c="dimmed" mt="xs">
+                        ✓ Todos los cantones de {prov.nombre} ya tienen
+                        ubicaciones
+                      </Text>
+                    )}
+                </Paper>
+              );
+            })}
           </Stack>
         </Tabs.Panel>
 

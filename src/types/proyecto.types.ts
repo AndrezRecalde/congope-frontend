@@ -49,9 +49,7 @@ export interface ProyectoFormValues {
   fecha_fin_real:       string;
   provincias:           ProvinciaFormItem[];
   ods_ids:              number[];
-  canton_ids:           string[];
-  parroquia_ids:        string[];
-  ubicaciones:          Array<{nombre: string; lat: number | ''; lng: number | ''}>;
+  ubicaciones:          Array<{canton_id: string; nombre: string; lat: number | ''; lng: number | ''}>;
 }
 
 export interface HitoFormValues {

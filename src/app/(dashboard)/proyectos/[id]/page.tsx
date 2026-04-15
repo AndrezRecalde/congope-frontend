@@ -1,40 +1,49 @@
-'use client'
+"use client";
 
-import { use }        from 'react';
-import { useRouter }  from 'next/navigation';
+import { use } from "react";
+import { useRouter } from "next/navigation";
 import {
-  Grid, Paper, Stack, Title, Text, Badge,
-  Group, Button, Skeleton, SimpleGrid,
-  Progress, Divider, Anchor, Alert,
-  ThemeIcon, List,
-} from '@mantine/core';
+  Grid,
+  Paper,
+  Stack,
+  Title,
+  Text,
+  Badge,
+  Group,
+  Button,
+  Skeleton,
+  SimpleGrid,
+  Progress,
+  Divider,
+  Anchor,
+  Alert,
+  ThemeIcon,
+} from "@mantine/core";
 import {
-  IconArrowLeft, IconEdit, IconTrash,
-  IconBuilding, IconMapPin, IconCalendar,
-  IconCurrencyDollar, IconAlertCircle,
+  IconArrowLeft,
+  IconEdit,
+  IconTrash,
+  IconBuilding,
+  IconMapPin,
+  IconCalendar,
+  IconAlertCircle,
   IconRefresh,
-} from '@tabler/icons-react';
-import Link from 'next/link';
-import { modals } from '@mantine/modals';
-import { PageHeader }  from
-  '@/components/ui/PageHeader/PageHeader';
-import { StatusBadge } from
-  '@/components/ui/StatusBadge/StatusBadge';
-import { HitosList }   from
-  '@/components/modulos/proyectos/HitosList';
+} from "@tabler/icons-react";
+import Link from "next/link";
+import { modals } from "@mantine/modals";
+import { PageHeader } from "@/components/ui/PageHeader/PageHeader";
+import { StatusBadge } from "@/components/ui/StatusBadge/StatusBadge";
+import { HitosList } from "@/components/modulos/proyectos/HitosList";
 import {
   useProyecto,
   useEliminarProyecto,
   useCambiarEstadoProyecto,
-} from '@/queries/proyectos.queries';
-import { usePermisos } from '@/hooks/usePermisos';
-import { useConfirm }  from '@/hooks/useConfirm';
-import {
-  formatFecha,
-  formatMoneda,
-} from '@/utils/formatters';
-import { getColorOds }  from '@/utils/colores-ods';
-import type { EstadoProyecto } from '@/types/proyecto.types';
+} from "@/queries/proyectos.queries";
+import { usePermisos } from "@/hooks/usePermisos";
+import { useConfirm } from "@/hooks/useConfirm";
+import { formatFecha } from "@/utils/formatters";
+import { getColorOds } from "@/utils/colores-ods";
+import type { EstadoProyecto } from "@/types/proyecto.types";
 
 function CampoInfo({
   label,
@@ -47,14 +56,22 @@ function CampoInfo({
 }) {
   return (
     <Stack gap={4}>
-      <Text size="xs" fw={600} c="dimmed" tt="uppercase"
-        style={{ letterSpacing: '0.05em' }}>
+      <Text
+        size="xs"
+        fw={600}
+        c="dimmed"
+        tt="uppercase"
+        style={{ letterSpacing: "0.05em" }}
+      >
         {label}
       </Text>
       {icono ? (
-        <Group gap="xs">{icono}<Text size="sm">{valor}</Text></Group>
+        <Group gap="xs">
+          {icono}
+          <Text size="sm">{valor}</Text>
+        </Group>
       ) : (
-        <Text size="sm">{valor || '—'}</Text>
+        <Text size="sm">{valor || "—"}</Text>
       )}
     </Stack>
   );
@@ -66,37 +83,40 @@ interface PageProps {
 
 export default function ProyectoDetallePage(props: PageProps) {
   const { id } = use(props.params);
-  const router  = useRouter();
+  const router = useRouter();
   const { can } = usePermisos();
   const { confirmar } = useConfirm();
 
-  const { data: proyecto, isLoading, isError } =
-    useProyecto(id);
+  const { data: proyecto, isLoading, isError } = useProyecto(id);
   const { mutate: eliminarProyecto } = useEliminarProyecto();
-  const { mutate: cambiarEstado }    = useCambiarEstadoProyecto();
+  const { mutate: cambiarEstado } = useCambiarEstadoProyecto();
 
   const abrirModalCambioEstado = () => {
     if (!proyecto) return;
     const ESTADOS: EstadoProyecto[] = [
-      'En gestión', 'En ejecución', 'Finalizado', 'Suspendido',
+      "En gestión",
+      "En ejecución",
+      "Finalizado",
+      "Suspendido",
     ];
     modals.open({
-      title: 'Cambiar estado',
-      size:  'sm',
+      title: "Cambiar estado",
+      size: "sm",
       children: (
         <Group gap="xs" wrap="wrap">
-          {ESTADOS
-            .filter((e) => e !== proyecto.estado)
-            .map((e) => (
-              <Button key={e} variant="light" size="sm"
-                onClick={() => {
-                  cambiarEstado({ id, estado: e });
-                  modals.closeAll();
-                }}
-              >
-                → {e}
-              </Button>
-            ))}
+          {ESTADOS.filter((e) => e !== proyecto.estado).map((e) => (
+            <Button
+              key={e}
+              variant="light"
+              size="sm"
+              onClick={() => {
+                cambiarEstado({ id, estado: e });
+                modals.closeAll();
+              }}
+            >
+              → {e}
+            </Button>
+          ))}
         </Group>
       ),
     });
@@ -108,16 +128,24 @@ export default function ProyectoDetallePage(props: PageProps) {
         <PageHeader
           titulo="Proyecto no encontrado"
           breadcrumbs={[
-            { label: 'Inicio',    href: '/dashboard' },
-            { label: 'Proyectos', href: '/proyectos' },
-            { label: 'Detalle' },
+            { label: "Inicio", href: "/dashboard" },
+            { label: "Proyectos", href: "/proyectos" },
+            { label: "Detalle" },
           ]}
         />
-        <Alert icon={<IconAlertCircle size={16} />}
-          color="red" title="No se pudo cargar el proyecto">
+        <Alert
+          icon={<IconAlertCircle size={16} />}
+          color="red"
+          title="No se pudo cargar el proyecto"
+        >
           El proyecto solicitado no existe.
-          <Anchor component={Link} href="/proyectos"
-            size="sm" display="block" mt="xs">
+          <Anchor
+            component={Link}
+            href="/proyectos"
+            size="sm"
+            display="block"
+            mt="xs"
+          >
             ← Volver al listado
           </Anchor>
         </Alert>
@@ -131,9 +159,9 @@ export default function ProyectoDetallePage(props: PageProps) {
         <PageHeader
           titulo="Cargando proyecto..."
           breadcrumbs={[
-            { label: 'Inicio',    href: '/dashboard' },
-            { label: 'Proyectos', href: '/proyectos' },
-            { label: 'Detalle' },
+            { label: "Inicio", href: "/dashboard" },
+            { label: "Proyectos", href: "/proyectos" },
+            { label: "Detalle" },
           ]}
         />
         <Grid>
@@ -156,10 +184,12 @@ export default function ProyectoDetallePage(props: PageProps) {
 
   // Calcular totales de beneficiarios
   const totalBenefDirectos = proyecto.provincias.reduce(
-    (sum, p) => sum + (p.beneficiarios_directos ?? 0), 0
+    (sum, p) => sum + (p.beneficiarios_directos ?? 0),
+    0,
   );
   const totalBenefIndirectos = proyecto.provincias.reduce(
-    (sum, p) => sum + (p.beneficiarios_indirectos ?? 0), 0
+    (sum, p) => sum + (p.beneficiarios_indirectos ?? 0),
+    0,
   );
 
   return (
@@ -167,48 +197,64 @@ export default function ProyectoDetallePage(props: PageProps) {
       <PageHeader
         titulo={proyecto.nombre}
         breadcrumbs={[
-          { label: 'Inicio',    href: '/dashboard' },
-          { label: 'Proyectos', href: '/proyectos' },
+          { label: "Inicio", href: "/dashboard" },
+          { label: "Proyectos", href: "/proyectos" },
           { label: proyecto.codigo },
         ]}
         acciones={
           <Group gap="sm">
-            <Button variant="subtle" color="gray" size="sm"
+            <Button
+              variant="subtle"
+              color="gray"
+              size="sm"
               leftSection={<IconArrowLeft size={15} />}
-              component={Link} href="/proyectos">
+              component={Link}
+              href="/proyectos"
+            >
               Volver
             </Button>
-            {can('proyectos.cambiar_estado') && (
-              <Button variant="outline" color="blue" size="sm"
+            {can("proyectos.cambiar_estado") && (
+              <Button
+                variant="outline"
+                color="blue"
+                size="sm"
                 leftSection={<IconRefresh size={15} />}
-                onClick={abrirModalCambioEstado}>
+                onClick={abrirModalCambioEstado}
+              >
                 Cambiar estado
               </Button>
             )}
-            {can('proyectos.editar') && (
-              <Button variant="outline" color="congope" size="sm"
+            {can("proyectos.editar") && (
+              <Button
+                variant="outline"
+                color="congope"
+                size="sm"
                 leftSection={<IconEdit size={15} />}
                 component={Link}
-                href={`/proyectos/${id}/editar`}>
+                href={`/proyectos/${id}/editar`}
+              >
                 Editar
               </Button>
             )}
-            {can('proyectos.eliminar') && (
-              <Button color="red" variant="light" size="sm"
+            {can("proyectos.eliminar") && (
+              <Button
+                color="red"
+                variant="light"
+                size="sm"
                 leftSection={<IconTrash size={15} />}
                 onClick={() =>
                   confirmar({
-                    titulo:     'Eliminar proyecto',
-                    mensaje:    `¿Eliminar "${proyecto.nombre}"?`,
-                    textoBoton: 'Eliminar',
-                    colorBoton: 'red',
+                    titulo: "Eliminar proyecto",
+                    mensaje: `¿Eliminar "${proyecto.nombre}"?`,
+                    textoBoton: "Eliminar",
+                    colorBoton: "red",
                     onConfirmar: () =>
                       eliminarProyecto(id, {
-                        onSuccess: () =>
-                          router.push('/proyectos'),
+                        onSuccess: () => router.push("/proyectos"),
                       }),
                   })
-                }>
+                }
+              >
                 Eliminar
               </Button>
             )}
@@ -220,19 +266,18 @@ export default function ProyectoDetallePage(props: PageProps) {
         {/* ── Columna principal ── */}
         <Grid.Col span={{ base: 12, md: 8 }}>
           <Stack gap="md">
-
             {/* Información general */}
-            <Paper p="lg" radius="lg"
-              style={{ border: '1px solid var(--mantine-color-gray-3)' }}>
+            <Paper
+              p="lg"
+              radius="lg"
+              style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+            >
               <Group justify="space-between" mb="md">
                 <Title order={5} c="gray.7">
                   Información general
                 </Title>
                 <Group gap="xs">
-                  <StatusBadge
-                    estado={proyecto.estado}
-                    tipo="proyecto"
-                  />
+                  <StatusBadge estado={proyecto.estado} tipo="proyecto" />
                   <Badge variant="outline" color="gray" size="sm">
                     {proyecto.codigo}
                   </Badge>
@@ -244,8 +289,10 @@ export default function ProyectoDetallePage(props: PageProps) {
                   label="Actor cooperante"
                   valor={proyecto.actor?.nombre}
                   icono={
-                    <IconBuilding size={14}
-                      color="var(--mantine-color-gray-5)" />
+                    <IconBuilding
+                      size={14}
+                      color="var(--mantine-color-gray-5)"
+                    />
                   }
                 />
                 <CampoInfo
@@ -256,19 +303,13 @@ export default function ProyectoDetallePage(props: PageProps) {
                   label="Flujo de cooperación"
                   valor={proyecto.flujo_direccion}
                 />
-                <CampoInfo
-                  label="Moneda"
-                  valor={proyecto.moneda}
-                />
+                <CampoInfo label="Moneda" valor={proyecto.moneda} />
               </SimpleGrid>
 
               {proyecto.descripcion && (
                 <>
                   <Divider my="md" />
-                  <CampoInfo
-                    label="Descripción"
-                    valor={proyecto.descripcion}
-                  />
+                  <CampoInfo label="Descripción" valor={proyecto.descripcion} />
                 </>
               )}
 
@@ -276,9 +317,13 @@ export default function ProyectoDetallePage(props: PageProps) {
                 <>
                   <Divider my="md" />
                   <Stack gap={6}>
-                    <Text size="xs" fw={600} c="dimmed"
+                    <Text
+                      size="xs"
+                      fw={600}
+                      c="dimmed"
                       tt="uppercase"
-                      style={{ letterSpacing: '0.05em' }}>
+                      style={{ letterSpacing: "0.05em" }}
+                    >
                       Modalidad de cooperación
                     </Text>
                     <Group gap="xs">
@@ -294,8 +339,11 @@ export default function ProyectoDetallePage(props: PageProps) {
             </Paper>
 
             {/* Fechas y financiamiento */}
-            <Paper p="lg" radius="lg"
-              style={{ border: '1px solid var(--mantine-color-gray-3)' }}>
+            <Paper
+              p="lg"
+              radius="lg"
+              style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+            >
               <Title order={5} c="gray.7" mb="md">
                 Cronograma y financiamiento
               </Title>
@@ -304,16 +352,20 @@ export default function ProyectoDetallePage(props: PageProps) {
                   label="Inicio"
                   valor={formatFecha(proyecto.fecha_inicio)}
                   icono={
-                    <IconCalendar size={14}
-                      color="var(--mantine-color-gray-5)" />
+                    <IconCalendar
+                      size={14}
+                      color="var(--mantine-color-gray-5)"
+                    />
                   }
                 />
                 <CampoInfo
                   label="Fin planificado"
                   valor={formatFecha(proyecto.fecha_fin_planificada)}
                   icono={
-                    <IconCalendar size={14}
-                      color="var(--mantine-color-gray-5)" />
+                    <IconCalendar
+                      size={14}
+                      color="var(--mantine-color-gray-5)"
+                    />
                   }
                 />
                 <CampoInfo
@@ -321,11 +373,13 @@ export default function ProyectoDetallePage(props: PageProps) {
                   valor={
                     proyecto.fecha_fin_real
                       ? formatFecha(proyecto.fecha_fin_real)
-                      : '—'
+                      : "—"
                   }
                   icono={
-                    <IconCalendar size={14}
-                      color="var(--mantine-color-gray-5)" />
+                    <IconCalendar
+                      size={14}
+                      color="var(--mantine-color-gray-5)"
+                    />
                   }
                 />
               </SimpleGrid>
@@ -334,9 +388,13 @@ export default function ProyectoDetallePage(props: PageProps) {
 
               <Group gap="xl">
                 <Stack gap={4}>
-                  <Text size="xs" fw={600} c="dimmed"
+                  <Text
+                    size="xs"
+                    fw={600}
+                    c="dimmed"
                     tt="uppercase"
-                    style={{ letterSpacing: '0.05em' }}>
+                    style={{ letterSpacing: "0.05em" }}
+                  >
                     Monto total
                   </Text>
                   <Text size="xl" fw={700} c="congope.8">
@@ -346,25 +404,33 @@ export default function ProyectoDetallePage(props: PageProps) {
                 </Stack>
                 {totalBenefDirectos > 0 && (
                   <Stack gap={4}>
-                    <Text size="xs" fw={600} c="dimmed"
+                    <Text
+                      size="xs"
+                      fw={600}
+                      c="dimmed"
                       tt="uppercase"
-                      style={{ letterSpacing: '0.05em' }}>
+                      style={{ letterSpacing: "0.05em" }}
+                    >
                       Beneficiarios directos
                     </Text>
                     <Text size="xl" fw={700} c="teal.7">
-                      {totalBenefDirectos.toLocaleString('es-EC')}
+                      {totalBenefDirectos.toLocaleString("es-EC")}
                     </Text>
                   </Stack>
                 )}
                 {totalBenefIndirectos > 0 && (
                   <Stack gap={4}>
-                    <Text size="xs" fw={600} c="dimmed"
+                    <Text
+                      size="xs"
+                      fw={600}
+                      c="dimmed"
                       tt="uppercase"
-                      style={{ letterSpacing: '0.05em' }}>
+                      style={{ letterSpacing: "0.05em" }}
+                    >
                       Beneficiarios indirectos
                     </Text>
                     <Text size="xl" fw={700} c="blue.6">
-                      {totalBenefIndirectos.toLocaleString('es-EC')}
+                      {totalBenefIndirectos.toLocaleString("es-EC")}
                     </Text>
                   </Stack>
                 )}
@@ -373,8 +439,11 @@ export default function ProyectoDetallePage(props: PageProps) {
 
             {/* Provincias */}
             {proyecto.provincias.length > 0 && (
-              <Paper p="lg" radius="lg"
-                style={{ border: '1px solid var(--mantine-color-gray-3)' }}>
+              <Paper
+                p="lg"
+                radius="lg"
+                style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+              >
                 <Title order={5} c="gray.7" mb="md">
                   Ubicación Geográfica
                 </Title>
@@ -382,8 +451,10 @@ export default function ProyectoDetallePage(props: PageProps) {
                   {proyecto.provincias.map((prov) => (
                     <Group key={prov.id} justify="space-between">
                       <Group gap="sm">
-                        <IconMapPin size={14}
-                          color="var(--mantine-color-gray-5)" />
+                        <IconMapPin
+                          size={14}
+                          color="var(--mantine-color-gray-5)"
+                        />
                         <Text size="sm" fw={500}>
                           {prov.nombre}
                         </Text>
@@ -406,63 +477,73 @@ export default function ProyectoDetallePage(props: PageProps) {
                       )}
                     </Group>
                   ))}
-
-                  {proyecto.cantones && proyecto.cantones.length > 0 && (
-                    <>
-                      <Divider my="xs" />
-                      <Text size="xs" fw={600} c="dimmed" tt="uppercase">Cantones participantes</Text>
-                      <Group gap="xs">
-                        {proyecto.cantones.map((c) => (
-                          <Badge key={c.id} variant="light" color="blue" size="sm">{c.nombre}</Badge>
-                        ))}
-                      </Group>
-                    </>
-                  )}
-
-                  {proyecto.parroquias && proyecto.parroquias.length > 0 && (
-                    <>
-                      <Divider my="xs" />
-                      <Text size="xs" fw={600} c="dimmed" tt="uppercase">Parroquias participantes</Text>
-                      <Group gap="xs">
-                        {proyecto.parroquias.map((p) => (
-                          <Badge key={p.id} variant="light" color="teal" size="sm">{p.nombre}</Badge>
-                        ))}
-                      </Group>
-                    </>
-                  )}
                 </Stack>
               </Paper>
             )}
 
-            {/* Ubicaciones */}
-            {proyecto.ubicaciones && proyecto.ubicaciones.length > 0 && (
-              <Paper p="lg" radius="lg" style={{ border: '1px solid var(--mantine-color-gray-3)' }}>
+            {/* Ubicaciones por Cantón */}
+            {(proyecto.ubicaciones_por_canton ?? []).length > 0 && (
+              <Paper
+                p="lg"
+                radius="lg"
+                style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+              >
                 <Title order={5} c="gray.7" mb="md">
-                  Ubicaciones y Puntos Específicos
+                  Ubicaciones por Cantón
                 </Title>
-                <Stack gap="sm">
-                  {proyecto.ubicaciones.map((ub) => (
-                    <Group key={ub.id} justify="space-between" wrap="nowrap">
-                      <Group gap="sm">
-                        <ThemeIcon color="gray" variant="light" size="sm">
+                <Stack gap="md">
+                  {(proyecto.ubicaciones_por_canton ?? []).map((grupo) => (
+                    <Paper
+                      key={grupo.canton_id}
+                      p="sm"
+                      radius="md"
+                      style={{
+                        border: "1px solid var(--mantine-color-blue-2)",
+                        background: "var(--mantine-color-blue-0)",
+                      }}
+                    >
+                      <Group gap="xs" mb="xs">
+                        <ThemeIcon color="blue" variant="light" size="sm">
                           <IconMapPin size={12} />
                         </ThemeIcon>
-                        <Text size="sm" fw={500}>{ub.nombre || 'Ubicación sin nombre'}</Text>
-                      </Group>
-                      {ub.coordenadas?.lat && (
-                        <Badge variant="dot" size="sm" color="gray">
-                          {ub.coordenadas.lat}, {ub.coordenadas.lng}
+                        <Text size="sm" fw={700} c="blue.8">
+                          {grupo.canton_nombre}
+                        </Text>
+                        <Badge size="xs" variant="light" color="blue">
+                          {grupo.ubicaciones.length}
                         </Badge>
-                      )}
-                    </Group>
+                      </Group>
+                      <Stack gap={4} pl="xl">
+                        {grupo.ubicaciones.map((ub) => (
+                          <Group
+                            key={ub.id}
+                            justify="space-between"
+                            wrap="nowrap"
+                          >
+                            <Text size="sm">
+                              {ub.nombre || "Ubicación sin nombre"}
+                            </Text>
+                            {ub.coordenadas?.lat && (
+                              <Badge variant="dot" size="sm" color="gray">
+                                {ub.coordenadas.lat.toFixed(4)},{" "}
+                                {ub.coordenadas.lng.toFixed(4)}
+                              </Badge>
+                            )}
+                          </Group>
+                        ))}
+                      </Stack>
+                    </Paper>
                   ))}
                 </Stack>
               </Paper>
             )}
 
             {/* Hitos del proyecto */}
-            <Paper p="lg" radius="lg"
-              style={{ border: '1px solid var(--mantine-color-gray-3)' }}>
+            <Paper
+              p="lg"
+              radius="lg"
+              style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+            >
               <HitosList proyectoId={id} />
             </Paper>
           </Stack>
@@ -471,11 +552,13 @@ export default function ProyectoDetallePage(props: PageProps) {
         {/* ── Columna lateral ── */}
         <Grid.Col span={{ base: 12, md: 4 }}>
           <Stack gap="md">
-
             {/* ODS */}
             {proyecto.ods.length > 0 && (
-              <Paper p="lg" radius="lg"
-                style={{ border: '1px solid var(--mantine-color-gray-3)' }}>
+              <Paper
+                p="lg"
+                radius="lg"
+                style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+              >
                 <Title order={5} c="gray.7" mb="md">
                   ODS alineados
                 </Title>
@@ -487,8 +570,8 @@ export default function ProyectoDetallePage(props: PageProps) {
                         circle
                         style={{
                           background: getColorOds(ods.numero),
-                          color:      'white',
-                          minWidth:   28,
+                          color: "white",
+                          minWidth: 28,
                         }}
                       >
                         {ods.numero}
@@ -501,8 +584,11 @@ export default function ProyectoDetallePage(props: PageProps) {
             )}
 
             {/* Metadata */}
-            <Paper p="lg" radius="lg"
-              style={{ border: '1px solid var(--mantine-color-gray-3)' }}>
+            <Paper
+              p="lg"
+              radius="lg"
+              style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+            >
               <Title order={5} c="gray.7" mb="md">
                 Información del registro
               </Title>
