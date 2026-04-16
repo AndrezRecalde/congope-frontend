@@ -35,7 +35,7 @@ export interface ProvinciaFormItem {
 
 export interface ProyectoFormValues {
   nombre:               string;
-  actor_id:             string;
+  actor_ids:            string[];
   estado:               EstadoProyecto;
   codigo:               string;
   descripcion:          string;

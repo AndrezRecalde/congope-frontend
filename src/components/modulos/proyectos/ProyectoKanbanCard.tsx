@@ -104,17 +104,29 @@ export function ProyectoKanbanCard({
               {proyecto.nombre}
             </Text>
 
-            {/* Actor cooperante */}
-            {proyecto.actor && (
-              <Group gap={4}>
-                <IconBuilding
-                  size={12}
-                  color="var(--mantine-color-gray-5)"
-                />
-                <Text size="xs" c="dimmed" truncate>
-                  {proyecto.actor.nombre}
-                </Text>
-              </Group>
+            {/* Actores cooperantes */}
+            {proyecto.actores && proyecto.actores.length > 0 && (
+              <Tooltip
+                label={proyecto.actores.map((a) => a.nombre).join(' · ')}
+                disabled={proyecto.actores.length <= 1}
+                multiline
+                maw={220}
+              >
+                <Group gap={4} wrap="nowrap">
+                  <IconBuilding
+                    size={12}
+                    color="var(--mantine-color-gray-5)"
+                  />
+                  <Text size="xs" c="dimmed" truncate style={{ flex: 1 }}>
+                    {proyecto.actores[0].nombre}
+                  </Text>
+                  {proyecto.actores.length > 1 && (
+                    <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
+                      +{proyecto.actores.length - 1}
+                    </Text>
+                  )}
+                </Group>
+              </Tooltip>
             )}
 
             {/* Monto */}

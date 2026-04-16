@@ -286,13 +286,23 @@ export default function ProyectoDetallePage(props: PageProps) {
 
               <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
                 <CampoInfo
-                  label="Actor cooperante"
-                  valor={proyecto.actor?.nombre}
-                  icono={
-                    <IconBuilding
-                      size={14}
-                      color="var(--mantine-color-gray-5)"
-                    />
+                  label="Actores cooperantes"
+                  valor={
+                    proyecto.actores && proyecto.actores.length > 0 ? (
+                      <Group gap="xs" wrap="wrap">
+                        {proyecto.actores.map((a) => (
+                          <Group key={a.id} gap={4}>
+                            <IconBuilding
+                              size={13}
+                              color="var(--mantine-color-gray-5)"
+                            />
+                            <Text size="sm">{a.nombre}</Text>
+                          </Group>
+                        ))}
+                      </Group>
+                    ) : (
+                      "—"
+                    )
                   }
                 />
                 <CampoInfo

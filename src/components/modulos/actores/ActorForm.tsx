@@ -121,7 +121,7 @@ export function ActorForm({
           <TextInput
             label="Nombre del actor"
             placeholder="Ej: Banco Interamericano de Desarrollo (BID)"
-            required
+            withAsterisk
             {...form.getInputProps('nombre')}
           />
         </SimpleGrid>
@@ -139,7 +139,7 @@ export function ActorForm({
             label="Tipo de actor"
             placeholder="Seleccionar tipo"
             data={TIPOS_ACTOR}
-            required
+            withAsterisk
             {...form.getInputProps('tipo')}
           />
           <Select
@@ -152,7 +152,7 @@ export function ActorForm({
         <TextInput
           label="País de origen"
           placeholder="Ej: Estados Unidos, Alemania"
-          required
+          withAsterisk
           {...form.getInputProps('pais_origen')}
         />
 
@@ -174,7 +174,6 @@ export function ActorForm({
           <TextInput
             label="Email del contacto"
             placeholder="contacto@organizacion.org"
-            type="email"
             {...form.getInputProps('contacto_email')}
           />
         </SimpleGrid>

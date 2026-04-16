@@ -1,29 +1,27 @@
-'use client'
+"use client";
 
-import {
-  Group, TextInput, Select, Button, Paper,
-} from '@mantine/core';
-import { IconSearch, IconX } from '@tabler/icons-react';
-import { useDebouncedValue } from '@mantine/hooks';
-import { useEffect, useState } from 'react';
-import { useActores }          from '@/queries/actores.queries';
-import { useQuery }            from '@tanstack/react-query';
-import { queryKeys }           from '@/lib/query-client';
-import apiClient, { extractData } from '@/services/axios';
-import type { Provincia }      from '@/services/axios';
-import type { ProyectoFiltros } from '@/types/proyecto.types';
+import { Group, TextInput, Select, Button, Paper } from "@mantine/core";
+import { IconSearch, IconX } from "@tabler/icons-react";
+import { useDebouncedValue } from "@mantine/hooks";
+import { useEffect, useState } from "react";
+import { useActores } from "@/queries/actores.queries";
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-client";
+import apiClient, { extractData } from "@/services/axios";
+import type { Provincia } from "@/services/axios";
+import type { ProyectoFiltros } from "@/types/proyecto.types";
 
 const OPCIONES_ESTADO = [
-  { value: '',              label: 'Todos los estados' },
-  { value: 'En gestión',   label: 'En gestión' },
-  { value: 'En ejecución', label: 'En ejecución' },
-  { value: 'Finalizado',   label: 'Finalizado' },
-  { value: 'Suspendido',   label: 'Suspendido' },
+  { value: "", label: "Todos los estados" },
+  { value: "En gestión", label: "En gestión" },
+  { value: "En ejecución", label: "En ejecución" },
+  { value: "Finalizado", label: "Finalizado" },
+  { value: "Suspendido", label: "Suspendido" },
 ];
 
 interface ProyectosFiltrosProps {
-  filtros:   ProyectoFiltros;
-  onChange:  (filtros: ProyectoFiltros) => void;
+  filtros: ProyectoFiltros;
+  onChange: (filtros: ProyectoFiltros) => void;
   onLimpiar: () => void;
 }
 
@@ -32,9 +30,7 @@ export function ProyectosFiltros({
   onChange,
   onLimpiar,
 }: ProyectosFiltrosProps) {
-  const [searchInput, setSearchInput] = useState(
-    filtros.search ?? ''
-  );
+  const [searchInput, setSearchInput] = useState(filtros.search ?? "");
   const [debouncedSearch] = useDebouncedValue(searchInput, 400);
 
   useEffect(() => {
@@ -46,15 +42,15 @@ export function ProyectosFiltros({
   const { data: actoresData } = useActores({ per_page: 100 });
   const { data: provinciasData } = useQuery({
     queryKey: queryKeys.provincias.list,
-    queryFn:  async () => {
-      const res = await apiClient.get('/provincias');
+    queryFn: async () => {
+      const res = await apiClient.get("/publico/provincias");
       return extractData<Provincia[]>(res);
     },
     staleTime: Infinity,
   });
 
   const opcionesActores = [
-    { value: '', label: 'Todos los actores' },
+    { value: "", label: "Todos los actores" },
     ...(actoresData?.data ?? []).map((a) => ({
       value: a.id,
       label: a.nombre,
@@ -62,7 +58,7 @@ export function ProyectosFiltros({
   ];
 
   const opcionesProvincias = [
-    { value: '', label: 'Todas las provincias' },
+    { value: "", label: "Todas las provincias" },
     ...(provinciasData ?? []).map((p) => ({
       value: p.id,
       label: p.nombre,
@@ -81,8 +77,8 @@ export function ProyectosFiltros({
       mb="md"
       radius="md"
       style={{
-        border: '1px solid var(--mantine-color-gray-3)',
-        background: 'var(--mantine-color-gray-0)',
+        border: "1px solid var(--mantine-color-gray-3)",
+        background: "var(--mantine-color-gray-0)",
       }}
     >
       <Group gap="sm" wrap="wrap">
@@ -97,11 +93,11 @@ export function ProyectosFiltros({
         <Select
           placeholder="Estado"
           data={OPCIONES_ESTADO}
-          value={filtros.estado ?? ''}
+          value={filtros.estado ?? ""}
           onChange={(val) =>
             onChange({
               ...filtros,
-              estado: val as ProyectoFiltros['estado'],
+              estado: val as ProyectoFiltros["estado"],
               page: 1,
             })
           }
@@ -111,9 +107,9 @@ export function ProyectosFiltros({
         <Select
           placeholder="Actor"
           data={opcionesActores}
-          value={filtros.actor_id ?? ''}
+          value={filtros.actor_id ?? ""}
           onChange={(val) =>
-            onChange({ ...filtros, actor_id: val ?? '', page: 1 })
+            onChange({ ...filtros, actor_id: val ?? "", page: 1 })
           }
           w={200}
           size="sm"
@@ -122,11 +118,11 @@ export function ProyectosFiltros({
         <Select
           placeholder="Provincia"
           data={opcionesProvincias}
-          value={filtros.provincia_id ?? ''}
+          value={filtros.provincia_id ?? ""}
           onChange={(val) =>
             onChange({
               ...filtros,
-              provincia_id: val ?? '',
+              provincia_id: val ?? "",
               page: 1,
             })
           }
@@ -141,7 +137,7 @@ export function ProyectosFiltros({
             size="sm"
             leftSection={<IconX size={14} />}
             onClick={() => {
-              setSearchInput('');
+              setSearchInput("");
               onLimpiar();
             }}
           >

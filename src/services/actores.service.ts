@@ -81,13 +81,26 @@ export const actoresService = {
     const formData = new FormData();
     formData.append('_method', 'PUT');
 
+    // Campos de texto nullable: enviar string vacío para que el backend
+    // los limpie (null no es serializable en multipart/form-data).
+    const NULLABLE_TEXT = ['notas', 'contacto_nombre', 'contacto_email',
+      'contacto_telefono', 'sitio_web', 'identificador_institucional'] as const;
+
     Object.entries(datos).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        if (key === 'areas_tematicas' && Array.isArray(value)) {
-          value.forEach((v) => formData.append(`${key}[]`, v));
-        } else {
-          formData.append(key, value as string | Blob);
+      if (value === undefined) return; // campo no incluido → no enviar
+
+      if (value === null) {
+        // Solo serializar null en campos de texto nullables
+        if (NULLABLE_TEXT.includes(key as typeof NULLABLE_TEXT[number])) {
+          formData.append(key, '');
         }
+        return;
+      }
+
+      if (key === 'areas_tematicas' && Array.isArray(value)) {
+        value.forEach((v) => formData.append(`${key}[]`, v));
+      } else {
+        formData.append(key, value as string | Blob);
       }
     });
 

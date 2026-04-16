@@ -153,7 +153,7 @@ export function ProyectoForm({
   const form = useForm<ProyectoFormValues>({
     initialValues: {
       nombre: proyecto?.nombre ?? "",
-      actor_id: proyecto?.actor?.id ?? "",
+      actor_ids: proyecto?.actores?.map((a) => a.id) ?? [],
       estado: proyecto?.estado ?? "En gestión",
       codigo: proyecto?.codigo ?? "",
       descripcion: proyecto?.descripcion ?? "",
@@ -180,7 +180,10 @@ export function ProyectoForm({
     },
     validate: {
       nombre: isNotEmpty("El nombre es requerido"),
-      actor_id: isNotEmpty("Selecciona el actor cooperante"),
+      actor_ids: (v: string[]) =>
+        !v || v.length === 0
+          ? "Selecciona al menos un actor cooperante"
+          : null,
       estado: isNotEmpty("Selecciona el estado"),
       monto_total: (v) =>
         v === "" || v === undefined
@@ -271,7 +274,7 @@ export function ProyectoForm({
   const handleSubmit = (values: ProyectoFormValues) => {
     const dto: CreateProyectoDto = {
       nombre: values.nombre,
-      actor_id: values.actor_id,
+      actor_ids: values.actor_ids,
       estado: values.estado,
       monto_total: Number(values.monto_total),
       moneda: values.moneda,
@@ -319,7 +322,7 @@ export function ProyectoForm({
     // Si hay errores en campos de la pestaña general, saltar ahí
     if (
       errors.nombre ||
-      errors.actor_id ||
+      errors.actor_ids ||
       errors.estado ||
       errors.monto_total ||
       errors.moneda ||
@@ -365,13 +368,13 @@ export function ProyectoForm({
               />
             </SimpleGrid>
 
-            <Select
-              label="Actor cooperante"
-              placeholder="Seleccionar organización"
+            <MultiSelect
+              label="Actores cooperantes"
+              placeholder="Seleccionar una o más organizaciones"
               data={opcionesActores}
               required
               searchable
-              {...form.getInputProps("actor_id")}
+              {...form.getInputProps("actor_ids")}
             />
 
             <Textarea

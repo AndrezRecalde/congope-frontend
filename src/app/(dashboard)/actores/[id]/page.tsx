@@ -327,7 +327,7 @@ export default function ActorDetallePage(props: PageProps) {
                 />
               </SimpleGrid>
 
-              {actor.notas && (
+              {actor.notas != null && actor.notas.trim() !== '' && (
                 <>
                   <Divider my="md" />
                   <CampoInfo

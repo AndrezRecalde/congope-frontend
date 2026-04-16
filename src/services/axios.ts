@@ -145,7 +145,8 @@ export interface Proyecto {
   sector_tematico: string | null;
   flujo_direccion: FlujoDireccion | null;
   modalidad_cooperacion: ModalidadCooperacion[];
-  actor: ActorResumen | null;
+  actor: ActorResumen | null;       // primer actor (retrocompatibilidad)
+  actores: ActorResumen[];           // todos los actores cooperantes
   provincias: ProvinciaProyecto[];
   ubicaciones: UbicacionProyecto[];
   ubicaciones_por_canton?: UbicacionesPorCanton[];
@@ -236,7 +237,7 @@ export interface OdsResumen {
 
 export interface CreateProyectoDto {
   nombre: string;
-  actor_id: string;
+  actor_ids: string[];
   codigo?: string | null;
   descripcion?: string | null;
   estado?: EstadoProyecto;

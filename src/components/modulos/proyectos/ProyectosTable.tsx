@@ -97,10 +97,17 @@ export function ProyectosTable({
               >
                 {p.nombre}
               </Anchor>
-              {p.actor && (
-                <Text size="xs" c="dimmed" truncate>
-                  {p.actor.nombre}
-                </Text>
+              {p.actores && p.actores.length > 0 && (
+                <Group gap={4} wrap="nowrap">
+                  <Text size="xs" c="dimmed" truncate style={{ flex: 1 }}>
+                    {p.actores[0].nombre}
+                  </Text>
+                  {p.actores.length > 1 && (
+                    <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
+                      +{p.actores.length - 1}
+                    </Text>
+                  )}
+                </Group>
               )}
             </Stack>
           ),
