@@ -149,7 +149,7 @@ export default function PortalPage() {
     resultados?.resumen?.total_proyectos ?? 0;
 
   return (
-    <div style={{ fontFamily: 'var(--font-dm-sans)' }}>
+    <div style={{ fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
 
       {/* Header flotante */}
       <PortalHeader />
@@ -333,19 +333,16 @@ export default function PortalPage() {
             Desplaza para ver más
           </div>
           <div style={{
-            width:      24,
-            height:     24,
-            border:     '2px solid rgba(255,255,255,0.3)',
-            borderRadius:'50%',
-            margin:     '0 auto',
-            animation:  'portalFadeUp 1.5s ease infinite',
-            display:    'flex',
-            alignItems: 'center',
-            justifyContent:'center',
-            fontSize:   10,
-            color:      'rgba(255,255,255,0.5)',
+            width: 24, height: 24,
+            border: '2px solid rgba(255,255,255,0.3)',
+            borderRadius: '50%',
+            margin: '0 auto',
+            animation: 'portalFadeUp 1.5s ease infinite',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            ↓
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="3" strokeLinecap="round">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
           </div>
         </div>
       </section>

@@ -177,6 +177,14 @@ export interface DetalleProyectoPortal {
   fecha_inicio:          string | null;
   fecha_fin_planificada: string | null;
   fecha_fin_real:        string | null;
+  actores: Array<{
+    id:          string;
+    nombre:      string;
+    tipo:        string;
+    pais_origen: string;
+    sitio_web:   string | null;
+  }>;
+  // retrocompat
   actor: {
     id:          string;
     nombre:      string;
@@ -185,12 +193,10 @@ export interface DetalleProyectoPortal {
     sitio_web:   string | null;
   } | null;
   provincias: Array<{
-    id:                      string;
-    nombre:                  string;
-    rol:                     string;
-    porcentaje_avance:       number | null;
-    beneficiarios_directos:  number | null;
-    beneficiarios_indirectos:number | null;
+    id:                string;
+    nombre:            string;
+    rol:               string;
+    porcentaje_avance: number | null;
   }>;
   ods: Array<{
     id:        string;
@@ -212,6 +218,19 @@ export interface DetalleProyectoPortal {
     directos:   number | null;
     indirectos: number | null;
   };
+  beneficiarios_por_provincia: Array<{
+    provincia_id:      string;
+    provincia_nombre:  string;
+    total_directos:    number;
+    total_indirectos:  number;
+    categorias: Array<{
+      categoria_nombre:    string | null;
+      categoria_grupo:     string | null;
+      cantidad_directos:   number | null;
+      cantidad_indirectos: number | null;
+      observaciones:       string | null;
+    }>;
+  }>;
 }
 
 export const portalService = {

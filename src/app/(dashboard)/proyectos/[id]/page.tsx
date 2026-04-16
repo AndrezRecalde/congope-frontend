@@ -18,6 +18,7 @@ import {
   Anchor,
   Alert,
   ThemeIcon,
+  Table,
 } from "@mantine/core";
 import {
   IconArrowLeft,
@@ -28,6 +29,7 @@ import {
   IconCalendar,
   IconAlertCircle,
   IconRefresh,
+  IconUsers,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { modals } from "@mantine/modals";
@@ -62,16 +64,17 @@ function CampoInfo({
         c="dimmed"
         tt="uppercase"
         style={{ letterSpacing: "0.05em" }}
+        component="span"
       >
         {label}
       </Text>
       {icono ? (
         <Group gap="xs">
           {icono}
-          <Text size="sm">{valor}</Text>
+          <Text size="sm" component="span">{valor}</Text>
         </Group>
       ) : (
-        <Text size="sm">{valor || "—"}</Text>
+        <Text size="sm" component="div">{valor || "—"}</Text>
       )}
     </Stack>
   );
@@ -182,15 +185,22 @@ export default function ProyectoDetallePage(props: PageProps) {
 
   if (!proyecto) return null;
 
-  // Calcular totales de beneficiarios
-  const totalBenefDirectos = proyecto.provincias.reduce(
-    (sum, p) => sum + (p.beneficiarios_directos ?? 0),
+  // Calcular totales de beneficiarios desde la nueva estructura
+  const beneficiarios = proyecto.beneficiarios ?? [];
+  const totalBenefDirectos = beneficiarios.reduce(
+    (sum, b) => sum + (b.cantidad_directos ?? 0),
     0,
   );
-  const totalBenefIndirectos = proyecto.provincias.reduce(
-    (sum, p) => sum + (p.beneficiarios_indirectos ?? 0),
+  const totalBenefIndirectos = beneficiarios.reduce(
+    (sum, b) => sum + (b.cantidad_indirectos ?? 0),
     0,
   );
+
+  // Agrupar beneficiarios por provincia para la vista de detalle
+  const beneficiariosPorProvincia = proyecto.provincias.map((prov) => ({
+    provincia: prov,
+    items: beneficiarios.filter((b) => b.provincia_id === prov.id),
+  })).filter((g) => g.items.length > 0);
 
   return (
     <>
@@ -296,7 +306,7 @@ export default function ProyectoDetallePage(props: PageProps) {
                               size={13}
                               color="var(--mantine-color-gray-5)"
                             />
-                            <Text size="sm">{a.nombre}</Text>
+                            <Text size="sm" component="span">{a.nombre}</Text>
                           </Group>
                         ))}
                       </Group>
@@ -544,6 +554,110 @@ export default function ProyectoDetallePage(props: PageProps) {
                       </Stack>
                     </Paper>
                   ))}
+                </Stack>
+              </Paper>
+            )}
+
+            {/* Beneficiarios por Provincia */}
+            {beneficiariosPorProvincia.length > 0 && (
+              <Paper
+                p="lg"
+                radius="lg"
+                style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+              >
+                <Group gap="sm" mb="md">
+                  <ThemeIcon color="teal" variant="light" size="md">
+                    <IconUsers size={14} />
+                  </ThemeIcon>
+                  <Title order={5} c="gray.7">
+                    Beneficiarios
+                  </Title>
+                  <Badge variant="light" color="teal" size="sm">
+                    {totalBenefDirectos.toLocaleString("es-EC")} directos
+                    {totalBenefIndirectos > 0 && ` · ${totalBenefIndirectos.toLocaleString("es-EC")} indirectos`}
+                  </Badge>
+                </Group>
+
+                <Stack gap="md">
+                  {beneficiariosPorProvincia.map(({ provincia, items }) => {
+                    const totalDir = items.reduce((s, b) => s + (b.cantidad_directos ?? 0), 0);
+                    const totalInd = items.reduce((s, b) => s + (b.cantidad_indirectos ?? 0), 0);
+                    return (
+                      <Paper
+                        key={provincia.id}
+                        p="sm"
+                        radius="md"
+                        style={{
+                          border: "1px solid var(--mantine-color-teal-2)",
+                          background: "var(--mantine-color-teal-0)",
+                        }}
+                      >
+                        {/* Cabecera de provincia */}
+                        <Group justify="space-between" mb="sm">
+                          <Group gap="sm">
+                            <IconMapPin size={14} color="var(--mantine-color-teal-6)" />
+                            <Text size="sm" fw={700} c="teal.8">{provincia.nombre}</Text>
+                          </Group>
+                          <Group gap="sm">
+                            {totalDir > 0 && (
+                              <Badge size="sm" variant="filled" color="teal">
+                                {totalDir.toLocaleString("es-EC")} dir.
+                              </Badge>
+                            )}
+                            {totalInd > 0 && (
+                              <Badge size="sm" variant="light" color="blue">
+                                {totalInd.toLocaleString("es-EC")} ind.
+                              </Badge>
+                            )}
+                          </Group>
+                        </Group>
+
+                        {/* Tabla de categorías */}
+                        <Table
+                          withColumnBorders
+                          withTableBorder
+                          fz="xs"
+                          style={{ background: "white", borderRadius: 6, overflow: "hidden" }}
+                        >
+                          <Table.Thead>
+                            <Table.Tr>
+                              <Table.Th>Categoría</Table.Th>
+                              <Table.Th style={{ width: 110, textAlign: "right" }}>Directos</Table.Th>
+                              <Table.Th style={{ width: 110, textAlign: "right" }}>Indirectos</Table.Th>
+                              <Table.Th>Observaciones</Table.Th>
+                            </Table.Tr>
+                          </Table.Thead>
+                          <Table.Tbody>
+                            {items.map((b, i) => (
+                              <Table.Tr key={i}>
+                                <Table.Td>
+                                  <Stack gap={1}>
+                                    <Text size="xs" fw={500}>{b.categoria_nombre ?? "—"}</Text>
+                                    {b.categoria_grupo && (
+                                      <Text size="xs" c="dimmed">{b.categoria_grupo}</Text>
+                                    )}
+                                  </Stack>
+                                </Table.Td>
+                                <Table.Td style={{ textAlign: "right", fontWeight: 600 }}>
+                                  {b.cantidad_directos != null
+                                    ? b.cantidad_directos.toLocaleString("es-EC")
+                                    : "—"}
+                                </Table.Td>
+                                <Table.Td style={{ textAlign: "right" }}>
+                                  {b.cantidad_indirectos != null
+                                    ? b.cantidad_indirectos.toLocaleString("es-EC")
+                                    : "—"}
+                                </Table.Td>
+                                <Table.Td>
+                                  <Text size="xs" c="dimmed">{b.observaciones ?? "—"}</Text>
+                                </Table.Td>
+                              </Table.Tr>
+                            ))}
+                          </Table.Tbody>
+                        </Table>
+                      </Paper>
+                    );
+                  })}
                 </Stack>
               </Paper>
             )}

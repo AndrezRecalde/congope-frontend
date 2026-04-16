@@ -23,14 +23,20 @@ export interface ProyectoFiltros {
 }
 
 // El formulario maneja provincias como un array
-// de objetos para poder capturar rol y beneficiarios
+// de objetos para poder capturar rol y avance
 export interface ProvinciaFormItem {
   id:                    string;
   nombre:                string;
   rol:                   'Líder' | 'Co-ejecutora' | 'Beneficiaria';
   porcentaje_avance:     number | null;
-  beneficiarios_directos: number | null;
-  beneficiarios_indirectos: number | null;
+}
+
+export interface BeneficiarioFormItem {
+  provincia_id:       string;
+  categoria_id:       number;
+  cantidad_directos:  number | null;
+  cantidad_indirectos: number | null;
+  observaciones:      string;
 }
 
 export interface ProyectoFormValues {

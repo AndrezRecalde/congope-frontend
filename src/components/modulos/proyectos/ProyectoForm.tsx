@@ -21,6 +21,7 @@ import {
 import { useForm, isNotEmpty } from "@mantine/form";
 import { IconX, IconPlus, IconMapPin } from "@tabler/icons-react";
 import { useActores } from "@/queries/actores.queries";
+import { useCategoriasAgrupadas } from "@/queries/categorias-beneficiario.queries";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-client";
 import apiClient, { extractData } from "@/services/axios";
@@ -34,6 +35,7 @@ import type {
 import type {
   ProyectoFormValues,
   ProvinciaFormItem,
+  BeneficiarioFormItem,
 } from "@/types/proyecto.types";
 import { getColorOds } from "@/utils/colores-ods";
 
@@ -118,6 +120,7 @@ export function ProyectoForm({
     },
     staleTime: Infinity,
   });
+  const { data: gruposCategoria } = useCategoriasAgrupadas();
 
   // Transformar para los selects
   const opcionesActores = useMemo(() => {
@@ -145,8 +148,16 @@ export function ProyectoForm({
       nombre: p.nombre,
       rol: p.rol ?? "Beneficiaria",
       porcentaje_avance: p.porcentaje_avance ?? null,
-      beneficiarios_directos: p.beneficiarios_directos ?? null,
-      beneficiarios_indirectos: p.beneficiarios_indirectos ?? null,
+    })) ?? [],
+  );
+
+  const [beneficiarios, setBeneficiarios] = useState<BeneficiarioFormItem[]>(
+    proyecto?.beneficiarios?.map((b) => ({
+      provincia_id: b.provincia_id ?? "",
+      categoria_id: b.categoria_id,
+      cantidad_directos: b.cantidad_directos ?? null,
+      cantidad_indirectos: b.cantidad_indirectos ?? null,
+      observaciones: b.observaciones ?? "",
     })) ?? [],
   );
 
@@ -216,8 +227,6 @@ export function ProyectoForm({
         nombre: provincia.nombre,
         rol: "Beneficiaria",
         porcentaje_avance: null,
-        beneficiarios_directos: null,
-        beneficiarios_indirectos: null,
       },
     ]);
   };
@@ -298,8 +307,6 @@ export function ProyectoForm({
               id: p.id,
               rol: p.rol,
               porcentaje_avance: p.porcentaje_avance ?? undefined,
-              beneficiarios_directos: p.beneficiarios_directos ?? undefined,
-              beneficiarios_indirectos: p.beneficiarios_indirectos ?? undefined,
             }))
           : undefined,
       ubicaciones:
@@ -314,6 +321,18 @@ export function ProyectoForm({
               }))
           : undefined,
       ods_ids: values.ods_ids.length > 0 ? values.ods_ids : undefined,
+      beneficiarios:
+        beneficiarios.length > 0
+          ? beneficiarios
+              .filter((b) => b.categoria_id && b.provincia_id)
+              .map((b) => ({
+                provincia_id: b.provincia_id,
+                categoria_id: b.categoria_id,
+                cantidad_directos: b.cantidad_directos ?? undefined,
+                cantidad_indirectos: b.cantidad_indirectos ?? undefined,
+                observaciones: b.observaciones || undefined,
+              }))
+          : undefined,
     };
     onSubmit(dto);
   };
@@ -342,6 +361,9 @@ export function ProyectoForm({
           <Tabs.Tab value="general">Datos generales</Tabs.Tab>
           <Tabs.Tab value="provincias">Ubicación Geográfica</Tabs.Tab>
           <Tabs.Tab value="ods">ODS ({form.values.ods_ids.length})</Tabs.Tab>
+          <Tabs.Tab value="beneficiarios">
+            Beneficiarios{beneficiarios.length > 0 ? ` (${beneficiarios.length})` : ""}
+          </Tabs.Tab>
         </Tabs.List>
 
         {/* ── TAB 1: Datos generales ── */}
@@ -565,7 +587,7 @@ export function ProyectoForm({
                     </ActionIcon>
                   </Group>
 
-                  {/* Datos de la provincia: rol, avance, beneficiarios */}
+                  {/* Datos de la provincia: rol, avance */}
                   <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm" mb="md">
                     <Select
                       label="Rol en el proyecto"
@@ -591,34 +613,6 @@ export function ProyectoForm({
                         actualizarProvincia(
                           prov.id,
                           "porcentaje_avance",
-                          val === "" ? null : Number(val),
-                        )
-                      }
-                    />
-                    <NumberInput
-                      label="Beneficiarios directos"
-                      size="sm"
-                      min={0}
-                      thousandSeparator=","
-                      value={prov.beneficiarios_directos ?? ""}
-                      onChange={(val) =>
-                        actualizarProvincia(
-                          prov.id,
-                          "beneficiarios_directos",
-                          val === "" ? null : Number(val),
-                        )
-                      }
-                    />
-                    <NumberInput
-                      label="Beneficiarios indirectos"
-                      size="sm"
-                      min={0}
-                      thousandSeparator=","
-                      value={prov.beneficiarios_indirectos ?? ""}
-                      onChange={(val) =>
-                        actualizarProvincia(
-                          prov.id,
-                          "beneficiarios_indirectos",
                           val === "" ? null : Number(val),
                         )
                       }
@@ -834,6 +828,164 @@ export function ProyectoForm({
             </SimpleGrid>
           </Stack>
         </Tabs.Panel>
+
+        {/* ── TAB 4: Beneficiarios (seccionados por provincia) ── */}
+        <Tabs.Panel value="beneficiarios" pt="md">
+          <Stack gap="lg">
+            {provinciasSeleccionadas.length === 0 ? (
+              <Text size="sm" c="dimmed" ta="center" py="xl">
+                Primero añade provincias en la pestaña &ldquo;Ubicación Geográfica&rdquo;
+                para poder registrar beneficiarios por provincia.
+              </Text>
+            ) : (
+              provinciasSeleccionadas.map((prov) => {
+                // Beneficiarios de esta provincia
+                const bDeEsta = beneficiarios.filter((b) => b.provincia_id === prov.id);
+                // Categorías ya usadas en esta provincia
+                const usadas = new Set(bDeEsta.map((b) => b.categoria_id));
+
+                return (
+                  <Paper
+                    key={prov.id}
+                    p="md"
+                    radius="md"
+                    style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+                  >
+                    {/* Cabecera de provincia */}
+                    <Group gap="sm" mb="sm">
+                      <IconMapPin size={16} color="var(--mantine-color-gray-6)" />
+                      <Text fw={700} size="md">{prov.nombre}</Text>
+                      <Badge size="sm" variant="light" color="teal">
+                        {bDeEsta.length} categoría{bDeEsta.length !== 1 ? "s" : ""}
+                      </Badge>
+                    </Group>
+
+                    {/* Filas de beneficiarios de esta provincia */}
+                    {bDeEsta.length > 0 && (
+                      <Stack gap="xs" mb="sm">
+                        {bDeEsta.map((b) => {
+                          const globalIdx = beneficiarios.indexOf(b);
+                          let catNombre = "Categoría";
+                          gruposCategoria?.forEach((g) => {
+                            const found = g.categorias.find((c) => c.id === b.categoria_id);
+                            if (found) catNombre = found.nombre;
+                          });
+                          return (
+                            <Paper
+                              key={globalIdx}
+                              p="sm"
+                              radius="md"
+                              style={{
+                                border: "1px solid var(--mantine-color-teal-2)",
+                                background: "var(--mantine-color-teal-0)",
+                              }}
+                            >
+                              <Group justify="space-between" mb="xs">
+                                <Text size="sm" fw={600} c="teal.8">{catNombre}</Text>
+                                <ActionIcon
+                                  variant="subtle"
+                                  color="red"
+                                  size="sm"
+                                  onClick={() =>
+                                    setBeneficiarios((prev) =>
+                                      prev.filter((_, i) => i !== globalIdx),
+                                    )
+                                  }
+                                >
+                                  <IconX size={13} />
+                                </ActionIcon>
+                              </Group>
+                              <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
+                                <NumberInput
+                                  label="Directos"
+                                  size="sm"
+                                  min={0}
+                                  thousandSeparator=","
+                                  value={b.cantidad_directos ?? ""}
+                                  onChange={(val) =>
+                                    setBeneficiarios((prev) =>
+                                      prev.map((item, i) =>
+                                        i === globalIdx
+                                          ? { ...item, cantidad_directos: val === "" ? null : Number(val) }
+                                          : item,
+                                      ),
+                                    )
+                                  }
+                                />
+                                <NumberInput
+                                  label="Indirectos"
+                                  size="sm"
+                                  min={0}
+                                  thousandSeparator=","
+                                  value={b.cantidad_indirectos ?? ""}
+                                  onChange={(val) =>
+                                    setBeneficiarios((prev) =>
+                                      prev.map((item, i) =>
+                                        i === globalIdx
+                                          ? { ...item, cantidad_indirectos: val === "" ? null : Number(val) }
+                                          : item,
+                                      ),
+                                    )
+                                  }
+                                />
+                                <TextInput
+                                  label="Observaciones"
+                                  size="sm"
+                                  placeholder="Opcional"
+                                  value={b.observaciones ?? ""}
+                                  onChange={(e) =>
+                                    setBeneficiarios((prev) =>
+                                      prev.map((item, i) =>
+                                        i === globalIdx
+                                          ? { ...item, observaciones: e.target.value }
+                                          : item,
+                                      ),
+                                    )
+                                  }
+                                />
+                              </SimpleGrid>
+                            </Paper>
+                          );
+                        })}
+                      </Stack>
+                    )}
+
+                    {/* Selector de categoría para esta provincia */}
+                    {gruposCategoria && gruposCategoria.length > 0 && (
+                      <Select
+                        size="sm"
+                        placeholder={`+ Añadir categoría en ${prov.nombre}...`}
+                        searchable
+                        clearable
+                        value={null}
+                        leftSection={<IconPlus size={13} />}
+                        data={gruposCategoria.map((g) => ({
+                          group: g.grupo,
+                          items: g.categorias
+                            .filter((c) => !usadas.has(c.id))
+                            .map((c) => ({ value: String(c.id), label: c.nombre })),
+                        }))}
+                        onChange={(val) => {
+                          if (!val) return;
+                          setBeneficiarios((prev) => [
+                            ...prev,
+                            {
+                              provincia_id: prov.id,
+                              categoria_id: Number(val),
+                              cantidad_directos: null,
+                              cantidad_indirectos: null,
+                              observaciones: "",
+                            },
+                          ]);
+                        }}
+                      />
+                    )}
+                  </Paper>
+                );
+              })
+            )}
+          </Stack>
+        </Tabs.Panel>
       </Tabs>
 
       {/* Botones de acción */}
@@ -850,23 +1002,25 @@ export function ProyectoForm({
               variant="subtle"
               color="gray"
               size="sm"
-              onClick={() =>
-                setTabActiva(
-                  tabActiva === "provincias" ? "general" : "provincias",
-                )
-              }
+              onClick={() => {
+                if (tabActiva === "provincias") setTabActiva("general");
+                else if (tabActiva === "ods") setTabActiva("provincias");
+                else if (tabActiva === "beneficiarios") setTabActiva("ods");
+              }}
             >
               ← Anterior
             </Button>
           )}
-          {tabActiva !== "ods" && (
+          {tabActiva !== "beneficiarios" && (
             <Button
               variant="outline"
               color="congope"
               size="sm"
-              onClick={() =>
-                setTabActiva(tabActiva === "general" ? "provincias" : "ods")
-              }
+              onClick={() => {
+                if (tabActiva === "general") setTabActiva("provincias");
+                else if (tabActiva === "provincias") setTabActiva("ods");
+                else if (tabActiva === "ods") setTabActiva("beneficiarios");
+              }}
             >
               Siguiente →
             </Button>

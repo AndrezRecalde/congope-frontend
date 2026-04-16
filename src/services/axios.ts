@@ -151,6 +151,7 @@ export interface Proyecto {
   ubicaciones: UbicacionProyecto[];
   ubicaciones_por_canton?: UbicacionesPorCanton[];
   ods: OdsResumen[];
+  beneficiarios?: ProyectoBeneficiario[];
   hitos?: HitoProyecto[];
   hitos_count?: number;
   created_at: string;      // formato: "DD/MM/YYYY HH:mm"
@@ -193,8 +194,6 @@ export interface ProvinciaProyecto {
   nombre: string;
   rol: 'Líder' | 'Co-ejecutora' | 'Beneficiaria';
   porcentaje_avance: number | null;
-  beneficiarios_directos: number | null;
-  beneficiarios_indirectos: number | null;
 }
 
 export interface CantomResumen {
@@ -235,6 +234,25 @@ export interface OdsResumen {
   color_hex?: string;
 }
 
+export interface CategoriaBeneficiario {
+  id: number;
+  nombre: string;
+  grupo: string;
+  activo: boolean;
+}
+
+export interface ProyectoBeneficiario {
+  id?: number;
+  provincia_id: string;
+  provincia_nombre?: string;
+  categoria_id: number;
+  categoria_nombre?: string;
+  categoria_grupo?: string;
+  cantidad_directos: number | null;
+  cantidad_indirectos: number | null;
+  observaciones: string | null;
+}
+
 export interface CreateProyectoDto {
   nombre: string;
   actor_ids: string[];
@@ -253,8 +271,6 @@ export interface CreateProyectoDto {
     id: string;
     rol?: 'Líder' | 'Co-ejecutora' | 'Beneficiaria' | null;
     porcentaje_avance?: number | null;
-    beneficiarios_directos?: number | null;
-    beneficiarios_indirectos?: number | null;
   }>;
   // canton_ids y parroquia_ids eliminados — el cantón va embebido en cada ubicación
   ubicaciones?: Array<{
@@ -264,6 +280,13 @@ export interface CreateProyectoDto {
     lng: number;
   }>;
   ods_ids?: number[];
+  beneficiarios?: Array<{
+    provincia_id: string;
+    categoria_id: number;
+    cantidad_directos?: number | null;
+    cantidad_indirectos?: number | null;
+    observaciones?: string | null;
+  }>;
 }
 
 export type UpdateProyectoDto = Partial<CreateProyectoDto>;
