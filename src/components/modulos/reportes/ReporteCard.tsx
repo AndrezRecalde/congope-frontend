@@ -1,11 +1,19 @@
-'use client'
+"use client";
 
-import { useState }    from 'react';
+import { useState } from "react";
 import {
-  Paper, Stack, Title, Text, Button,
-  Group, Select, ThemeIcon, Badge,
-  Alert, Loader,
-} from '@mantine/core';
+  Paper,
+  Stack,
+  Title,
+  Text,
+  Button,
+  Group,
+  Select,
+  ThemeIcon,
+  Badge,
+  Alert,
+  Loader,
+} from "@mantine/core";
 import {
   IconDownload,
   IconFileAnalytics,
@@ -16,35 +24,37 @@ import {
   IconWorld,
   IconAlertCircle,
   IconCheck,
-} from '@tabler/icons-react';
-import { useQuery }    from '@tanstack/react-query';
-import { queryKeys }   from '@/lib/query-client';
-import apiClient, { extractData } from '@/services/axios';
-import { useActores }  from '@/queries/actores.queries';
-import type { Provincia, Ods } from '@/services/axios';
-import { getColorOds } from '@/utils/colores-ods';
+} from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-client";
+import apiClient, { extractData } from "@/services/axios";
+import { useActores } from "@/queries/actores.queries";
+import type { Provincia, Ods } from "@/services/axios";
+import { getColorOds } from "@/utils/colores-ods";
 
 // Mapeo de nombres de ícono a componentes Tabler
-const ICONOS: Record<string, React.ComponentType<{
-  size?: number
-}>> = {
-  IconMap:           IconMap,
-  IconLeaf:          IconLeaf,
-  IconBuildingBank:  IconBuildingBank,
-  IconCalendar:      IconCalendar,
-  IconWorld:         IconWorld,
+const ICONOS: Record<
+  string,
+  React.ComponentType<{
+    size?: number;
+  }>
+> = {
+  IconMap: IconMap,
+  IconLeaf: IconLeaf,
+  IconBuildingBank: IconBuildingBank,
+  IconCalendar: IconCalendar,
+  IconWorld: IconWorld,
   IconFileAnalytics: IconFileAnalytics,
 };
 
 interface ReporteCardProps {
-  id:          string;
-  titulo:      string;
+  id: string;
+  titulo: string;
   descripcion: string;
-  icono:       string;
-  color:       string;
-  onGenerar:   (params: Record<string, unknown>) =>
-    Promise<void>;
-  tienePermiso:boolean;
+  icono: string;
+  color: string;
+  onGenerar: (params: Record<string, unknown>) => Promise<void>;
+  tienePermiso: boolean;
 }
 
 export function ReporteCard({
@@ -57,36 +67,34 @@ export function ReporteCard({
   tienePermiso,
 }: ReporteCardProps) {
   const [generando, setGenerando] = useState(false);
-  const [error, setError]         = useState<string | null>(null);
-  const [exito, setExito]         = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [exito, setExito] = useState(false);
 
   // Parámetros del formulario según el tipo de reporte
-  const [provinciaId, setProvinciaId] = useState('');
-  const [odsId, setOdsId]             = useState('');
-  const [actorId, setActorId]         = useState('');
-  const [anio, setAnio]               = useState(
-    String(new Date().getFullYear())
-  );
+  const [provinciaId, setProvinciaId] = useState("");
+  const [odsId, setOdsId] = useState("");
+  const [actorId, setActorId] = useState("");
+  const [anio, setAnio] = useState(String(new Date().getFullYear()));
 
   // Cargar datos para los selects
   const { data: provinciasData } = useQuery({
     queryKey: queryKeys.provincias.list,
-    queryFn:  async () => {
-      const res = await apiClient.get('/provincias');
+    queryFn: async () => {
+      const res = await apiClient.get("/publico/provincias");
       return extractData<Provincia[]>(res);
     },
     staleTime: Infinity,
-    enabled:   id === 'provincia',
+    enabled: id === "provincia",
   });
 
   const { data: odsData } = useQuery({
     queryKey: queryKeys.ods.list,
-    queryFn:  async () => {
-      const res = await apiClient.get('/ods');
+    queryFn: async () => {
+      const res = await apiClient.get("/ods");
       return extractData<Ods[]>(res);
     },
     staleTime: Infinity,
-    enabled:   id === 'ods',
+    enabled: id === "ods",
   });
 
   const { data: actoresData } = useActores({
@@ -96,12 +104,18 @@ export function ReporteCard({
   // Validar si el formulario está completo
   const formularioValido = (() => {
     switch (id) {
-      case 'provincia':  return !!provinciaId;
-      case 'ods':        return !!odsId;
-      case 'cooperante': return !!actorId;
-      case 'anual':      return !!anio;
-      case 'global':     return true;
-      default:           return false;
+      case "provincia":
+        return !!provinciaId;
+      case "ods":
+        return !!odsId;
+      case "cooperante":
+        return !!actorId;
+      case "anual":
+        return !!anio;
+      case "global":
+        return true;
+      default:
+        return false;
     }
   })();
 
@@ -113,26 +127,31 @@ export function ReporteCard({
 
     try {
       const params: Record<string, unknown> = {};
-      if (id === 'provincia')  params.provincia_id = provinciaId;
-      if (id === 'ods')        params.ods_id = Number(odsId);
-      if (id === 'cooperante') params.actor_id = actorId;
-      if (id === 'anual')      params.anio = anio;
+      if (id === "provincia") params.provincia_id = provinciaId;
+      if (id === "ods") params.ods_id = Number(odsId);
+      if (id === "cooperante") params.actor_id = actorId;
+      if (id === "anual") params.anio = anio;
 
       await onGenerar(params);
       setExito(true);
       setTimeout(() => setExito(false), 3000);
     } catch (err: unknown) {
       const axiosErr = err as {
-        response?: { data?: { message?: string } | Blob | unknown }
+        response?: { data?: { message?: string } | Blob | unknown };
       };
-      
+
       // Fallback para Blob responses que contienen JSON en error
       const responseData = axiosErr?.response?.data;
       if (responseData instanceof Blob) {
         try {
           const text = await responseData.text();
           const json = JSON.parse(text);
-          if (json && typeof json === 'object' && 'message' in json && json.message) {
+          if (
+            json &&
+            typeof json === "object" &&
+            "message" in json &&
+            json.message
+          ) {
             setError(String(json.message));
             return;
           }
@@ -140,65 +159,56 @@ export function ReporteCard({
           // Not JSON inside Blob
         }
       }
-      
-      const dataTyped = axiosErr?.response?.data as { message?: string } | undefined;
+
+      const dataTyped = axiosErr?.response?.data as
+        | { message?: string }
+        | undefined;
       setError(
         dataTyped?.message ??
-        'Error al generar el reporte. Intenta nuevamente.'
+          "Error al generar el reporte. Intenta nuevamente.",
       );
     } finally {
       setGenerando(false);
     }
   };
 
-  const IconoComponente =
-    ICONOS[icono] ?? IconFileAnalytics;
+  const IconoComponente = ICONOS[icono] ?? IconFileAnalytics;
 
   // Opciones de años para el reporte anual
-  const anioActual   = new Date().getFullYear();
-  const opcionesAnio = Array.from(
-    { length: 10 },
-    (_, i) => {
-      const a = String(anioActual - i);
-      return { value: a, label: a };
-    }
-  );
+  const anioActual = new Date().getFullYear();
+  const opcionesAnio = Array.from({ length: 10 }, (_, i) => {
+    const a = String(anioActual - i);
+    return { value: a, label: a };
+  });
 
-  const opcionesProvincias =
-    (provinciasData ?? []).map((p) => ({
-      value: p.id,
-      label: p.nombre,
-    }));
+  const opcionesProvincias = (provinciasData ?? []).map((p) => ({
+    value: p.id,
+    label: p.nombre,
+  }));
 
   const opcionesOds = (odsData ?? []).map((o) => ({
     value: String(o.id),
     label: `ODS ${o.numero} — ${o.nombre}`,
   }));
 
-  const opcionesActores =
-    (actoresData?.data ?? []).map((a) => ({
-      value: a.id,
-      label: `${a.nombre} (${a.tipo})`,
-    }));
+  const opcionesActores = (actoresData?.data ?? []).map((a) => ({
+    value: a.id,
+    label: `${a.nombre} (${a.tipo})`,
+  }));
 
   return (
     <Paper
       p="lg"
       radius="lg"
       style={{
-        border: '1px solid var(--mantine-color-gray-3)',
+        border: "1px solid var(--mantine-color-gray-3)",
         opacity: tienePermiso ? 1 : 0.6,
       }}
     >
       <Stack gap="md">
         {/* Cabecera */}
         <Group gap="md" align="flex-start">
-          <ThemeIcon
-            size={48}
-            radius="md"
-            color={color}
-            variant="light"
-          >
+          <ThemeIcon size={48} radius="md" color={color} variant="light">
             <IconoComponente size={24} />
           </ThemeIcon>
           <Stack gap={4} style={{ flex: 1 }}>
@@ -207,11 +217,7 @@ export function ReporteCard({
                 {titulo}
               </Title>
               {!tienePermiso && (
-                <Badge
-                  size="xs"
-                  color="gray"
-                  variant="outline"
-                >
+                <Badge size="xs" color="gray" variant="outline">
                   Sin permiso
                 </Badge>
               )}
@@ -223,26 +229,26 @@ export function ReporteCard({
         </Group>
 
         {/* Parámetros del reporte */}
-        {id === 'provincia' && (
+        {id === "provincia" && (
           <Select
             label="Provincia"
             placeholder="Seleccionar provincia..."
             data={opcionesProvincias}
             value={provinciaId}
-            onChange={(v) => setProvinciaId(v ?? '')}
+            onChange={(v) => setProvinciaId(v ?? "")}
             searchable
             disabled={!tienePermiso || generando}
             size="sm"
           />
         )}
 
-        {id === 'ods' && (
+        {id === "ods" && (
           <Select
             label="ODS"
             placeholder="Seleccionar ODS..."
             data={opcionesOds}
             value={odsId}
-            onChange={(v) => setOdsId(v ?? '')}
+            onChange={(v) => setOdsId(v ?? "")}
             searchable
             disabled={!tienePermiso || generando}
             size="sm"
@@ -255,33 +261,33 @@ export function ReporteCard({
                     circle
                     style={{
                       background: getColorOds(num),
-                      color:      'white',
-                      minWidth:   20,
+                      color: "white",
+                      minWidth: 20,
                     }}
                   >
                     {num}
                   </Badge>
-                  <Text size="sm">{option.label.split('— ')[1]}</Text>
+                  <Text size="sm">{option.label.split("— ")[1]}</Text>
                 </Group>
               );
             }}
           />
         )}
 
-        {id === 'cooperante' && (
+        {id === "cooperante" && (
           <Select
             label="Actor cooperante"
             placeholder="Seleccionar actor..."
             data={opcionesActores}
             value={actorId}
-            onChange={(v) => setActorId(v ?? '')}
+            onChange={(v) => setActorId(v ?? "")}
             searchable
             disabled={!tienePermiso || generando}
             size="sm"
           />
         )}
 
-        {id === 'anual' && (
+        {id === "anual" && (
           <Select
             label="Año"
             data={opcionesAnio}
@@ -321,19 +327,18 @@ export function ReporteCard({
           disabled={!tienePermiso || !formularioValido}
           loading={generando}
           fullWidth
-          variant={exito ? 'light' : 'filled'}
+          variant={exito ? "light" : "filled"}
         >
           {generando
-            ? 'Generando PDF...'
+            ? "Generando PDF..."
             : exito
-            ? '¡Descargado!'
-            : 'Descargar reporte PDF'}
+              ? "¡Descargado!"
+              : "Descargar reporte PDF"}
         </Button>
 
         {generando && (
           <Text size="xs" c="dimmed" ta="center">
-            El reporte puede tardar unos segundos
-            en generarse...
+            El reporte puede tardar unos segundos en generarse...
           </Text>
         )}
       </Stack>
