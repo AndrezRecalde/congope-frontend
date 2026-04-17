@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
   Grid, Paper, Stack, Title, Text, Badge,
   Group, Button, Skeleton, Divider,
-  Anchor, Alert, ThemeIcon,
+  Anchor, Alert,
 } from '@mantine/core';
 import {
   IconArrowLeft, IconEdit, IconTrash,
@@ -29,7 +29,6 @@ import {
 } from '@/queries/eventos.queries';
 import { usePermisos } from '@/hooks/usePermisos';
 import { useConfirm }  from '@/hooks/useConfirm';
-import { formatFecha } from '@/utils/formatters';
 import {
   COLOR_TIPO_EVENTO,
 } from '@/types/evento.types';
@@ -71,7 +70,9 @@ export default function EventoDetallePage(
             try {
               await actualizarEventoAsync({ id, datos });
               modals.closeAll();
-            } catch (e) {}
+            } catch {
+              // error managed by mutation globally
+            }
           }}
           onCancel={() => modals.closeAll()}
           isLoading={actualizando}

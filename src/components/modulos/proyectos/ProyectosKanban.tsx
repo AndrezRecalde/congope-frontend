@@ -1,15 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { DragDropContext, Droppable, type DropResult } from "@hello-pangea/dnd";
 import {
   Group,
   Paper,
   Text,
   Badge,
-  Stack,
   ScrollArea,
-  Skeleton,
 } from "@mantine/core";
 import { ProyectoKanbanCard } from "./ProyectoKanbanCard";
 import {
@@ -30,7 +28,7 @@ interface ProyectosKanbanProps {
 
 export function ProyectosKanban({
   proyectos,
-  isLoading,
+  isLoading: _isLoading,
   onCambiarEstado,
   onEditar,
   puedeEditar,

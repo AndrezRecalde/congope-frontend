@@ -3,7 +3,6 @@
 import {
   Drawer, Stack, Text, Title, Badge, Group,
   Skeleton, Divider, Progress, Anchor,
-  SimpleGrid, ThemeIcon,
 } from '@mantine/core';
 import {
   IconBuilding, IconCalendar, IconMapPin,
@@ -15,8 +14,7 @@ import { useProyectoMapaDetalle }
   from '@/queries/mapa.queries';
 import { StatusBadge }  from
   '@/components/ui/StatusBadge/StatusBadge';
-import { formatFecha, formatMoneda }
-  from '@/utils/formatters';
+import { formatFecha } from '@/utils/formatters';
 import { getColorOds }  from '@/utils/colores-ods';
 
 interface ProyectoDrawerProps {

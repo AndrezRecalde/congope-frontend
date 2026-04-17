@@ -10,9 +10,7 @@ import {
 } from '@tabler/icons-react';
 import Link from 'next/link';
 import { EstrellaRating } from './EstrellaRating';
-import { StatusBadge }    from
-  '@/components/ui/StatusBadge/StatusBadge';
-import { formatFecha, truncar } from '@/utils/formatters';
+import { formatFecha } from '@/utils/formatters';
 import {
   COLOR_REPLICABILIDAD,
 } from '@/types/practica.types';

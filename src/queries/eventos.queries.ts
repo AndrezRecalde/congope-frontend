@@ -13,6 +13,7 @@ import {
   type CreateCompromisoDto,
 } from '@/services/eventos.service';
 import { getErrorMessage } from '@/services/axios';
+import type { Evento, CompromisoEvento } from '@/services/axios';
 
 export function useEventos(params: EventosParams = {}) {
   return useQuery({
@@ -193,19 +194,20 @@ export function useMarcarAsistencia(eventoId: string) {
       ),
     onMutate: async ({ userId, asistio }) => {
       await qc.cancelQueries({ queryKey: queryKeys.eventos.detail(eventoId) });
-      const previousEvento = qc.getQueryData(queryKeys.eventos.detail(eventoId));
-      qc.setQueryData(queryKeys.eventos.detail(eventoId), (old: any) => {
+      const previousEvento = qc.getQueryData<Evento>(queryKeys.eventos.detail(eventoId));
+      qc.setQueryData<Evento>(queryKeys.eventos.detail(eventoId), (old) => {
         if (!old) return old;
         return {
           ...old,
-          participantes: old.participantes.map((p: any) =>
-            p.id === userId ? { ...p, asistio } : p
+          participantes: (old as Evento & { participantes: Array<{ id: number; asistio: boolean }> }).participantes.map(
+            (p: { id: number; asistio: boolean }) =>
+              p.id === userId ? { ...p, asistio } : p
           ),
         };
       });
       return { previousEvento };
     },
-    onError: (error, variables, context: any) => {
+    onError: (error, _variables, context: { previousEvento: Evento | undefined } | undefined) => {
       if (context?.previousEvento) {
         qc.setQueryData(queryKeys.eventos.detail(eventoId), context.previousEvento);
       }
@@ -258,10 +260,10 @@ export function useResolverCompromiso(eventoId: string) {
       ),
     onMutate: async ({ compromisoId, resuelto }) => {
       await qc.cancelQueries({ queryKey: queryKeys.eventos.compromisos(eventoId) });
-      const previousCompromisos = qc.getQueryData(queryKeys.eventos.compromisos(eventoId));
-      qc.setQueryData(queryKeys.eventos.compromisos(eventoId), (old: any) => {
+      const previousCompromisos = qc.getQueryData<CompromisoEvento[]>(queryKeys.eventos.compromisos(eventoId));
+      qc.setQueryData<CompromisoEvento[]>(queryKeys.eventos.compromisos(eventoId), (old) => {
         if (!old) return old;
-        return old.map((c: any) =>
+        return old.map((c: CompromisoEvento) =>
           c.id === compromisoId ? { ...c, resuelto } : c
         );
       });
@@ -274,7 +276,7 @@ export function useResolverCompromiso(eventoId: string) {
         color:   variables.resuelto ? 'teal' : 'orange',
       });
     },
-    onError: (error, variables, context: any) => {
+    onError: (error, _variables, context: { previousCompromisos: CompromisoEvento[] | undefined } | undefined) => {
       if (context?.previousCompromisos) {
         qc.setQueryData(queryKeys.eventos.compromisos(eventoId), context.previousCompromisos);
       }

@@ -1,7 +1,7 @@
 'use client'
 
 import ReactECharts from 'echarts-for-react';
-import { Paper, Title, Skeleton, Text, Stack }
+import { Paper, Title, Skeleton, Text }
   from '@mantine/core';
 import { useGraficaAnual } from
   '@/queries/dashboard.queries';

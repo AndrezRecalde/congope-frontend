@@ -1,14 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import maplibregl from "maplibre-gl";
 import { env } from "@/lib/env";
 import type {
   ProvinciaPortal,
-  ProyectoPortal,
   ResultadosFiltro,
   CatalogosMapa,
-  DetalleProyectoPortal,
 } from "@/services/portal.service";
 
 // Colores de polígonos según cantidad de proyectos
@@ -50,7 +48,7 @@ interface PortalMapaProps {
 
 export function PortalMapa({
   catalogos,
-  filtros,
+  filtros: _filtros,
   resultados,
   hayFiltros,
   onClickPin,

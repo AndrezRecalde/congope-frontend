@@ -2,7 +2,6 @@
 
 import {
   useState, useEffect, useCallback,
-  useRef,
 } from 'react';
 import dynamic from 'next/dynamic';
 import { PortalHeader }   from
@@ -91,12 +90,12 @@ export default function PortalPage() {
       setConteos(cnt);
       setEstadisticas(est);
     }).catch(console.error);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ── Reaccionar a cambios de filtros ───────────
   useEffect(() => {
     if (!hayFiltros) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setResultados(null);
       return;
     }
@@ -110,7 +109,6 @@ export default function PortalPage() {
       .then(setResultados)
       .catch(console.error)
       .finally(() => setCargandoFiltros(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtros, hayFiltros]);
 
   // ── Scroll reveal ──────────────────────────────
@@ -128,7 +126,6 @@ export default function PortalPage() {
     document.querySelectorAll('.scroll-reveal')
       .forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [estadisticas]);
 
   const handleHoverProvincia = useCallback(

@@ -25,7 +25,7 @@ export function AuthInitializer({ children }: { children: React.ReactNode }) {
         // Valida el token contra el servidor y obtiene al usuario nuevamente
         const user = await authService.me();
         dispatch(setCredentials({ usuario: user, token }));
-      } catch (error) {
+      } catch (_error) {
         // Token inválido o sesión expirada
         localStorage.removeItem('congope_token');
         document.cookie =

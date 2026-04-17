@@ -43,6 +43,9 @@ export function RedesFiltros({
     if (debounced !== filtros.search) {
       onChange({ ...filtros, search: debounced, page: 1 });
     }
+    // onChange and filtros are stable references from parent;
+    // including them would cause infinite re-renders
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debounced]);
 
   const hayFiltros =

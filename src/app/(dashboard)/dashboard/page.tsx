@@ -9,11 +9,8 @@ import {
   Text,
   Title,
   Badge,
-  Skeleton,
   ThemeIcon,
-  Divider,
   Button,
-  Anchor,
 } from "@mantine/core";
 import {
   IconFolderOpen,
@@ -37,12 +34,10 @@ import { GraficaActores } from "@/components/dashboard/GraficaActores";
 import { CompromisosPendientes } from "@/components/dashboard/CompromisosPendientes";
 import { ProyectosDestacados } from "@/components/dashboard/ProyectosDestacados";
 import { useDashboard } from "@/queries/dashboard.queries";
-import { usePermisos } from "@/hooks/usePermisos";
 import { useAppSelector } from "@/store/hooks";
 import { selectUsuario } from "@/store/slices/authSlice";
 
 export default function DashboardPage() {
-  const { can } = usePermisos();
   const usuario = useAppSelector(selectUsuario);
   const { data, isLoading } = useDashboard();
 
@@ -64,11 +59,8 @@ export default function DashboardPage() {
       }).format(parseFloat(kpis.proyectos.monto_total))
     : "—";
 
-  // Desglose de actores por tipo para la KPI card
-  // por_tipo es un objeto dinámico Record<string, number>
-  const desgloseActores = Object.entries(kpis?.actores?.por_tipo ?? {}).map(
-    ([label, valor]) => ({ label, valor: valor as number }),
-  );
+  // Desglose de actores por tipo — disponible para uso futuro
+  void Object.entries(kpis?.actores?.por_tipo ?? {});
 
   return (
     <>

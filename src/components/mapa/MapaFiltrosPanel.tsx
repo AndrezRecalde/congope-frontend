@@ -2,8 +2,7 @@
 
 import {
   Paper, Stack, Select, Button, Title,
-  Group, Text, Badge, ActionIcon, Collapse,
-  Tooltip,
+  Group, Badge, ActionIcon, Collapse,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {

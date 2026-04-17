@@ -42,7 +42,7 @@ export const mapaService = {
    * Para calcular estadísticas por provincia y el select.
    */
   listarProvincias: async (): Promise<Provincia[]> => {
-    const res = await apiClient.get("/provincias");
+    const res = await apiClient.get("/publico/provincias");
     return extractData<Provincia[]>(res);
   },
 

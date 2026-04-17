@@ -4,8 +4,7 @@ import { useState }  from 'react';
 import { DataTable } from 'mantine-datatable';
 import {
   Group, Text, Badge, Stack, Code,
-  Collapse, ActionIcon, Tooltip,
-  Paper, SimpleGrid,
+  ActionIcon, Paper, SimpleGrid,
 } from '@mantine/core';
 import { IconChevronDown, IconChevronUp }
   from '@tabler/icons-react';

@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { cookies }   from 'next/headers';
 import { redirect }  from 'next/navigation';
-import { Box, Stack, Text, Group } from '@mantine/core';
-import Image from 'next/image';
+import { Box, Stack, Text } from '@mantine/core';
 
 export const metadata: Metadata = {
   title: 'Iniciar Sesión',

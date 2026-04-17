@@ -1,7 +1,7 @@
 'use client'
 
 import { useState }  from 'react';
-import { Group, Tooltip, Text, Stack } from '@mantine/core';
+import { Group, Tooltip, Text } from '@mantine/core';
 import { IconStar, IconStarFilled } from '@tabler/icons-react';
 
 interface EstrellaRatingProps {

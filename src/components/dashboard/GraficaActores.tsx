@@ -1,8 +1,7 @@
 'use client'
 
 import ReactECharts from 'echarts-for-react';
-import { Paper, Title, Skeleton, Group, Stack,
-  Text, Badge }
+import { Paper, Title, Skeleton, Text }
   from '@mantine/core';
 import { useDashboard } from
   '@/queries/dashboard.queries';

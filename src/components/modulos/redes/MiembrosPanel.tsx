@@ -1,11 +1,9 @@
 'use client'
 
-import { useState } from 'react';
 import {
   Stack, Group, Text, Badge, ActionIcon,
-  Button, Tooltip, Divider, Title,
+  Button, Tooltip, Title,
   TextInput, Select, Paper, Avatar,
-  Skeleton,
 } from '@mantine/core';
 import { useForm, isNotEmpty } from '@mantine/form';
 import { modals }   from '@mantine/modals';

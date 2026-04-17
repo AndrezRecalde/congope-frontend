@@ -2,7 +2,6 @@ import apiClient, {
   extractData,
   type BuenaPractica,
   type PaginatedResponse,
-  type ApiResponse,
 } from './axios';
 
 export interface PracticasParams {

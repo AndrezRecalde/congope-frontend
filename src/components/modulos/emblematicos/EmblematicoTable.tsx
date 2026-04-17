@@ -7,7 +7,6 @@ import {
 } from '@mantine/core';
 import {
   IconEye, IconEdit, IconTrash,
-  IconWorld, IconWorldOff,
 } from '@tabler/icons-react';
 import Link from 'next/link';
 import { formatFecha } from '@/utils/formatters';

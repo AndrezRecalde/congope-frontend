@@ -25,7 +25,7 @@ import {
 import { actoresService } from '@/services/actores.service';
 import { usePermisos }    from '@/hooks/usePermisos';
 import { useConfirm }     from '@/hooks/useConfirm';
-import type { ActorCooperacion, CreateActorDto }
+import type { ActorCooperacion }
   from '@/services/axios';
 import type { ActorFiltros } from '@/types/actor.types';
 import { IconBuildingBank } from '@tabler/icons-react';
@@ -74,8 +74,6 @@ function EditarActorModal({ actor }: { actor: ActorCooperacion }) {
 export default function ActoresPage() {
   const [filtros, setFiltros] =
     useState<ActorFiltros>(FILTROS_INICIALES);
-  const [actorEditando, setActorEditando] =
-    useState<ActorCooperacion | null>(null);
   const [exportando, setExportando] = useState(false);
 
   // Permisos del usuario actual
@@ -98,7 +96,6 @@ export default function ActoresPage() {
 
   // ── Abrir modal CREAR ──────────────────────────────────
   const abrirModalCrear = () => {
-    setActorEditando(null);
     modals.open({
       title:    'Nuevo actor de cooperación',
       size:     'lg',
@@ -108,7 +105,6 @@ export default function ActoresPage() {
 
   // ── Abrir modal EDITAR ─────────────────────────────────
   const abrirModalEditar = (actor: ActorCooperacion) => {
-    setActorEditando(actor);
     modals.open({
       title:    'Editar actor de cooperación',
       size:     'lg',
@@ -129,7 +125,7 @@ export default function ActoresPage() {
 
   // ── Exportar ───────────────────────────────────────────
   const handleExportar = async (
-    formato: 'pdf' | 'excel' | 'csv'
+    _formato: 'pdf' | 'excel' | 'csv'
   ) => {
     setExportando(true);
     try {

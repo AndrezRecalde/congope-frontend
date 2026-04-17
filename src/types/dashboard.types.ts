@@ -40,6 +40,7 @@ export interface ProyectoDestacado {
 export interface DashboardData {
   kpis:    DashboardKpis;
   alertas: DashboardAlertas;
+  proyectos_destacados?: ProyectoDestacado[];
 }
 
 export interface GraficaAnualItem {

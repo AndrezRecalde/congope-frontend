@@ -9,7 +9,7 @@ import {
 } from '@mantine/core';
 import {
   IconArrowLeft, IconEdit, IconTrash,
-  IconCalendar, IconAlertCircle,
+  IconAlertCircle,
 } from '@tabler/icons-react';
 import Link    from 'next/link';
 import { modals } from '@mantine/modals';

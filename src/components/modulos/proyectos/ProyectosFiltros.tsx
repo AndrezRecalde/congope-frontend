@@ -37,6 +37,9 @@ export function ProyectosFiltros({
     if (debouncedSearch !== filtros.search) {
       onChange({ ...filtros, search: debouncedSearch, page: 1 });
     }
+    // onChange and filtros are stable references from parent;
+    // including them would cause infinite re-renders
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch]);
 
   const { data: actoresData } = useActores({ per_page: 100 });

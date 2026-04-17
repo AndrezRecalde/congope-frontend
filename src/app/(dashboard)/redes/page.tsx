@@ -88,7 +88,6 @@ export default function RedesPage() {
 
   const redes    = data?.data  ?? [];
   const total    = data?.meta?.total ?? 0;
-  const lastPage = data?.meta?.last_page ?? 1;
 
   const abrirModalCrear = () => {
     modals.open({

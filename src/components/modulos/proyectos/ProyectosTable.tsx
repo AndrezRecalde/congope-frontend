@@ -12,8 +12,7 @@ import {
 import Link from 'next/link';
 import { StatusBadge }   from
   '@/components/ui/StatusBadge/StatusBadge';
-import { formatFecha, formatMoneda }
-  from '@/utils/formatters';
+import { formatFecha }  from '@/utils/formatters';
 import { getColorOds }  from '@/utils/colores-ods';
 import type { Proyecto } from '@/services/axios';
 

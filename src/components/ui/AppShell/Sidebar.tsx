@@ -22,7 +22,6 @@ import {
   IconFiles,
   IconCalendarEvent,
   IconChartBar,
-  IconSettings,
   IconUsers,
   IconShield,
   IconCategory,

@@ -123,7 +123,7 @@ export default function ProyectosPage() {
   };
 
   const handleExportar = async (
-    formato: 'pdf' | 'excel' | 'csv'
+    _formato: 'pdf' | 'excel' | 'csv'
   ) => {
     setExportando(true);
     try {

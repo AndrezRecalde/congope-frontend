@@ -12,11 +12,8 @@ import {
   Group,
   Button,
   Skeleton,
-  Divider,
   Anchor,
   Alert,
-  ThemeIcon,
-  SimpleGrid,
 } from "@mantine/core";
 import {
   IconArrowLeft,
@@ -31,7 +28,6 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { modals } from "@mantine/modals";
-import { notifications } from "@mantine/notifications";
 import { PageHeader } from "@/components/ui/PageHeader/PageHeader";
 import { EstrellaRating } from "@/components/modulos/practicas/EstrellaRating";
 import { ValoracionModal } from "@/components/modulos/practicas/ValoracionModal";
@@ -42,7 +38,6 @@ import {
   useEliminarPractica,
   useDestacarPractica,
 } from "@/queries/practicas.queries";
-import { practicasService } from "@/services/practicas.service";
 import { usePermisos } from "@/hooks/usePermisos";
 import { useConfirm } from "@/hooks/useConfirm";
 import { formatFecha } from "@/utils/formatters";

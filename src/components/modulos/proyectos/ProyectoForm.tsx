@@ -231,7 +231,10 @@ export function ProyectoForm({
     ]);
   };
 
-  const cantonesArr = cantonesDataRaw ?? [];
+  const cantonesArr = useMemo(
+    () => cantonesDataRaw ?? [],
+    [cantonesDataRaw],
+  );
 
   // Mapa O(1): canton_id → Canton (para lookups en el render)
   const cantonPorId = useMemo(

@@ -6,11 +6,8 @@ import {
   Title,
   Text,
   Alert,
-  Paper,
-  Group,
-  ThemeIcon,
 } from "@mantine/core";
-import { IconInfoCircle, IconFileAnalytics } from "@tabler/icons-react";
+import { IconInfoCircle } from "@tabler/icons-react";
 import { PageHeader } from "@/components/ui/PageHeader/PageHeader";
 import { ReporteCard } from "@/components/modulos/reportes/ReporteCard";
 import { reportesService } from "@/services/reportes.service";

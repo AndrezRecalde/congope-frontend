@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect }   from 'react';
+import { useState }   from 'react';
 import {
   Stack, Group, Text, Badge, Checkbox,
   ActionIcon, Button, Tooltip, Paper,
@@ -9,7 +9,6 @@ import {
 } from '@mantine/core';
 import { useForm, isNotEmpty } from '@mantine/form';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
-import { modals }   from '@mantine/modals';
 import { formatFecha } from '@/utils/formatters';
 import {
   useHitosProyecto,

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect }    from 'react';
+import { useState }    from 'react';
 import { useRouter }   from 'next/navigation';
 import dynamic         from 'next/dynamic';
 import Link from 'next/link';
@@ -67,29 +67,17 @@ export default function EventosPage() {
     useState<'calendario' | 'lista'>('calendario');
   const [filtros, setFiltros] =
     useState<EventoFiltros>(FILTROS_INICIALES);
-  const [fechaInicial, setFechaInicial] =
-    useState<string | null>(null);
 
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch] =
     useDebouncedValue(searchInput, 400);
-
-  useEffect(() => {
-    if (debouncedSearch !== filtros.search) {
-      setFiltros((prev) => ({
-        ...prev,
-        search: debouncedSearch,
-        page: 1,
-      }));
-    }
-  }, [debouncedSearch]);
 
   const { can } = usePermisos();
   const puedeCrear = can('eventos.crear');
 
   // Para el calendario cargar más eventos (sin paginar)
   const { data, isLoading } = useEventos({
-    search:      filtros.search,
+    search:      debouncedSearch,
     tipo_evento: filtros.tipo_evento,
     per_page:    100, // suficiente para el calendario
     page:        1,
@@ -107,7 +95,7 @@ export default function EventosPage() {
   const eventos = data?.data ?? [];
 
   const abrirModalCrear = (fecha?: string) => {
-    setFechaInicial(fecha ?? null);
+    void fecha; // fecha reservada para uso futuro
     modals.open({
       title: 'Nuevo evento',
       size:  'lg',
@@ -118,7 +106,7 @@ export default function EventosPage() {
               const evento = await crearEventoAsync(datos);
               modals.closeAll();
               router.push(`/eventos/${evento.id}`);
-            } catch (e) {
+            } catch {
               // error managed by mutation globally
             }
           }}
@@ -250,9 +238,6 @@ export default function EventosPage() {
       ) : (
         <EventosListaView
           eventos={eventos}
-          onVerDetalle={(id) =>
-            router.push(`/eventos/${id}`)
-          }
           onEditar={(evento) => {
             modals.open({
               title: 'Editar evento',
@@ -264,7 +249,9 @@ export default function EventosPage() {
                     try {
                       await actualizarEventoAsync({ id: evento.id, datos });
                       modals.closeAll();
-                    } catch (e) {}
+                    } catch {
+                      // error managed by mutation globally
+                    }
                   }}
                   onCancel={() => modals.closeAll()}
                 />
@@ -281,12 +268,10 @@ export default function EventosPage() {
 // para mantener el código organizado
 function EventosListaView({
   eventos,
-  onVerDetalle,
   onEditar,
 }: {
-  eventos:      Evento[];
-  onVerDetalle: (id: string) => void;
-  onEditar:     (e: Evento) => void;
+  eventos:  Evento[];
+  onEditar: (e: Evento) => void;
 }) {
   return (
     <DataTable

@@ -31,8 +31,6 @@ import { usePermisos } from '@/hooks/usePermisos';
 import { useConfirm }  from '@/hooks/useConfirm';
 import type { BuenaPractica } from '@/services/axios';
 import type { PracticaFiltros } from '@/types/practica.types';
-import type { CreatePracticaDto } from
-  '@/services/practicas.service';
 import { practicasService } from '@/services/practicas.service';
 
 const FILTROS_INICIALES: PracticaFiltros = {
@@ -73,7 +71,6 @@ export default function BuenasPracticasPage() {
   const { confirmar } = useConfirm();
 
   const practicas  = data?.data  ?? [];
-  const total      = data?.meta?.total ?? 0;
   const lastPage   = data?.meta?.last_page ?? 1;
 
   // ── Abrir modal CREAR ──────────────────────────────────

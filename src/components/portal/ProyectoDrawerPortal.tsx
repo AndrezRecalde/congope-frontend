@@ -95,13 +95,21 @@ export function ProyectoDrawerPortal({
 
   useEffect(() => {
     if (!proyectoId) return;
-    setCargando(true);
-    setProyecto(null);
-    portalService.detalleProyecto(proyectoId)
-      .then(setProyecto)
-      .catch(console.error)
-      .finally(() => setCargando(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    let active = true;
+    const cargar = async () => {
+      setCargando(true);
+      setProyecto(null);
+      try {
+        const data = await portalService.detalleProyecto(proyectoId);
+        if (active) setProyecto(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (active) setCargando(false);
+      }
+    };
+    cargar();
+    return () => { active = false; };
   }, [proyectoId]);
 
   const abierto = !!proyectoId;

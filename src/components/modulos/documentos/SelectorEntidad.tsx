@@ -1,7 +1,7 @@
 'use client'
 
 import {
-  Paper, Group, Select, Text, Badge,
+  Paper, Group, Select, Badge,
 } from '@mantine/core';
 import { useActores }    from '@/queries/actores.queries';
 import { useRedes }      from '@/queries/redes.queries';

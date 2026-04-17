@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import {
   Stack, TextInput, Select, Textarea,
-  Switch, Button, Group, TextInput as UrlInput,
-  Collapse, Text, LoadingOverlay, Box,
+  Switch, Button, Group,
+  Collapse, LoadingOverlay, Box,
 } from '@mantine/core';
 import { useForm, isNotEmpty } from '@mantine/form';
 import type { Evento }     from '@/services/axios';
+import type { TipoEvento } from '@/services/axios';
 import type {
   EventoFormValues,
 } from '@/types/evento.types';
@@ -52,7 +53,7 @@ export function EventoForm({
   const form = useForm<EventoFormValues>({
     initialValues: {
       titulo:       evento?.titulo       ?? '',
-      tipo_evento:  (evento?.tipo_evento as any)  ?? '',
+      tipo_evento:  (evento?.tipo_evento as TipoEvento) ?? '' as TipoEvento,
       // fecha_evento del API: "DD/MM/YYYY"
       // el input type=date necesita "YYYY-MM-DD"
       fecha_evento: evento?.fecha_evento

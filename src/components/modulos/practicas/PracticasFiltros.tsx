@@ -1,28 +1,25 @@
-'use client'
+"use client";
 
-import {
-  Group, TextInput, Select, Button,
-  Paper, Switch,
-} from '@mantine/core';
-import { IconSearch, IconX } from '@tabler/icons-react';
-import { useDebouncedValue }  from '@mantine/hooks';
-import { useEffect, useState } from 'react';
-import { useQuery }            from '@tanstack/react-query';
-import { queryKeys }           from '@/lib/query-client';
-import apiClient, { extractData } from '@/services/axios';
-import type { Provincia }      from '@/services/axios';
-import type { PracticaFiltros } from '@/types/practica.types';
+import { Group, TextInput, Select, Button, Paper, Switch } from "@mantine/core";
+import { IconSearch, IconX } from "@tabler/icons-react";
+import { useDebouncedValue } from "@mantine/hooks";
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-client";
+import apiClient, { extractData } from "@/services/axios";
+import type { Provincia } from "@/services/axios";
+import type { PracticaFiltros } from "@/types/practica.types";
 
 const OPCIONES_REPLICABILIDAD = [
-  { value: '',      label: 'Todas' },
-  { value: 'Alta',  label: 'Alta' },
-  { value: 'Media', label: 'Media' },
-  { value: 'Baja',  label: 'Baja' },
+  { value: "", label: "Todas" },
+  { value: "Alta", label: "Alta" },
+  { value: "Media", label: "Media" },
+  { value: "Baja", label: "Baja" },
 ];
 
 interface PracticasFiltrosProps {
-  filtros:   PracticaFiltros;
-  onChange:  (f: PracticaFiltros) => void;
+  filtros: PracticaFiltros;
+  onChange: (f: PracticaFiltros) => void;
   onLimpiar: () => void;
 }
 
@@ -31,28 +28,29 @@ export function PracticasFiltros({
   onChange,
   onLimpiar,
 }: PracticasFiltrosProps) {
-  const [searchInput, setSearchInput] = useState(
-    filtros.search ?? ''
-  );
+  const [searchInput, setSearchInput] = useState(filtros.search ?? "");
   const [debounced] = useDebouncedValue(searchInput, 400);
 
   useEffect(() => {
     if (debounced !== filtros.search) {
       onChange({ ...filtros, search: debounced, page: 1 });
     }
+    // onChange and filtros are stable references from parent;
+    // including them would cause infinite re-renders
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debounced]);
 
   const { data: provinciasData } = useQuery({
     queryKey: queryKeys.provincias.list,
-    queryFn:  async () => {
-      const res = await apiClient.get('/provincias');
+    queryFn: async () => {
+      const res = await apiClient.get("/publico/provincias");
       return extractData<Provincia[]>(res);
     },
     staleTime: Infinity,
   });
 
   const opcionesProvincias = [
-    { value: '', label: 'Todas las provincias' },
+    { value: "", label: "Todas las provincias" },
     ...(provinciasData ?? []).map((p) => ({
       value: p.id,
       label: p.nombre,
@@ -71,8 +69,8 @@ export function PracticasFiltros({
       mb="md"
       radius="md"
       style={{
-        border: '1px solid var(--mantine-color-gray-3)',
-        background: 'var(--mantine-color-gray-0)',
+        border: "1px solid var(--mantine-color-gray-3)",
+        background: "var(--mantine-color-gray-0)",
       }}
     >
       <Group gap="sm" wrap="wrap" align="center">
@@ -88,11 +86,11 @@ export function PracticasFiltros({
         <Select
           placeholder="Provincia"
           data={opcionesProvincias}
-          value={filtros.provincia_id ?? ''}
+          value={filtros.provincia_id ?? ""}
           onChange={(val) =>
             onChange({
               ...filtros,
-              provincia_id: val ?? '',
+              provincia_id: val ?? "",
               page: 1,
             })
           }
@@ -104,12 +102,11 @@ export function PracticasFiltros({
         <Select
           placeholder="Replicabilidad"
           data={OPCIONES_REPLICABILIDAD}
-          value={filtros.replicabilidad ?? ''}
+          value={filtros.replicabilidad ?? ""}
           onChange={(val) =>
             onChange({
               ...filtros,
-              replicabilidad:
-                val as PracticaFiltros['replicabilidad'],
+              replicabilidad: val as PracticaFiltros["replicabilidad"],
               page: 1,
             })
           }
@@ -123,9 +120,7 @@ export function PracticasFiltros({
           onChange={(e) =>
             onChange({
               ...filtros,
-              es_destacada: e.currentTarget.checked
-                ? true
-                : undefined,
+              es_destacada: e.currentTarget.checked ? true : undefined,
               page: 1,
             })
           }
@@ -139,7 +134,7 @@ export function PracticasFiltros({
             size="sm"
             leftSection={<IconX size={14} />}
             onClick={() => {
-              setSearchInput('');
+              setSearchInput("");
               onLimpiar();
             }}
           >

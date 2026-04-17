@@ -1,4 +1,3 @@
-import type { Proyecto, Provincia, Ods } from '@/services/axios';
 
 // Filtros activos en el mapa
 export interface MapaFiltros {

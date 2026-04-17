@@ -10,7 +10,6 @@ import {
 } from '@tabler/icons-react';
 import Link from 'next/link';
 import { getColorOds }   from '@/utils/colores-ods';
-import { formatMoneda }  from '@/utils/formatters';
 import type { Proyecto } from '@/services/axios';
 
 interface ProyectoKanbanCardProps {

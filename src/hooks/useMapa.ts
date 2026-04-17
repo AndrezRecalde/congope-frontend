@@ -7,16 +7,11 @@ import {
   useProvinciasMapa,
   useOdsMapa,
 } from '@/queries/mapa.queries';
-import { useAppSelector } from '@/store/hooks';
-import {
-  selectSidebarAbierto,
-} from '@/store/slices/uiSlice';
 import type {
   MapaFiltros,
   ProvinciaMapaData,
   ProyectoPin,
 } from '@/types/mapa.types';
-import type { Proyecto } from '@/services/axios';
 
 export function useMapa() {
   const [filtros, setFiltros] = useState<MapaFiltros>({});

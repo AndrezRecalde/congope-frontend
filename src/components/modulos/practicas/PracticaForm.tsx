@@ -114,6 +114,8 @@ export function PracticaForm({
           String(practicaDetalle.es_destacada).toLowerCase() === "true",
       });
     }
+    // form is a stable reference from useForm (Mantine guarantees this)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [practicaDetalle, esEdicion]);
 
   const handleSubmit = async (values: PracticaFormValues) => {
