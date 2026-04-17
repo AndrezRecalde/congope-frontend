@@ -1,9 +1,14 @@
-'use client'
+"use client";
 
 import {
-  Stack, Divider, Box, Text,
-  ActionIcon, Group, rem,
-} from '@mantine/core';
+  Stack,
+  Divider,
+  Box,
+  Text,
+  ActionIcon,
+  Group,
+  rem,
+} from "@mantine/core";
 import {
   IconChevronLeft,
   IconChevronRight,
@@ -20,117 +25,120 @@ import {
   IconSettings,
   IconUsers,
   IconShield,
-} from '@tabler/icons-react';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import {
-  toggleSidebar,
-  selectSidebarAbierto,
-} from '@/store/slices/uiSlice';
-import { usePermisos } from '@/hooks/usePermisos';
-import { NavItem }     from './NavItem';
+  IconCategory,
+} from "@tabler/icons-react";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { toggleSidebar, selectSidebarAbierto } from "@/store/slices/uiSlice";
+import { usePermisos } from "@/hooks/usePermisos";
+import { NavItem } from "./NavItem";
 
 const ICON_SIZE = 17;
 
 // Navegación principal del sistema
 const NAV_PRINCIPAL = [
   {
-    href:    '/dashboard',
-    label:   'Dashboard',
-    icon:    <IconLayoutDashboard size={ICON_SIZE} />,
-    permiso: 'dashboard.ver',
+    href: "/dashboard",
+    label: "Dashboard",
+    icon: <IconLayoutDashboard size={ICON_SIZE} />,
+    permiso: "dashboard.ver",
   },
   {
-    href:    '/actores',
-    label:   'Actores',
-    icon:    <IconBuildingBank size={ICON_SIZE} />,
-    permiso: 'actores.ver',
+    href: "/actores",
+    label: "Actores",
+    icon: <IconBuildingBank size={ICON_SIZE} />,
+    permiso: "actores.ver",
   },
   {
-    href:    '/proyectos',
-    label:   'Proyectos',
-    icon:    <IconFolderOpen size={ICON_SIZE} />,
-    permiso: 'proyectos.ver',
+    href: "/proyectos",
+    label: "Proyectos",
+    icon: <IconFolderOpen size={ICON_SIZE} />,
+    permiso: "proyectos.ver",
   },
   {
-    href:    '/buenas-practicas',
-    label:   'Buenas Prácticas',
-    icon:    <IconStar size={ICON_SIZE} />,
-    permiso: 'practicas.ver',
+    href: "/buenas-practicas",
+    label: "Buenas Prácticas",
+    icon: <IconStar size={ICON_SIZE} />,
+    permiso: "practicas.ver",
   },
   {
-    href:    '/redes',
-    label:   'Redes',
-    icon:    <IconNetwork size={ICON_SIZE} />,
-    permiso: 'redes.ver',
+    href: "/redes",
+    label: "Redes",
+    icon: <IconNetwork size={ICON_SIZE} />,
+    permiso: "redes.ver",
   },
   {
-    href:    '/emblematicos',
-    label:   'Emblemáticos',
-    icon:    <IconTrophy size={ICON_SIZE} />,
-    permiso: 'emblematicos.ver',
+    href: "/emblematicos",
+    label: "Emblemáticos",
+    icon: <IconTrophy size={ICON_SIZE} />,
+    permiso: "emblematicos.ver",
   },
   {
-    href:    '/mapa',
-    label:   'Mapa',
-    icon:    <IconMap2 size={ICON_SIZE} />,
-    permiso: 'mapa.ver',
+    href: "/mapa",
+    label: "Mapa",
+    icon: <IconMap2 size={ICON_SIZE} />,
+    permiso: "mapa.ver",
   },
 ];
 
 // Herramientas de trabajo
 const NAV_HERRAMIENTAS = [
   {
-    href:    '/documentos',
-    label:   'Documentos',
-    icon:    <IconFiles size={ICON_SIZE} />,
-    permiso: 'documentos.ver',
+    href: "/documentos",
+    label: "Documentos",
+    icon: <IconFiles size={ICON_SIZE} />,
+    permiso: "documentos.ver",
   },
   {
-    href:    '/eventos',
-    label:   'Agenda',
-    icon:    <IconCalendarEvent size={ICON_SIZE} />,
-    permiso: 'eventos.ver',
+    href: "/eventos",
+    label: "Agenda",
+    icon: <IconCalendarEvent size={ICON_SIZE} />,
+    permiso: "eventos.ver",
   },
   {
-    href:    '/reportes',
-    label:   'Reportes',
-    icon:    <IconChartBar size={ICON_SIZE} />,
-    permiso: 'reportes.generar',
+    href: "/reportes",
+    label: "Reportes",
+    icon: <IconChartBar size={ICON_SIZE} />,
+    permiso: "reportes.generar",
   },
 ];
 
 // Administración del sistema
 const NAV_ADMIN = [
   {
-    href:    '/configuracion/usuarios',
-    label:   'Usuarios',
-    icon:    <IconUsers size={ICON_SIZE} />,
-    permiso: 'usuarios.ver',
+    href: "/configuracion/usuarios",
+    label: "Usuarios",
+    icon: <IconUsers size={ICON_SIZE} />,
+    permiso: "usuarios.ver",
   },
   {
-    href:    '/configuracion/auditoria',
-    label:   'Auditoría',
-    icon:    <IconShield size={ICON_SIZE} />,
-    permiso: 'usuarios.ver_auditoria',
+    href: "/configuracion/auditoria",
+    label: "Auditoría",
+    icon: <IconShield size={ICON_SIZE} />,
+    permiso: "usuarios.ver_auditoria",
+  },
+  {
+    href: "/configuracion/beneficiarios",
+    label: "Beneficiarios",
+    icon: <IconCategory size={ICON_SIZE} />,
+    permiso: "categorias_beneficiarios.ver",
   },
 ];
 
 export function Sidebar() {
-  const dispatch       = useAppDispatch();
+  const dispatch = useAppDispatch();
   const sidebarAbierto = useAppSelector(selectSidebarAbierto);
-  const { can }        = usePermisos();
+  const { can } = usePermisos();
 
   return (
     <Stack h="100%" gap={0}>
-
       {/* Cabecera del sidebar con logo y botón colapsar */}
       <Group
-        justify={sidebarAbierto ? 'space-between' : 'center'}
+        justify={sidebarAbierto ? "space-between" : "center"}
         p="sm"
         mb="xs"
         style={{
-          borderBottom: '1px solid var(--mantine-color-gray-2)',
-          height: 60,    // Alineado con el topbar
+          borderBottom: "1px solid var(--mantine-color-gray-2)",
+          height: 60, // Alineado con el topbar
           flexShrink: 0,
         }}
       >
@@ -138,23 +146,25 @@ export function Sidebar() {
           <Group gap="xs">
             <Box
               style={{
-                width:        28,
-                height:       28,
-                borderRadius: '6px',
-                background:   'var(--mantine-color-congope-8)',
-                display:      'flex',
-                alignItems:   'center',
-                justifyContent: 'center',
-                flexShrink:   0,
+                width: 28,
+                height: 28,
+                borderRadius: "6px",
+                background: "var(--mantine-color-congope-8)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
               }}
             >
-              <Text fw={700} size="xs" c="white">C</Text>
+              <Text fw={700} size="xs" c="white">
+                C
+              </Text>
             </Box>
             <Text
               fw={700}
               size="sm"
               c="congope.8"
-              style={{ letterSpacing: '0.03em' }}
+              style={{ letterSpacing: "0.03em" }}
             >
               CONGOPE
             </Text>
@@ -166,55 +176,51 @@ export function Sidebar() {
           color="gray"
           size="sm"
           onClick={() => dispatch(toggleSidebar())}
-          aria-label={
-            sidebarAbierto ? 'Colapsar sidebar' : 'Expandir sidebar'
-          }
+          aria-label={sidebarAbierto ? "Colapsar sidebar" : "Expandir sidebar"}
         >
-          {sidebarAbierto
-            ? <IconChevronLeft size={16} />
-            : <IconChevronRight size={16} />}
+          {sidebarAbierto ? (
+            <IconChevronLeft size={16} />
+          ) : (
+            <IconChevronRight size={16} />
+          )}
         </ActionIcon>
       </Group>
 
       {/* Área de navegación con scroll */}
       <Box
         style={{
-          flex:     1,
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          padding:  '8px',
+          flex: 1,
+          overflowY: "auto",
+          overflowX: "hidden",
+          padding: "8px",
         }}
       >
         {/* Módulos principales */}
         <Stack gap={2}>
-          {NAV_PRINCIPAL
-            .filter((item) => can(item.permiso))
-            .map((item) => (
-              <NavItem
-                key={item.href}
-                href={item.href}
-                label={item.label}
-                icon={item.icon}
-                collapsed={!sidebarAbierto}
-              />
-            ))}
+          {NAV_PRINCIPAL.filter((item) => can(item.permiso)).map((item) => (
+            <NavItem
+              key={item.href}
+              href={item.href}
+              label={item.label}
+              icon={item.icon}
+              collapsed={!sidebarAbierto}
+            />
+          ))}
         </Stack>
 
         <Divider my="xs" />
 
         {/* Herramientas */}
         <Stack gap={2}>
-          {NAV_HERRAMIENTAS
-            .filter((item) => can(item.permiso))
-            .map((item) => (
-              <NavItem
-                key={item.href}
-                href={item.href}
-                label={item.label}
-                icon={item.icon}
-                collapsed={!sidebarAbierto}
-              />
-            ))}
+          {NAV_HERRAMIENTAS.filter((item) => can(item.permiso)).map((item) => (
+            <NavItem
+              key={item.href}
+              href={item.href}
+              label={item.label}
+              icon={item.icon}
+              collapsed={!sidebarAbierto}
+            />
+          ))}
         </Stack>
 
         {/* Administración — solo si tiene permisos */}
@@ -230,25 +236,23 @@ export function Sidebar() {
                   px="xs"
                   mb={4}
                   style={{
-                    textTransform:  'uppercase',
-                    letterSpacing:  '0.06em',
-                    fontSize:       rem(10),
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                    fontSize: rem(10),
                   }}
                 >
                   Administración
                 </Text>
               )}
-              {NAV_ADMIN
-                .filter((item) => can(item.permiso))
-                .map((item) => (
-                  <NavItem
-                    key={item.href}
-                    href={item.href}
-                    label={item.label}
-                    icon={item.icon}
-                    collapsed={!sidebarAbierto}
-                  />
-                ))}
+              {NAV_ADMIN.filter((item) => can(item.permiso)).map((item) => (
+                <NavItem
+                  key={item.href}
+                  href={item.href}
+                  label={item.label}
+                  icon={item.icon}
+                  collapsed={!sidebarAbierto}
+                />
+              ))}
             </Stack>
           </>
         )}
