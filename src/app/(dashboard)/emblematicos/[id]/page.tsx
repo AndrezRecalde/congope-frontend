@@ -1,34 +1,46 @@
-'use client'
+"use client";
 
-import { use }       from 'react';
-import { useRouter } from 'next/navigation';
+import { use } from "react";
+import { useRouter } from "next/navigation";
 import {
-  Grid, Paper, Stack, Title, Text, Badge,
-  Group, Button, Skeleton, SimpleGrid,
-  Divider, Anchor, Alert,
-} from '@mantine/core';
+  Grid,
+  Paper,
+  Stack,
+  Title,
+  Text,
+  Badge,
+  Group,
+  Button,
+  Skeleton,
+  SimpleGrid,
+  Divider,
+  Anchor,
+  Alert,
+} from "@mantine/core";
 import {
-  IconArrowLeft, IconEdit, IconTrash,
-  IconWorld, IconWorldOff, IconFolderOpen,
-  IconMapPin, IconAlertCircle,
-} from '@tabler/icons-react';
-import Link    from 'next/link';
-import { modals } from '@mantine/modals';
-import { PageHeader }            from
-  '@/components/ui/PageHeader/PageHeader';
-import { ReconocimientosPanel }  from
-  '@/components/modulos/emblematicos/ReconocimientosPanel';
-import { EmblematicoForm }       from
-  '@/components/modulos/emblematicos/EmblematicoForm';
+  IconArrowLeft,
+  IconEdit,
+  IconTrash,
+  IconWorld,
+  IconWorldOff,
+  IconFolderOpen,
+  IconMapPin,
+  IconAlertCircle,
+} from "@tabler/icons-react";
+import Link from "next/link";
+import { modals } from "@mantine/modals";
+import { PageHeader } from "@/components/ui/PageHeader/PageHeader";
+import { ReconocimientosPanel } from "@/components/modulos/emblematicos/ReconocimientosPanel";
+import { EmblematicoForm } from "@/components/modulos/emblematicos/EmblematicoForm";
 import {
   useEmblematico,
   useActualizarEmblematico,
   useEliminarEmblematico,
   usePublicarEmblematico,
-} from '@/queries/emblematicos.queries';
-import { usePermisos } from '@/hooks/usePermisos';
-import { useConfirm }  from '@/hooks/useConfirm';
-import { formatFecha } from '@/utils/formatters';
+} from "@/queries/emblematicos.queries";
+import { usePermisos } from "@/hooks/usePermisos";
+import { useConfirm } from "@/hooks/useConfirm";
+import { formatFecha } from "@/utils/formatters";
 
 function CampoInfo({
   label,
@@ -44,11 +56,11 @@ function CampoInfo({
         fw={600}
         c="dimmed"
         tt="uppercase"
-        style={{ letterSpacing: '0.05em' }}
+        style={{ letterSpacing: "0.05em" }}
       >
         {label}
       </Text>
-      <Text size="sm">{valor || '—'}</Text>
+      <Text size="sm">{valor || "—"}</Text>
     </Stack>
   );
 }
@@ -57,31 +69,23 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function EmblematicoDetallePage(
-  props: PageProps
-) {
+export default function EmblematicoDetallePage(props: PageProps) {
   const { id } = use(props.params);
-  const router  = useRouter();
+  const router = useRouter();
   const { can } = usePermisos();
   const { confirmar } = useConfirm();
 
-  const {
-    data: emblematico,
-    isLoading,
-    isError,
-  } = useEmblematico(id);
+  const { data: emblematico, isLoading, isError } = useEmblematico(id);
 
-  const {
-    mutateAsync: actualizarAsync,
-  } = useActualizarEmblematico();
-  const { mutate: eliminar }  = useEliminarEmblematico();
-  const { mutate: publicar }  = usePublicarEmblematico();
+  const { mutateAsync: actualizarAsync } = useActualizarEmblematico();
+  const { mutate: eliminar } = useEliminarEmblematico();
+  const { mutate: publicar } = usePublicarEmblematico();
 
   const abrirModalEditar = () => {
     if (!emblematico) return;
     modals.open({
-      title:    'Editar proyecto emblemático',
-      size:     'lg',
+      title: "Editar proyecto emblemático",
+      size: "lg",
       children: (
         <EmblematicoForm
           emblematico={emblematico}
@@ -101,9 +105,9 @@ export default function EmblematicoDetallePage(
         <PageHeader
           titulo="Emblemático no encontrado"
           breadcrumbs={[
-            { label: 'Inicio',        href: '/dashboard' },
-            { label: 'Emblemáticos', href: '/emblematicos' },
-            { label: 'Detalle' },
+            { label: "Inicio", href: "/dashboard" },
+            { label: "Emblemáticos", href: "/emblematicos" },
+            { label: "Detalle" },
           ]}
         />
         <Alert
@@ -132,9 +136,9 @@ export default function EmblematicoDetallePage(
         <PageHeader
           titulo="Cargando..."
           breadcrumbs={[
-            { label: 'Inicio',        href: '/dashboard' },
-            { label: 'Emblemáticos', href: '/emblematicos' },
-            { label: 'Detalle' },
+            { label: "Inicio", href: "/dashboard" },
+            { label: "Emblemáticos", href: "/emblematicos" },
+            { label: "Detalle" },
           ]}
         />
         <Grid>
@@ -160,8 +164,8 @@ export default function EmblematicoDetallePage(
       <PageHeader
         titulo={emblematico.titulo}
         breadcrumbs={[
-          { label: 'Inicio',        href: '/dashboard' },
-          { label: 'Emblemáticos', href: '/emblematicos' },
+          { label: "Inicio", href: "/dashboard" },
+          { label: "Emblemáticos", href: "/emblematicos" },
           { label: emblematico.titulo },
         ]}
         acciones={
@@ -178,11 +182,9 @@ export default function EmblematicoDetallePage(
             </Button>
 
             {/* Toggle publicar */}
-            {can('emblematicos.publicar') && (
+            {can("emblematicos.publicar") && (
               <Button
-                variant={
-                  emblematico.es_publico ? 'filled' : 'outline'
-                }
+                variant={emblematico.es_publico ? "filled" : "outline"}
                 color="green"
                 size="sm"
                 leftSection={
@@ -192,15 +194,15 @@ export default function EmblematicoDetallePage(
                     <IconWorldOff size={15} />
                   )
                 }
-                onClick={() => publicar({ id, es_publico: !emblematico.es_publico })}
+                onClick={() =>
+                  publicar({ id, es_publico: !emblematico.es_publico })
+                }
               >
-                {emblematico.es_publico
-                  ? 'Publicado'
-                  : 'Publicar'}
+                {emblematico.es_publico ? "Publicado" : "Publicar"}
               </Button>
             )}
 
-            {can('emblematicos.editar') && (
+            {can("emblematicos.editar") && (
               <Button
                 variant="outline"
                 color="congope"
@@ -212,7 +214,7 @@ export default function EmblematicoDetallePage(
               </Button>
             )}
 
-            {can('emblematicos.eliminar') && (
+            {can("emblematicos.eliminar") && (
               <Button
                 color="red"
                 variant="light"
@@ -220,14 +222,13 @@ export default function EmblematicoDetallePage(
                 leftSection={<IconTrash size={15} />}
                 onClick={() =>
                   confirmar({
-                    titulo:     'Eliminar emblemático',
-                    mensaje:    `¿Eliminar "${emblematico.titulo}"?`,
-                    textoBoton: 'Eliminar',
-                    colorBoton: 'red',
+                    titulo: "Eliminar emblemático",
+                    mensaje: `¿Eliminar "${emblematico.titulo}"?`,
+                    textoBoton: "Eliminar",
+                    colorBoton: "red",
                     onConfirmar: () =>
                       eliminar(id, {
-                        onSuccess: () =>
-                          router.push('/emblematicos'),
+                        onSuccess: () => router.push("/emblematicos"),
                       }),
                   })
                 }
@@ -243,14 +244,12 @@ export default function EmblematicoDetallePage(
         {/* ── Columna principal ── */}
         <Grid.Col span={{ base: 12, md: 8 }}>
           <Stack gap="md">
-
             {/* Información general */}
             <Paper
               p="lg"
               radius="lg"
               style={{
-                border:
-                  '1px solid var(--mantine-color-gray-3)',
+                border: "1px solid var(--mantine-color-gray-3)",
               }}
             >
               <Group justify="space-between" mb="md">
@@ -258,9 +257,7 @@ export default function EmblematicoDetallePage(
                   Información general
                 </Title>
                 <Badge
-                  color={
-                    emblematico.es_publico ? 'green' : 'gray'
-                  }
+                  color={emblematico.es_publico ? "green" : "gray"}
                   variant="light"
                   leftSection={
                     emblematico.es_publico ? (
@@ -270,40 +267,32 @@ export default function EmblematicoDetallePage(
                     )
                   }
                 >
-                  {emblematico.es_publico
-                    ? 'Portal público'
-                    : 'No publicado'}
+                  {emblematico.es_publico ? "Portal público" : "No publicado"}
                 </Badge>
               </Group>
 
-              <SimpleGrid
-                cols={{ base: 1, sm: 2 }}
-                spacing="lg"
-              >
+              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
                 <Stack gap={4}>
                   <Text
                     size="xs"
                     fw={600}
                     c="dimmed"
                     tt="uppercase"
-                    style={{ letterSpacing: '0.05em' }}
+                    style={{ letterSpacing: "0.05em" }}
                   >
                     Provincia ejecutora
                   </Text>
                   <Group gap="xs">
-                    <IconMapPin
-                      size={14}
-                      color="var(--mantine-color-gray-5)"
-                    />
+                    <IconMapPin size={14} color="var(--mantine-color-gray-5)" />
                     <Text size="sm">
-                      {emblematico.provincia?.nombre ?? '—'}
+                      {emblematico.provincia?.nombre ?? "—"}
                     </Text>
                   </Group>
                 </Stack>
 
                 <CampoInfo
                   label="Período de ejecución"
-                  valor={emblematico.periodo ?? '—'}
+                  valor={emblematico.periodo ?? "—"}
                 />
 
                 <Stack gap={4}>
@@ -312,7 +301,7 @@ export default function EmblematicoDetallePage(
                     fw={600}
                     c="dimmed"
                     tt="uppercase"
-                    style={{ letterSpacing: '0.05em' }}
+                    style={{ letterSpacing: "0.05em" }}
                   >
                     Proyecto de cooperación
                   </Text>
@@ -331,7 +320,9 @@ export default function EmblematicoDetallePage(
                       </Anchor>
                     </Group>
                   ) : (
-                    <Text size="sm" c="dimmed">—</Text>
+                    <Text size="sm" c="dimmed">
+                      —
+                    </Text>
                   )}
                 </Stack>
 
@@ -352,15 +343,11 @@ export default function EmblematicoDetallePage(
                   fw={600}
                   c="dimmed"
                   tt="uppercase"
-                  style={{ letterSpacing: '0.05em' }}
+                  style={{ letterSpacing: "0.05em" }}
                 >
                   Descripción del impacto
                 </Text>
-                <Text
-                  size="sm"
-                  lh={1.7}
-                  style={{ whiteSpace: 'pre-wrap' }}
-                >
+                <Text size="sm" lh={1.7} style={{ whiteSpace: "pre-wrap" }}>
                   {emblematico.descripcion_impacto}
                 </Text>
               </Stack>
@@ -371,15 +358,12 @@ export default function EmblematicoDetallePage(
               p="lg"
               radius="lg"
               style={{
-                border:
-                  '1px solid var(--mantine-color-gray-3)',
+                border: "1px solid var(--mantine-color-gray-3)",
               }}
             >
               <ReconocimientosPanel
                 emblematicoId={id}
-                reconocimientos={
-                  emblematico.reconocimientos ?? []
-                }
+                reconocimientos={emblematico.reconocimientos ?? []}
               />
             </Paper>
           </Stack>
@@ -388,14 +372,12 @@ export default function EmblematicoDetallePage(
         {/* ── Columna lateral ── */}
         <Grid.Col span={{ base: 12, md: 4 }}>
           <Stack gap="md">
-
             {/* Resumen */}
             <Paper
               p="lg"
               radius="lg"
               style={{
-                border:
-                  '1px solid var(--mantine-color-gray-3)',
+                border: "1px solid var(--mantine-color-gray-3)",
               }}
             >
               <Title order={5} c="gray.7" mb="md">
@@ -406,17 +388,12 @@ export default function EmblematicoDetallePage(
                   <Text size="sm" c="dimmed">
                     Reconocimientos
                   </Text>
-                  <Badge
-                    size="lg"
-                    variant="light"
-                    color="yellow"
-                  >
+                  <Badge size="lg" variant="light" color="yellow">
                     {emblematico.reconocimientos?.length ?? 0}
                   </Badge>
                 </Group>
 
-                {(emblematico.reconocimientos ?? []).length >
-                  0 && (
+                {(emblematico.reconocimientos ?? []).length > 0 && (
                   <>
                     <Divider />
                     <Stack gap="xs">
@@ -425,38 +402,32 @@ export default function EmblematicoDetallePage(
                         fw={600}
                         c="dimmed"
                         tt="uppercase"
-                        style={{ letterSpacing: '0.05em' }}
+                        style={{ letterSpacing: "0.05em" }}
                       >
                         Por ámbito
                       </Text>
-                      {(['Nacional', 'Internacional'] as const)
-                        .map((ambito) => {
+                      {(["Nacional", "Internacional"] as const).map(
+                        (ambito) => {
                           const count = (
                             emblematico.reconocimientos ?? []
-                          ).filter(
-                            (r) => r.ambito === ambito
-                          ).length;
+                          ).filter((r) => r.ambito === ambito).length;
                           if (count === 0) return null;
                           return (
-                            <Group
-                              key={ambito}
-                              justify="space-between"
-                            >
+                            <Group key={ambito} justify="space-between">
                               <Text size="xs">{ambito}</Text>
                               <Badge
                                 size="xs"
                                 variant="outline"
                                 color={
-                                  ambito === 'Internacional'
-                                    ? 'violet'
-                                    : 'blue'
+                                  ambito === "Internacional" ? "violet" : "blue"
                                 }
                               >
                                 {count}
                               </Badge>
                             </Group>
                           );
-                        })}
+                        },
+                      )}
                     </Stack>
                   </>
                 )}

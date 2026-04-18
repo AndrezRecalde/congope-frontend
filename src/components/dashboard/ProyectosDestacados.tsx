@@ -27,7 +27,7 @@ export function ProyectosDestacados() {
         p="xl"
         radius="lg"
         style={{
-          border: "2px dashed var(--mantine-color-gray-3)",
+          border: "2px dashed var(--mantine-color-default-border)",
           background: "var(--mantine-color-default)",
           minHeight: 160,
           display: "flex",
@@ -50,11 +50,11 @@ export function ProyectosDestacados() {
       p="md"
       radius="lg"
       style={{
-        border: "1px solid var(--mantine-color-gray-3)",
+        border: "1px solid var(--mantine-color-default-border)",
         overflow: "hidden",
       }}
     >
-      <Title order={5} c="gray.7" mb="md" px="xs">
+      <Title order={5} mb="md" px="xs">
         Top Proyectos en Ejecución
       </Title>
 
@@ -78,7 +78,7 @@ export function ProyectosDestacados() {
                 component={Link}
                 href={`/proyectos/${p.id}`}
                 fw={500}
-                c="blue.8"
+                style={{ color: "var(--mantine-color-blue-light-color)" }}
                 size="sm"
               >
                 {p.nombre}

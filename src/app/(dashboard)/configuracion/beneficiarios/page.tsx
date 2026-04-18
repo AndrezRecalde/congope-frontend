@@ -36,11 +36,14 @@ import type { CategoriaBeneficiario } from "@/services/axios";
 
 // ── Grupos predefinidos ────────────────────────────────────
 const GRUPOS = [
-  { value: "Enfoque Social y Prioritario", label: "Enfoque Social y Prioritario" },
-  { value: "Pueblos y Nacionalidades",     label: "Pueblos y Nacionalidades" },
-  { value: "Sector Productivo",            label: "Sector Productivo" },
-  { value: "Sociedad Civil",               label: "Sociedad Civil" },
-  { value: "Institucional",                label: "Institucional" },
+  {
+    value: "Enfoque Social y Prioritario",
+    label: "Enfoque Social y Prioritario",
+  },
+  { value: "Pueblos y Nacionalidades", label: "Pueblos y Nacionalidades" },
+  { value: "Sector Productivo", label: "Sector Productivo" },
+  { value: "Sociedad Civil", label: "Sociedad Civil" },
+  { value: "Institucional", label: "Institucional" },
 ];
 
 // ── Formulario en Modal ────────────────────────────────────
@@ -52,26 +55,24 @@ interface CategoriaFormProps {
 function CategoriaForm({ categoria, onClose }: CategoriaFormProps) {
   const esEdicion = !!categoria;
   const { mutate: crear, isPending: creando } = useCrearCategoria();
-  const { mutate: actualizar, isPending: actualizando } = useActualizarCategoria();
+  const { mutate: actualizar, isPending: actualizando } =
+    useActualizarCategoria();
 
   const form = useForm({
     initialValues: {
       nombre: categoria?.nombre ?? "",
-      grupo:  categoria?.grupo  ?? "",
+      grupo: categoria?.grupo ?? "",
       activo: categoria?.activo ?? true,
     },
     validate: {
       nombre: isNotEmpty("El nombre es obligatorio"),
-      grupo:  isNotEmpty("El grupo es obligatorio"),
+      grupo: isNotEmpty("El grupo es obligatorio"),
     },
   });
 
   const handleSubmit = (values: typeof form.values) => {
     if (esEdicion) {
-      actualizar(
-        { id: categoria.id, data: values },
-        { onSuccess: onClose },
-      );
+      actualizar({ id: categoria.id, data: values }, { onSuccess: onClose });
     } else {
       crear(values, { onSuccess: onClose });
     }
@@ -124,7 +125,9 @@ export default function CategoriasBeneficiarioPage() {
     CategoriaBeneficiario | undefined
   >(undefined);
 
-  const { data: categorias = [], isLoading } = useCategoriasLista({ search: busqueda });
+  const { data: categorias = [], isLoading } = useCategoriasLista({
+    search: busqueda,
+  });
   const { mutate: eliminar } = useEliminarCategoria();
   const { confirmar } = useConfirm();
 
@@ -140,10 +143,10 @@ export default function CategoriasBeneficiarioPage() {
 
   const confirmarEliminar = (cat: CategoriaBeneficiario) => {
     confirmar({
-      titulo:      "Eliminar categoría",
-      mensaje:     `¿Estás seguro de eliminar "${cat.nombre}"? No se puede eliminar si está en uso por proyectos.`,
-      textoBoton:  "Eliminar",
-      colorBoton:  "red",
+      titulo: "Eliminar categoría",
+      mensaje: `¿Estás seguro de eliminar "${cat.nombre}"? No se puede eliminar si está en uso por proyectos.`,
+      textoBoton: "Eliminar",
+      colorBoton: "red",
       onConfirmar: () => eliminar(cat.id),
     });
   };
@@ -180,7 +183,12 @@ export default function CategoriasBeneficiarioPage() {
       />
 
       {/* Búsqueda */}
-      <Paper p="md" radius="md" mb="md" style={{ border: "1px solid var(--mantine-color-gray-3)" }}>
+      <Paper
+        p="md"
+        radius="md"
+        mb="md"
+        style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+      >
         <TextInput
           placeholder="Buscar categoría..."
           value={busqueda}
@@ -281,7 +289,9 @@ export default function CategoriasBeneficiarioPage() {
         opened={modalAbierto}
         onClose={() => setModalAbierto(false)}
         title={
-          categoriaEditando ? "Editar categoría" : "Nueva categoría de beneficiario"
+          categoriaEditando
+            ? "Editar categoría"
+            : "Nueva categoría de beneficiario"
         }
         size="md"
       >

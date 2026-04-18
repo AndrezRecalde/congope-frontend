@@ -13,7 +13,7 @@ export function GraficaOds() {
     return (
       <Paper p="lg" radius="lg"
         style={{
-          border: '1px solid var(--mantine-color-gray-3)',
+          border: '1px solid var(--mantine-color-default-border)',
         }}>
         <Skeleton height={16} width={200} mb="md" />
         <Skeleton height={320} radius="md" />
@@ -25,9 +25,9 @@ export function GraficaOds() {
     return (
       <Paper p="lg" radius="lg"
         style={{
-          border: '1px solid var(--mantine-color-gray-3)',
+          border: '1px solid var(--mantine-color-default-border)',
         }}>
-        <Title order={5} c="gray.7" mb="md">
+        <Title order={5} mb="md">
           Distribución por ODS
         </Title>
         <Text size="sm" c="dimmed" ta="center" py="xl">
@@ -138,10 +138,10 @@ export function GraficaOds() {
       p="lg"
       radius="lg"
       style={{
-        border: '1px solid var(--mantine-color-gray-3)',
+        border: '1px solid var(--mantine-color-default-border)',
       }}
     >
-      <Title order={5} c="gray.7" mb="md">
+      <Title order={5} mb="md">
         Proyectos por ODS
       </Title>
       <ReactECharts

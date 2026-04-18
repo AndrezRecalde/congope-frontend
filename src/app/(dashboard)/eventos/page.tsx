@@ -18,6 +18,7 @@ import {
   ActionIcon,
   Tooltip,
   Anchor,
+  Center,
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useDebouncedValue } from "@mantine/hooks";
@@ -42,7 +43,7 @@ import {
   useActualizarEvento,
 } from "@/queries/eventos.queries";
 import { usePermisos } from "@/hooks/usePermisos";
-import { COLOR_TIPO_EVENTO } from "@/types/evento.types";
+
 import type { EventoFiltros } from "@/types/evento.types";
 import type { Evento } from "@/services/axios";
 
@@ -142,19 +143,19 @@ export default function EventosPage() {
                 {
                   value: "calendario",
                   label: (
-                    <Group gap={6}>
+                    <Center style={{ gap: 10 }}>
                       <IconCalendar size={14} />
                       Calendario
-                    </Group>
+                    </Center>
                   ),
                 },
                 {
                   value: "lista",
                   label: (
-                    <Group gap={6}>
+                    <Center style={{ gap: 10 }}>
                       <IconList size={14} />
                       Lista
-                    </Group>
+                    </Center>
                   ),
                 },
               ]}
@@ -274,7 +275,7 @@ function EventosListaView({
       noRecordsText="Sin eventos"
       styles={{
         header: {
-          backgroundColor: "var(--mantine-color-gray-1)",
+          backgroundColor: "var(--mantine-color-default)",
         },
       }}
       columns={[
@@ -286,11 +287,13 @@ function EventosListaView({
             <Badge
               size="sm"
               variant="light"
-              style={{
-                background: COLOR_TIPO_EVENTO[e.tipo_evento] + "20",
-                color: COLOR_TIPO_EVENTO[e.tipo_evento],
-                border: `1px solid ${COLOR_TIPO_EVENTO[e.tipo_evento]}40`,
-              }}
+              color={
+                e.tipo_evento === 'Misión técnica' ? 'blue' :
+                e.tipo_evento === 'Reunión bilateral' ? 'green' :
+                e.tipo_evento === 'Conferencia' ? 'grape' :
+                e.tipo_evento === 'Visita de campo' ? 'orange' :
+                e.tipo_evento === 'Virtual' ? 'teal' : 'gray'
+              }
             >
               {e.tipo_evento}
             </Badge>
@@ -306,21 +309,20 @@ function EventosListaView({
                 href={`/eventos/${e.id}`}
                 size="sm"
                 fw={500}
-                c="congope.8"
-                style={{ textDecoration: "none" }}
+                style={{ textDecoration: "none", color: "var(--mantine-color-congope-light-color)" }}
               >
                 {e.titulo}
               </Anchor>
               {e.lugar ? (
                 <Group gap={4}>
-                  <IconMapPin size={11} color="var(--mantine-color-gray-5)" />
+                  <IconMapPin size={11} color="var(--mantine-color-dimmed)" />
                   <Text size="xs" c="dimmed">
                     {e.lugar}
                   </Text>
                 </Group>
               ) : e.es_virtual ? (
                 <Group gap={4}>
-                  <IconVideo size={11} color="var(--mantine-color-gray-5)" />
+                  <IconVideo size={11} color="var(--mantine-color-dimmed)" />
                   <Text size="xs" c="dimmed">
                     Virtual
                   </Text>
@@ -346,7 +348,7 @@ function EventosListaView({
           textAlign: "center",
           render: (e: Evento) => (
             <Group gap={4} justify="center">
-              <IconUsers size={13} color="var(--mantine-color-gray-5)" />
+              <IconUsers size={13} color="var(--mantine-color-dimmed)" />
               <Text size="sm">{e.participantes_count}</Text>
             </Group>
           ),

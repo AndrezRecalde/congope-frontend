@@ -192,9 +192,7 @@ export function ProyectoForm({
     validate: {
       nombre: isNotEmpty("El nombre es requerido"),
       actor_ids: (v: string[]) =>
-        !v || v.length === 0
-          ? "Selecciona al menos un actor cooperante"
-          : null,
+        !v || v.length === 0 ? "Selecciona al menos un actor cooperante" : null,
       estado: isNotEmpty("Selecciona el estado"),
       monto_total: (v) =>
         v === "" || v === undefined
@@ -231,10 +229,7 @@ export function ProyectoForm({
     ]);
   };
 
-  const cantonesArr = useMemo(
-    () => cantonesDataRaw ?? [],
-    [cantonesDataRaw],
-  );
+  const cantonesArr = useMemo(() => cantonesDataRaw ?? [], [cantonesDataRaw]);
 
   // Mapa O(1): canton_id → Canton (para lookups en el render)
   const cantonPorId = useMemo(
@@ -365,7 +360,8 @@ export function ProyectoForm({
           <Tabs.Tab value="provincias">Ubicación Geográfica</Tabs.Tab>
           <Tabs.Tab value="ods">ODS ({form.values.ods_ids.length})</Tabs.Tab>
           <Tabs.Tab value="beneficiarios">
-            Beneficiarios{beneficiarios.length > 0 ? ` (${beneficiarios.length})` : ""}
+            Beneficiarios
+            {beneficiarios.length > 0 ? ` (${beneficiarios.length})` : ""}
           </Tabs.Tab>
         </Tabs.List>
 
@@ -566,7 +562,7 @@ export function ProyectoForm({
                   key={prov.id}
                   p="md"
                   radius="md"
-                  style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+                  style={{ border: "1px solid var(--mantine-color-default-border)" }}
                 >
                   {/* ── Cabecera de provincia ── */}
                   <Group justify="space-between" mb="sm">
@@ -655,8 +651,8 @@ export function ProyectoForm({
                           p="sm"
                           radius="md"
                           style={{
-                            border: "1px solid var(--mantine-color-blue-2)",
-                            background: "var(--mantine-color-blue-0)",
+                            border: "1px solid var(--mantine-color-blue-light-color)",
+                            backgroundColor: "var(--mantine-color-blue-light)",
                           }}
                         >
                           {/* Cabecera del cantón */}
@@ -666,7 +662,7 @@ export function ProyectoForm({
                                 size={13}
                                 color="var(--mantine-color-blue-7)"
                               />
-                              <Text size="sm" fw={600} c="blue.8">
+                              <Text size="sm" fw={600} style={{ color: "var(--mantine-color-blue-light-color)" }}>
                                 {canton.nombre}
                               </Text>
                               <Badge size="xs" variant="light" color="blue">
@@ -801,10 +797,10 @@ export function ProyectoForm({
                       cursor: "pointer",
                       border: seleccionado
                         ? `2px solid ${getColorOds(ods.numero)}`
-                        : "2px solid var(--mantine-color-gray-3)",
+                        : "2px solid var(--mantine-color-default-border)",
                       background: seleccionado
                         ? `${getColorOds(ods.numero)}15`
-                        : "white",
+                        : "var(--mantine-color-body)",
                       transition: "all 150ms ease",
                     }}
                   >
@@ -837,13 +833,16 @@ export function ProyectoForm({
           <Stack gap="lg">
             {provinciasSeleccionadas.length === 0 ? (
               <Text size="sm" c="dimmed" ta="center" py="xl">
-                Primero añade provincias en la pestaña &ldquo;Ubicación Geográfica&rdquo;
-                para poder registrar beneficiarios por provincia.
+                Primero añade provincias en la pestaña &ldquo;Ubicación
+                Geográfica&rdquo; para poder registrar beneficiarios por
+                provincia.
               </Text>
             ) : (
               provinciasSeleccionadas.map((prov) => {
                 // Beneficiarios de esta provincia
-                const bDeEsta = beneficiarios.filter((b) => b.provincia_id === prov.id);
+                const bDeEsta = beneficiarios.filter(
+                  (b) => b.provincia_id === prov.id,
+                );
                 // Categorías ya usadas en esta provincia
                 const usadas = new Set(bDeEsta.map((b) => b.categoria_id));
 
@@ -852,14 +851,20 @@ export function ProyectoForm({
                     key={prov.id}
                     p="md"
                     radius="md"
-                    style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+                    style={{ border: "1px solid var(--mantine-color-default-border)" }}
                   >
                     {/* Cabecera de provincia */}
                     <Group gap="sm" mb="sm">
-                      <IconMapPin size={16} color="var(--mantine-color-gray-6)" />
-                      <Text fw={700} size="md">{prov.nombre}</Text>
+                      <IconMapPin
+                        size={16}
+                        color="var(--mantine-color-gray-6)"
+                      />
+                      <Text fw={700} size="md">
+                        {prov.nombre}
+                      </Text>
                       <Badge size="sm" variant="light" color="teal">
-                        {bDeEsta.length} categoría{bDeEsta.length !== 1 ? "s" : ""}
+                        {bDeEsta.length} categoría
+                        {bDeEsta.length !== 1 ? "s" : ""}
                       </Badge>
                     </Group>
 
@@ -870,7 +875,9 @@ export function ProyectoForm({
                           const globalIdx = beneficiarios.indexOf(b);
                           let catNombre = "Categoría";
                           gruposCategoria?.forEach((g) => {
-                            const found = g.categorias.find((c) => c.id === b.categoria_id);
+                            const found = g.categorias.find(
+                              (c) => c.id === b.categoria_id,
+                            );
                             if (found) catNombre = found.nombre;
                           });
                           return (
@@ -879,12 +886,14 @@ export function ProyectoForm({
                               p="sm"
                               radius="md"
                               style={{
-                                border: "1px solid var(--mantine-color-teal-2)",
-                                background: "var(--mantine-color-teal-0)",
+                                border: "1px solid var(--mantine-color-teal-light-color)",
+                                backgroundColor: "var(--mantine-color-teal-light)",
                               }}
                             >
                               <Group justify="space-between" mb="xs">
-                                <Text size="sm" fw={600} c="teal.8">{catNombre}</Text>
+                                <Text size="sm" fw={600} style={{ color: "var(--mantine-color-teal-light-color)" }}>
+                                  {catNombre}
+                                </Text>
                                 <ActionIcon
                                   variant="subtle"
                                   color="red"
@@ -898,7 +907,10 @@ export function ProyectoForm({
                                   <IconX size={13} />
                                 </ActionIcon>
                               </Group>
-                              <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
+                              <SimpleGrid
+                                cols={{ base: 1, sm: 3 }}
+                                spacing="sm"
+                              >
                                 <NumberInput
                                   label="Directos"
                                   size="sm"
@@ -909,7 +921,11 @@ export function ProyectoForm({
                                     setBeneficiarios((prev) =>
                                       prev.map((item, i) =>
                                         i === globalIdx
-                                          ? { ...item, cantidad_directos: val === "" ? null : Number(val) }
+                                          ? {
+                                              ...item,
+                                              cantidad_directos:
+                                                val === "" ? null : Number(val),
+                                            }
                                           : item,
                                       ),
                                     )
@@ -925,7 +941,11 @@ export function ProyectoForm({
                                     setBeneficiarios((prev) =>
                                       prev.map((item, i) =>
                                         i === globalIdx
-                                          ? { ...item, cantidad_indirectos: val === "" ? null : Number(val) }
+                                          ? {
+                                              ...item,
+                                              cantidad_indirectos:
+                                                val === "" ? null : Number(val),
+                                            }
                                           : item,
                                       ),
                                     )
@@ -940,7 +960,10 @@ export function ProyectoForm({
                                     setBeneficiarios((prev) =>
                                       prev.map((item, i) =>
                                         i === globalIdx
-                                          ? { ...item, observaciones: e.target.value }
+                                          ? {
+                                              ...item,
+                                              observaciones: e.target.value,
+                                            }
                                           : item,
                                       ),
                                     )
@@ -966,7 +989,10 @@ export function ProyectoForm({
                           group: g.grupo,
                           items: g.categorias
                             .filter((c) => !usadas.has(c.id))
-                            .map((c) => ({ value: String(c.id), label: c.nombre })),
+                            .map((c) => ({
+                              value: String(c.id),
+                              label: c.nombre,
+                            })),
                         }))}
                         onChange={(val) => {
                           if (!val) return;
@@ -996,7 +1022,7 @@ export function ProyectoForm({
         justify="space-between"
         pt="md"
         style={{
-          borderTop: "1px solid var(--mantine-color-gray-3)",
+          borderTop: "1px solid var(--mantine-color-default-border)",
         }}
       >
         <Group gap="sm">

@@ -48,7 +48,7 @@ export function KpiCard({
         p="lg"
         radius="lg"
         style={{
-          border: "1px solid var(--mantine-color-gray-3)",
+          border: "1px solid var(--mantine-color-default-border)",
         }}
       >
         <Skeleton height={16} width="60%" mb="sm" />
@@ -63,7 +63,7 @@ export function KpiCard({
       p="lg"
       radius="lg"
       style={{
-        border: "1px solid var(--mantine-color-gray-3)",
+        border: "1px solid var(--mantine-color-default-border)",
         transition: "all 200ms ease",
         cursor: href ? "pointer" : "default",
       }}
@@ -77,7 +77,7 @@ export function KpiCard({
         const el = e.currentTarget;
         el.style.boxShadow = "";
         el.style.transform = "none";
-        el.style.borderColor = "var(--mantine-color-gray-3)";
+        el.style.borderColor = "var(--mantine-color-default-border)";
       }}
     >
       <Group wrap="nowrap" align="center" gap="md">

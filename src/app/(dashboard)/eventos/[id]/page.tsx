@@ -1,68 +1,67 @@
-'use client'
+"use client";
 
-import { use }       from 'react';
-import { useRouter } from 'next/navigation';
+import { use } from "react";
+import { useRouter } from "next/navigation";
 import {
-  Grid, Paper, Stack, Title, Text, Badge,
-  Group, Button, Skeleton, Divider,
-  Anchor, Alert,
-} from '@mantine/core';
+  Grid,
+  Paper,
+  Stack,
+  Title,
+  Text,
+  Badge,
+  Group,
+  Button,
+  Skeleton,
+  Divider,
+  Anchor,
+  Alert,
+} from "@mantine/core";
 import {
-  IconArrowLeft, IconEdit, IconTrash,
-  IconMapPin, IconVideo, IconCalendar,
-  IconUser, IconAlertCircle,
-} from '@tabler/icons-react';
-import Link    from 'next/link';
-import { modals } from '@mantine/modals';
-import { PageHeader }       from
-  '@/components/ui/PageHeader/PageHeader';
-import { ParticipantesPanel } from
-  '@/components/modulos/eventos/ParticipantesPanel';
-import { CompromisosPanel }  from
-  '@/components/modulos/eventos/CompromisosPanel';
-import { EventoForm }        from
-  '@/components/modulos/eventos/EventoForm';
+  IconArrowLeft,
+  IconEdit,
+  IconTrash,
+  IconMapPin,
+  IconVideo,
+  IconCalendar,
+  IconUser,
+  IconAlertCircle,
+} from "@tabler/icons-react";
+import Link from "next/link";
+import { modals } from "@mantine/modals";
+import { PageHeader } from "@/components/ui/PageHeader/PageHeader";
+import { ParticipantesPanel } from "@/components/modulos/eventos/ParticipantesPanel";
+import { CompromisosPanel } from "@/components/modulos/eventos/CompromisosPanel";
+import { EventoForm } from "@/components/modulos/eventos/EventoForm";
 import {
   useEvento,
   useActualizarEvento,
   useEliminarEvento,
-} from '@/queries/eventos.queries';
-import { usePermisos } from '@/hooks/usePermisos';
-import { useConfirm }  from '@/hooks/useConfirm';
-import {
-  COLOR_TIPO_EVENTO,
-} from '@/types/evento.types';
+} from "@/queries/eventos.queries";
+import { usePermisos } from "@/hooks/usePermisos";
+import { useConfirm } from "@/hooks/useConfirm";
+import { COLOR_TIPO_EVENTO } from "@/types/evento.types";
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function EventoDetallePage(
-  props: PageProps
-) {
+export default function EventoDetallePage(props: PageProps) {
   const { id } = use(props.params);
-  const router  = useRouter();
+  const router = useRouter();
   const { can } = usePermisos();
   const { confirmar } = useConfirm();
 
-  const {
-    data: evento,
-    isLoading,
-    isError,
-  } = useEvento(id);
+  const { data: evento, isLoading, isError } = useEvento(id);
 
-  const {
-    mutateAsync: actualizarEventoAsync,
-    isPending: actualizando,
-  } = useActualizarEvento();
-  const { mutate: eliminarEvento } =
-    useEliminarEvento();
+  const { mutateAsync: actualizarEventoAsync, isPending: actualizando } =
+    useActualizarEvento();
+  const { mutate: eliminarEvento } = useEliminarEvento();
 
   const abrirModalEditar = () => {
     if (!evento) return;
     modals.open({
-      title:    'Editar evento',
-      size:     'lg',
+      title: "Editar evento",
+      size: "lg",
       children: (
         <EventoForm
           evento={evento}
@@ -87,9 +86,9 @@ export default function EventoDetallePage(
         <PageHeader
           titulo="Evento no encontrado"
           breadcrumbs={[
-            { label: 'Inicio',  href: '/dashboard' },
-            { label: 'Eventos', href: '/eventos' },
-            { label: 'Detalle' },
+            { label: "Inicio", href: "/dashboard" },
+            { label: "Eventos", href: "/eventos" },
+            { label: "Detalle" },
           ]}
         />
         <Alert
@@ -118,18 +117,16 @@ export default function EventoDetallePage(
         <PageHeader
           titulo="Cargando evento..."
           breadcrumbs={[
-            { label: 'Inicio',  href: '/dashboard' },
-            { label: 'Eventos', href: '/eventos' },
-            { label: 'Detalle' },
+            { label: "Inicio", href: "/dashboard" },
+            { label: "Eventos", href: "/eventos" },
+            { label: "Detalle" },
           ]}
         />
         <Grid>
           <Grid.Col span={{ base: 12, md: 8 }}>
             <Stack gap="md">
               {[1, 2].map((i) => (
-                <Skeleton
-                  key={i} height={160} radius="lg"
-                />
+                <Skeleton key={i} height={160} radius="lg" />
               ))}
             </Stack>
           </Grid.Col>
@@ -146,23 +143,26 @@ export default function EventoDetallePage(
   // NOTA: participantes vienen en el detalle pero NO en
   // el listado. El campo en el detalle se llama
   // "participantes" (no "participantes_count")
-  const participantes = (evento as unknown as {
-    participantes: Array<{
-      id: number;
-      nombres: string;
-      email: string;
-      asistio: boolean;
-      confirmado_en: string;
-    }>;
-  }).participantes ?? [];
+  const participantes =
+    (
+      evento as unknown as {
+        participantes: Array<{
+          id: number;
+          nombres: string;
+          email: string;
+          asistio: boolean;
+          confirmado_en: string;
+        }>;
+      }
+    ).participantes ?? [];
 
   return (
     <>
       <PageHeader
         titulo={evento.titulo}
         breadcrumbs={[
-          { label: 'Inicio',  href: '/dashboard' },
-          { label: 'Eventos', href: '/eventos' },
+          { label: "Inicio", href: "/dashboard" },
+          { label: "Eventos", href: "/eventos" },
           { label: evento.titulo },
         ]}
         acciones={
@@ -177,7 +177,7 @@ export default function EventoDetallePage(
             >
               Volver
             </Button>
-            {can('eventos.editar') && (
+            {can("eventos.editar") && (
               <Button
                 variant="outline"
                 color="congope"
@@ -188,7 +188,7 @@ export default function EventoDetallePage(
                 Editar
               </Button>
             )}
-            {can('eventos.eliminar') && (
+            {can("eventos.eliminar") && (
               <Button
                 color="red"
                 variant="light"
@@ -196,14 +196,13 @@ export default function EventoDetallePage(
                 leftSection={<IconTrash size={15} />}
                 onClick={() =>
                   confirmar({
-                    titulo:     'Eliminar evento',
-                    mensaje:    `¿Eliminar "${evento.titulo}"?`,
-                    textoBoton: 'Eliminar',
-                    colorBoton: 'red',
+                    titulo: "Eliminar evento",
+                    mensaje: `¿Eliminar "${evento.titulo}"?`,
+                    textoBoton: "Eliminar",
+                    colorBoton: "red",
                     onConfirmar: () =>
                       eliminarEvento(id, {
-                        onSuccess: () =>
-                          router.push('/eventos'),
+                        onSuccess: () => router.push("/eventos"),
                       }),
                   })
                 }
@@ -219,26 +218,21 @@ export default function EventoDetallePage(
         {/* ── Columna principal ── */}
         <Grid.Col span={{ base: 12, md: 8 }}>
           <Stack gap="md">
-
             {/* Información general */}
-            <Paper p="lg" radius="lg"
+            <Paper
+              p="lg"
+              radius="lg"
               style={{
-                border:
-                  '1px solid var(--mantine-color-default-border)',
-              }}>
+                border: "1px solid var(--mantine-color-default-border)",
+              }}
+            >
               <Group justify="space-between" mb="md">
-                <Title order={5}>
-                  Información del evento
-                </Title>
+                <Title order={5}>Información del evento</Title>
                 <Badge
                   size="md"
                   style={{
-                    background:
-                      COLOR_TIPO_EVENTO[
-                        evento.tipo_evento
-                      ] + '20',
-                    color:
-                      COLOR_TIPO_EVENTO[evento.tipo_evento],
+                    background: COLOR_TIPO_EVENTO[evento.tipo_evento] + "20",
+                    color: COLOR_TIPO_EVENTO[evento.tipo_evento],
                   }}
                 >
                   {evento.tipo_evento}
@@ -248,8 +242,7 @@ export default function EventoDetallePage(
               <Stack gap="md">
                 {/* Fecha */}
                 <Group gap="xs">
-                  <IconCalendar size={16}
-                    color="var(--mantine-color-gray-5)" />
+                  <IconCalendar size={16} color="var(--mantine-color-gray-5)" />
                   <Text size="sm" fw={500}>
                     {evento.fecha_evento}
                   </Text>
@@ -258,8 +251,7 @@ export default function EventoDetallePage(
                 {/* Lugar o virtual */}
                 {evento.es_virtual ? (
                   <Group gap="xs">
-                    <IconVideo size={16}
-                      color="var(--mantine-color-teal-6)" />
+                    <IconVideo size={16} color="var(--mantine-color-teal-6)" />
                     <Text size="sm">Evento virtual</Text>
                     {evento.url_virtual && (
                       <Anchor
@@ -271,22 +263,24 @@ export default function EventoDetallePage(
                       </Anchor>
                     )}
                   </Group>
-                ) : evento.lugar && (
-                  <Group gap="xs">
-                    <IconMapPin size={16}
-                      color="var(--mantine-color-gray-5)" />
-                    <Text size="sm">{evento.lugar}</Text>
-                  </Group>
+                ) : (
+                  evento.lugar && (
+                    <Group gap="xs">
+                      <IconMapPin
+                        size={16}
+                        color="var(--mantine-color-gray-5)"
+                      />
+                      <Text size="sm">{evento.lugar}</Text>
+                    </Group>
+                  )
                 )}
 
                 {/* Creado por */}
                 {evento.creado_por && (
                   <Group gap="xs">
-                    <IconUser size={16}
-                      color="var(--mantine-color-gray-5)" />
+                    <IconUser size={16} color="var(--mantine-color-gray-5)" />
                     <Text size="xs" c="dimmed">
-                      Organizado por{' '}
-                      {evento.creado_por.name}
+                      Organizado por {evento.creado_por.name}
                     </Text>
                   </Group>
                 )}
@@ -296,9 +290,13 @@ export default function EventoDetallePage(
                   <>
                     <Divider />
                     <Stack gap={4}>
-                      <Text size="xs" fw={600} c="dimmed"
+                      <Text
+                        size="xs"
+                        fw={600}
+                        c="dimmed"
                         tt="uppercase"
-                        style={{ letterSpacing: '0.05em' }}>
+                        style={{ letterSpacing: "0.05em" }}
+                      >
                         Descripción
                       </Text>
                       <Text size="sm" lh={1.7}>
@@ -311,11 +309,13 @@ export default function EventoDetallePage(
             </Paper>
 
             {/* Panel de compromisos */}
-            <Paper p="lg" radius="lg"
+            <Paper
+              p="lg"
+              radius="lg"
               style={{
-                border:
-                  '1px solid var(--mantine-color-default-border)',
-              }}>
+                border: "1px solid var(--mantine-color-default-border)",
+              }}
+            >
               <CompromisosPanel eventoId={id} />
             </Paper>
           </Stack>
@@ -323,15 +323,14 @@ export default function EventoDetallePage(
 
         {/* ── Columna lateral: Participantes ── */}
         <Grid.Col span={{ base: 12, md: 4 }}>
-          <Paper p="lg" radius="lg"
+          <Paper
+            p="lg"
+            radius="lg"
             style={{
-              border:
-                '1px solid var(--mantine-color-default-border)',
-            }}>
-            <ParticipantesPanel
-              eventoId={id}
-              participantes={participantes}
-            />
+              border: "1px solid var(--mantine-color-default-border)",
+            }}
+          >
+            <ParticipantesPanel eventoId={id} participantes={participantes} />
           </Paper>
         </Grid.Col>
       </Grid>

@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  SimpleGrid,
-  Stack,
-  Title,
-  Text,
-  Alert,
-} from "@mantine/core";
+import { SimpleGrid, Stack, Title, Text, Alert } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
 import { PageHeader } from "@/components/ui/PageHeader/PageHeader";
 import { ReporteCard } from "@/components/modulos/reportes/ReporteCard";
@@ -123,9 +117,7 @@ export default function ReportesPage() {
       {/* Sección: Reportes individuales */}
       <Stack gap="xl">
         <Stack gap="xs">
-          <Title order={4}>
-            Reportes individuales
-          </Title>
+          <Title order={4}>Reportes individuales</Title>
           <Text size="sm" c="dimmed">
             Informes enfocados en una provincia, ODS o actor cooperante
             específico.
@@ -151,9 +143,7 @@ export default function ReportesPage() {
 
         {/* Sección: Reportes masivos */}
         <Stack gap="xs">
-          <Title order={4}>
-            Reportes consolidados
-          </Title>
+          <Title order={4}>Reportes consolidados</Title>
           <Text size="sm" c="dimmed">
             Documentos ejecutivos completos del CONGOPE. Requieren permiso
             especial de exportación masiva.

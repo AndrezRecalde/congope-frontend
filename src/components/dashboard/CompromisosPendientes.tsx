@@ -26,7 +26,7 @@ export function CompromisosPendientes() {
     return (
       <Paper p="lg" radius="lg"
         style={{
-          border: '1px solid var(--mantine-color-gray-3)',
+          border: '1px solid var(--mantine-color-default-border)',
         }}>
         <Skeleton height={16} width={200} mb="md" />
         {[1, 2, 3].map((i) => (
@@ -43,11 +43,11 @@ export function CompromisosPendientes() {
       p="lg"
       radius="lg"
       style={{
-        border: '1px solid var(--mantine-color-gray-3)',
+        border: '1px solid var(--mantine-color-default-border)',
       }}
     >
       <Group justify="space-between" mb="md">
-        <Title order={5} c="gray.7">
+        <Title order={5}>
           Mis compromisos pendientes
         </Title>
         {compromisos.length > 0 && (

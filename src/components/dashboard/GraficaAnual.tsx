@@ -13,7 +13,7 @@ export function GraficaAnual() {
     return (
       <Paper p="lg" radius="lg"
         style={{
-          border: '1px solid var(--mantine-color-gray-3)',
+          border: '1px solid var(--mantine-color-default-border)',
         }}>
         <Skeleton height={16} width={200} mb="md" />
         <Skeleton height={240} radius="md" />
@@ -25,9 +25,9 @@ export function GraficaAnual() {
     return (
       <Paper p="lg" radius="lg"
         style={{
-          border: '1px solid var(--mantine-color-gray-3)',
+          border: '1px solid var(--mantine-color-default-border)',
         }}>
-        <Title order={5} c="gray.7" mb="md">
+        <Title order={5} mb="md">
           Proyectos por año
         </Title>
         <Text size="sm" c="dimmed" ta="center" py="xl">
@@ -180,10 +180,10 @@ export function GraficaAnual() {
       p="lg"
       radius="lg"
       style={{
-        border: '1px solid var(--mantine-color-gray-3)',
+        border: '1px solid var(--mantine-color-default-border)',
       }}
     >
-      <Title order={5} c="gray.7" mb="md">
+      <Title order={5} mb="md">
         Proyectos y financiamiento por año
       </Title>
       <ReactECharts

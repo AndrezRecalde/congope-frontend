@@ -1,16 +1,14 @@
-'use client'
+"use client";
 
-import { use }          from 'react';
-import { useRouter }    from 'next/navigation';
-import { Paper, Skeleton, Stack } from '@mantine/core';
-import { PageHeader }   from
-  '@/components/ui/PageHeader/PageHeader';
-import { ProyectoForm } from
-  '@/components/modulos/proyectos/ProyectoForm';
+import { use } from "react";
+import { useRouter } from "next/navigation";
+import { Paper, Skeleton, Stack } from "@mantine/core";
+import { PageHeader } from "@/components/ui/PageHeader/PageHeader";
+import { ProyectoForm } from "@/components/modulos/proyectos/ProyectoForm";
 import {
   useProyecto,
   useActualizarProyecto,
-} from '@/queries/proyectos.queries';
+} from "@/queries/proyectos.queries";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -18,11 +16,10 @@ interface PageProps {
 
 export default function EditarProyectoPage(props: PageProps) {
   const { id } = use(props.params);
-  const router  = useRouter();
+  const router = useRouter();
 
   const { data: proyecto, isLoading } = useProyecto(id);
-  const { mutate: actualizarProyecto, isPending } =
-    useActualizarProyecto();
+  const { mutate: actualizarProyecto, isPending } = useActualizarProyecto();
 
   if (isLoading) {
     return (
@@ -30,9 +27,9 @@ export default function EditarProyectoPage(props: PageProps) {
         <PageHeader
           titulo="Cargando proyecto..."
           breadcrumbs={[
-            { label: 'Inicio',     href: '/dashboard' },
-            { label: 'Proyectos', href: '/proyectos' },
-            { label: 'Editar' },
+            { label: "Inicio", href: "/dashboard" },
+            { label: "Proyectos", href: "/proyectos" },
+            { label: "Editar" },
           ]}
         />
         <Paper p="xl" radius="lg">
@@ -53,17 +50,17 @@ export default function EditarProyectoPage(props: PageProps) {
       <PageHeader
         titulo={`Editar: ${proyecto.nombre}`}
         breadcrumbs={[
-          { label: 'Inicio',           href: '/dashboard' },
-          { label: 'Proyectos',       href: '/proyectos' },
-          { label: proyecto.nombre,   href: `/proyectos/${id}` },
-          { label: 'Editar' },
+          { label: "Inicio", href: "/dashboard" },
+          { label: "Proyectos", href: "/proyectos" },
+          { label: proyecto.nombre, href: `/proyectos/${id}` },
+          { label: "Editar" },
         ]}
       />
       <Paper
         p="xl"
         radius="lg"
         style={{
-          border: '1px solid var(--mantine-color-gray-3)',
+          border: "1px solid var(--mantine-color-gray-3)",
         }}
       >
         <ProyectoForm
@@ -72,9 +69,8 @@ export default function EditarProyectoPage(props: PageProps) {
             actualizarProyecto(
               { id, datos },
               {
-                onSuccess: () =>
-                  router.push(`/proyectos/${id}`),
-              }
+                onSuccess: () => router.push(`/proyectos/${id}`),
+              },
             )
           }
           onCancel={() => router.push(`/proyectos/${id}`)}

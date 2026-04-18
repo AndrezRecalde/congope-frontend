@@ -23,7 +23,7 @@ export function GraficaActores() {
     return (
       <Paper p="lg" radius="lg"
         style={{
-          border: '1px solid var(--mantine-color-gray-3)',
+          border: '1px solid var(--mantine-color-default-border)',
         }}>
         <Skeleton height={16} width={200} mb="md" />
         <Skeleton height={220} radius="md" />
@@ -38,9 +38,9 @@ export function GraficaActores() {
     return (
       <Paper p="lg" radius="lg"
         style={{
-          border: '1px solid var(--mantine-color-gray-3)',
+          border: '1px solid var(--mantine-color-default-border)',
         }}>
-        <Title order={5} c="gray.7" mb="md">
+        <Title order={5} mb="md">
           Actores por tipo
         </Title>
         <Text size="sm" c="dimmed" ta="center" py="xl">
@@ -107,10 +107,10 @@ export function GraficaActores() {
       p="lg"
       radius="lg"
       style={{
-        border: '1px solid var(--mantine-color-gray-3)',
+        border: '1px solid var(--mantine-color-default-border)',
       }}
     >
-      <Title order={5} c="gray.7" mb="md">
+      <Title order={5} mb="md">
         Actores por tipo
       </Title>
       <ReactECharts
