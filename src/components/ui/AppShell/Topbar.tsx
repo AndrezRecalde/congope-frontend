@@ -76,7 +76,7 @@ export function Topbar() {
   const dispatch = useAppDispatch();
   const usuario = useAppSelector(selectUsuario);
 
-  const { toggleColorScheme } = useMantineColorScheme();
+  const { toggleColorScheme, setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
   });
@@ -103,6 +103,9 @@ export function Topbar() {
 
       // Limpiar Redux
       dispatch(clearCredentials());
+
+      // Desactivar modo oscuro al salir
+      setColorScheme("light");
 
       // Redirigir al login
       router.push("/login");
