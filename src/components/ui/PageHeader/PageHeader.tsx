@@ -1,9 +1,6 @@
-import {
-  Group, Stack, Title, Text,
-  Divider, Anchor, Box,
-} from '@mantine/core';
-import Link from 'next/link';
-import { IconChevronRight } from '@tabler/icons-react';
+import { Group, Stack, Title, Text, Divider, Anchor, Box } from "@mantine/core";
+import Link from "next/link";
+import { IconChevronRight } from "@tabler/icons-react";
 
 interface Breadcrumb {
   label: string;
@@ -11,9 +8,9 @@ interface Breadcrumb {
 }
 
 interface PageHeaderProps {
-  titulo:       string;
+  titulo: string;
   descripcion?: string;
-  acciones?:    React.ReactNode;
+  acciones?: React.ReactNode;
   breadcrumbs?: Breadcrumb[];
 }
 
@@ -32,12 +29,7 @@ export function PageHeader({
               {breadcrumbs.map((b, i) => (
                 <Group gap={8} key={i}>
                   {b.href ? (
-                    <Anchor
-                      component={Link}
-                      href={b.href}
-                      size="xs"
-                      c="dimmed"
-                    >
+                    <Anchor component={Link} href={b.href} size="xs" c="dimmed">
                       {b.label}
                     </Anchor>
                   ) : (
@@ -56,9 +48,7 @@ export function PageHeader({
             </Group>
           )}
 
-          <Title order={2} c="gray.9">
-            {titulo}
-          </Title>
+          <Title order={2}>{titulo}</Title>
 
           {descripcion && (
             <Text size="sm" c="dimmed" maw={600}>

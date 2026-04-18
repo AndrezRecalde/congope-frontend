@@ -28,7 +28,7 @@ export function ProyectosDestacados() {
         radius="lg"
         style={{
           border: "2px dashed var(--mantine-color-gray-3)",
-          background: "var(--mantine-color-gray-0)",
+          background: "var(--mantine-color-default)",
           minHeight: 160,
           display: "flex",
           alignItems: "center",
@@ -66,7 +66,7 @@ export function ProyectosDestacados() {
         records={proyectos}
         minHeight={150}
         styles={{
-          header: { background: "var(--mantine-color-gray-0)" },
+          header: { background: "var(--mantine-color-default)" },
         }}
         columns={[
           {

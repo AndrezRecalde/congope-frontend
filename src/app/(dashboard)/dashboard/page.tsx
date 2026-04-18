@@ -92,7 +92,7 @@ export default function DashboardPage() {
               component={Link}
               href="/proyectos/nuevo"
               leftSection={<IconPlus size={16} />}
-              color="blue"
+              color="congope"
             >
               Nuevo Proyecto
             </Button>

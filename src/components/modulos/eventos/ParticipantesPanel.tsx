@@ -143,7 +143,7 @@ export function ParticipantesPanel({
     <Stack gap="md">
       <Group justify="space-between">
         <Group gap="xs">
-          <Title order={5} c="gray.7">
+          <Title order={5}>
             Participantes
           </Title>
           <Badge variant="light" color="congope" size="sm">
@@ -176,7 +176,7 @@ export function ParticipantesPanel({
               radius="md"
               style={{
                 border:
-                  '1px solid var(--mantine-color-gray-3)',
+                  '1px solid var(--mantine-color-default-border)',
               }}
             >
               <Group

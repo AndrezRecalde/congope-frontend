@@ -101,7 +101,7 @@ export function HitosList({ proyectoId }: HitosListProps) {
       {/* Cabecera con progreso */}
       <Group justify="space-between">
         <Group gap="xs">
-          <Title order={5} c="gray.7">
+          <Title order={5}>
             Hitos del proyecto
           </Title>
           <Badge variant="light" color="congope" size="sm">
@@ -151,16 +151,16 @@ export function HitosList({ proyectoId }: HitosListProps) {
               style={{
                 border: `1px solid ${
                   hito.completado
-                    ? 'var(--mantine-color-green-3)'
+                    ? 'var(--mantine-color-green-light-color)'
                     : estaVencido
-                    ? 'var(--mantine-color-red-3)'
-                    : 'var(--mantine-color-gray-3)'
+                    ? 'var(--mantine-color-red-light-color)'
+                    : 'var(--mantine-color-default-border)'
                 }`,
-                background: hito.completado
-                  ? 'var(--mantine-color-green-0)'
+                backgroundColor: hito.completado
+                  ? 'var(--mantine-color-green-light)'
                   : estaVencido
-                  ? 'var(--mantine-color-red-0)'
-                  : 'white',
+                  ? 'var(--mantine-color-red-light)'
+                  : 'var(--mantine-color-body)',
                 transition: 'all 200ms ease',
               }}
             >
@@ -225,7 +225,7 @@ export function HitosList({ proyectoId }: HitosListProps) {
                         {formatFecha(hito.fecha_limite)}
                       </Text>
                       {hito.completado && hito.completado_en && (
-                        <Text size="xs" c="green.7">
+                        <Text size="xs" style={{ color: 'var(--mantine-color-green-light-color)' }}>
                           · Completado:{' '}
                           {formatFecha(hito.completado_en)}
                         </Text>

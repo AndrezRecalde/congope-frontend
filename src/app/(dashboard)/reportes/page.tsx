@@ -123,7 +123,7 @@ export default function ReportesPage() {
       {/* Sección: Reportes individuales */}
       <Stack gap="xl">
         <Stack gap="xs">
-          <Title order={4} c="gray.7">
+          <Title order={4}>
             Reportes individuales
           </Title>
           <Text size="sm" c="dimmed">
@@ -151,7 +151,7 @@ export default function ReportesPage() {
 
         {/* Sección: Reportes masivos */}
         <Stack gap="xs">
-          <Title order={4} c="gray.7">
+          <Title order={4}>
             Reportes consolidados
           </Title>
           <Text size="sm" c="dimmed">

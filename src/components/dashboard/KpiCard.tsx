@@ -92,7 +92,7 @@ export function KpiCard({
             <Text
               size="xs"
               fw={700}
-              c="gray.6"
+              c="dimmed"
               style={{ textTransform: "uppercase", letterSpacing: "0.05em" }}
             >
               {titulo}
@@ -105,7 +105,7 @@ export function KpiCard({
           </Group>
 
           <Group align="baseline" gap="xs">
-            <Title order={3} fw={700} lh={1} c="gray.9">
+            <Title order={3} fw={700} lh={1}>
               {valor}
             </Title>
           </Group>

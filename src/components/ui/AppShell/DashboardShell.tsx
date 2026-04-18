@@ -20,18 +20,18 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       padding="md"
       styles={{
         main: {
-          backgroundColor: "var(--mantine-color-gray-0)",
+          backgroundColor: "var(--color-bg-page, var(--mantine-color-body))",
           minHeight: "calc(100vh - 60px)",
         },
         navbar: {
-          borderRight: "1px solid var(--mantine-color-gray-3)",
-          backgroundColor: "#FFFFFF",
+          borderRight: "1px solid var(--mantine-color-default-border)",
+          backgroundColor: "var(--mantine-color-body)",
           transition: "width 250ms ease",
           overflow: "hidden",
         },
         header: {
-          borderBottom: "1px solid var(--mantine-color-gray-3)",
-          backgroundColor: "#FFFFFF",
+          borderBottom: "1px solid var(--mantine-color-default-border)",
+          backgroundColor: "var(--mantine-color-body)",
           boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
         },
       }}

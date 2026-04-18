@@ -53,12 +53,12 @@ export function PracticaCard({
       radius="lg"
       style={{
         border: isDestacada
-          ? '2px solid #F59E0B'
-          : '1px solid var(--mantine-color-gray-3)',
-        background: isDestacada
-          ? '#FFFBEB'
-          : 'white',
-        transition: 'box-shadow 200ms ease',
+          ? '2px solid var(--mantine-color-yellow-light-color)'
+          : '1px solid var(--mantine-color-default-border)',
+        backgroundColor: isDestacada
+          ? 'var(--mantine-color-yellow-light)'
+          : 'var(--mantine-color-default)',
+        transition: 'box-shadow 200ms ease, border-color 200ms ease, background-color 200ms ease',
       }}
     >
       <Stack gap="sm">
@@ -154,8 +154,7 @@ export function PracticaCard({
           href={`/buenas-practicas/${practica.id}`}
           fw={600}
           size="sm"
-          c="gray.9"
-          style={{ textDecoration: 'none' }}
+          style={{ textDecoration: 'none', color: 'var(--mantine-color-text)' }}
           lineClamp={2}
         >
           {practica.titulo}
@@ -182,7 +181,7 @@ export function PracticaCard({
         {/* Separador */}
         <div
           style={{
-            borderTop: '1px solid var(--mantine-color-gray-2)',
+            borderTop: '1px solid var(--mantine-color-default-border)',
             paddingTop: 8,
           }}
         >

@@ -201,7 +201,7 @@ export function ReporteCard({
       p="lg"
       radius="lg"
       style={{
-        border: "1px solid var(--mantine-color-gray-3)",
+        border: "1px solid var(--mantine-color-default-border)",
         opacity: tienePermiso ? 1 : 0.6,
       }}
     >
@@ -213,7 +213,7 @@ export function ReporteCard({
           </ThemeIcon>
           <Stack gap={4} style={{ flex: 1 }}>
             <Group justify="space-between">
-              <Title order={5} c="gray.8">
+              <Title order={5}>
                 {titulo}
               </Title>
               {!tienePermiso && (

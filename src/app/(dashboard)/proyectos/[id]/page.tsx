@@ -71,10 +71,14 @@ function CampoInfo({
       {icono ? (
         <Group gap="xs">
           {icono}
-          <Text size="sm" component="span">{valor}</Text>
+          <Text size="sm" component="span">
+            {valor}
+          </Text>
         </Group>
       ) : (
-        <Text size="sm" component="div">{valor || "—"}</Text>
+        <Text size="sm" component="div">
+          {valor || "—"}
+        </Text>
       )}
     </Stack>
   );
@@ -197,10 +201,12 @@ export default function ProyectoDetallePage(props: PageProps) {
   );
 
   // Agrupar beneficiarios por provincia para la vista de detalle
-  const beneficiariosPorProvincia = proyecto.provincias.map((prov) => ({
-    provincia: prov,
-    items: beneficiarios.filter((b) => b.provincia_id === prov.id),
-  })).filter((g) => g.items.length > 0);
+  const beneficiariosPorProvincia = proyecto.provincias
+    .map((prov) => ({
+      provincia: prov,
+      items: beneficiarios.filter((b) => b.provincia_id === prov.id),
+    }))
+    .filter((g) => g.items.length > 0);
 
   return (
     <>
@@ -280,10 +286,10 @@ export default function ProyectoDetallePage(props: PageProps) {
             <Paper
               p="lg"
               radius="lg"
-              style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+              style={{ border: "1px solid var(--mantine-color-default-border)" }}
             >
               <Group justify="space-between" mb="md">
-                <Title order={5} c="gray.7">
+                <Title order={5}>
                   Información general
                 </Title>
                 <Group gap="xs">
@@ -306,7 +312,9 @@ export default function ProyectoDetallePage(props: PageProps) {
                               size={13}
                               color="var(--mantine-color-gray-5)"
                             />
-                            <Text size="sm" component="span">{a.nombre}</Text>
+                            <Text size="sm" component="span">
+                              {a.nombre}
+                            </Text>
                           </Group>
                         ))}
                       </Group>
@@ -362,7 +370,7 @@ export default function ProyectoDetallePage(props: PageProps) {
             <Paper
               p="lg"
               radius="lg"
-              style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+              style={{ border: "1px solid var(--mantine-color-default-border)" }}
             >
               <Title order={5} c="gray.7" mb="md">
                 Cronograma y financiamiento
@@ -417,7 +425,7 @@ export default function ProyectoDetallePage(props: PageProps) {
                   >
                     Monto total
                   </Text>
-                  <Text size="xl" fw={700} c="congope.8">
+                  <Text size="xl" fw={700} style={{ color: 'var(--mantine-color-congope-light-color)' }}>
                     {/* Usar el campo formateado del backend */}
                     {proyecto.monto_formateado}
                   </Text>
@@ -433,7 +441,7 @@ export default function ProyectoDetallePage(props: PageProps) {
                     >
                       Beneficiarios directos
                     </Text>
-                    <Text size="xl" fw={700} c="teal.7">
+                    <Text size="xl" fw={700} style={{ color: 'var(--mantine-color-teal-light-color)' }}>
                       {totalBenefDirectos.toLocaleString("es-EC")}
                     </Text>
                   </Stack>
@@ -449,7 +457,7 @@ export default function ProyectoDetallePage(props: PageProps) {
                     >
                       Beneficiarios indirectos
                     </Text>
-                    <Text size="xl" fw={700} c="blue.6">
+                    <Text size="xl" fw={700} style={{ color: 'var(--mantine-color-blue-light-color)' }}>
                       {totalBenefIndirectos.toLocaleString("es-EC")}
                     </Text>
                   </Stack>
@@ -462,9 +470,9 @@ export default function ProyectoDetallePage(props: PageProps) {
               <Paper
                 p="lg"
                 radius="lg"
-                style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+                style={{ border: "1px solid var(--mantine-color-default-border)" }}
               >
-                <Title order={5} c="gray.7" mb="md">
+                <Title order={5} mb="md">
                   Ubicación Geográfica
                 </Title>
                 <Stack gap="sm">
@@ -506,9 +514,9 @@ export default function ProyectoDetallePage(props: PageProps) {
               <Paper
                 p="lg"
                 radius="lg"
-                style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+                style={{ border: "1px solid var(--mantine-color-default-border)" }}
               >
-                <Title order={5} c="gray.7" mb="md">
+                <Title order={5} mb="md">
                   Ubicaciones por Cantón
                 </Title>
                 <Stack gap="md">
@@ -518,15 +526,15 @@ export default function ProyectoDetallePage(props: PageProps) {
                       p="sm"
                       radius="md"
                       style={{
-                        border: "1px solid var(--mantine-color-blue-2)",
-                        background: "var(--mantine-color-blue-0)",
+                        border: "1px solid var(--mantine-color-blue-light-color)",
+                        backgroundColor: "var(--mantine-color-blue-light)",
                       }}
                     >
                       <Group gap="xs" mb="xs">
                         <ThemeIcon color="blue" variant="light" size="sm">
                           <IconMapPin size={12} />
                         </ThemeIcon>
-                        <Text size="sm" fw={700} c="blue.8">
+                        <Text size="sm" fw={700} style={{ color: 'var(--mantine-color-blue-light-color)' }}>
                           {grupo.canton_nombre}
                         </Text>
                         <Badge size="xs" variant="light" color="blue">
@@ -563,40 +571,52 @@ export default function ProyectoDetallePage(props: PageProps) {
               <Paper
                 p="lg"
                 radius="lg"
-                style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+                style={{ border: "1px solid var(--mantine-color-default-border)" }}
               >
                 <Group gap="sm" mb="md">
                   <ThemeIcon color="teal" variant="light" size="md">
                     <IconUsers size={14} />
                   </ThemeIcon>
-                  <Title order={5} c="gray.7">
+                  <Title order={5}>
                     Beneficiarios
                   </Title>
                   <Badge variant="light" color="teal" size="sm">
                     {totalBenefDirectos.toLocaleString("es-EC")} directos
-                    {totalBenefIndirectos > 0 && ` · ${totalBenefIndirectos.toLocaleString("es-EC")} indirectos`}
+                    {totalBenefIndirectos > 0 &&
+                      ` · ${totalBenefIndirectos.toLocaleString("es-EC")} indirectos`}
                   </Badge>
                 </Group>
 
                 <Stack gap="md">
                   {beneficiariosPorProvincia.map(({ provincia, items }) => {
-                    const totalDir = items.reduce((s, b) => s + (b.cantidad_directos ?? 0), 0);
-                    const totalInd = items.reduce((s, b) => s + (b.cantidad_indirectos ?? 0), 0);
+                    const totalDir = items.reduce(
+                      (s, b) => s + (b.cantidad_directos ?? 0),
+                      0,
+                    );
+                    const totalInd = items.reduce(
+                      (s, b) => s + (b.cantidad_indirectos ?? 0),
+                      0,
+                    );
                     return (
                       <Paper
                         key={provincia.id}
                         p="sm"
                         radius="md"
                         style={{
-                          border: "1px solid var(--mantine-color-teal-2)",
-                          background: "var(--mantine-color-teal-0)",
+                          border: "1px solid var(--mantine-color-teal-light-color)",
+                          backgroundColor: "var(--mantine-color-teal-light)",
                         }}
                       >
                         {/* Cabecera de provincia */}
                         <Group justify="space-between" mb="sm">
                           <Group gap="sm">
-                            <IconMapPin size={14} color="var(--mantine-color-teal-6)" />
-                            <Text size="sm" fw={700} c="teal.8">{provincia.nombre}</Text>
+                            <IconMapPin
+                              size={14}
+                              color="var(--mantine-color-teal-6)"
+                            />
+                            <Text size="sm" fw={700} style={{ color: 'var(--mantine-color-teal-light-color)' }}>
+                              {provincia.nombre}
+                            </Text>
                           </Group>
                           <Group gap="sm">
                             {totalDir > 0 && (
@@ -617,13 +637,25 @@ export default function ProyectoDetallePage(props: PageProps) {
                           withColumnBorders
                           withTableBorder
                           fz="xs"
-                          style={{ background: "white", borderRadius: 6, overflow: "hidden" }}
+                          style={{
+                            backgroundColor: "var(--mantine-color-body)",
+                            borderRadius: 6,
+                            overflow: "hidden",
+                          }}
                         >
                           <Table.Thead>
                             <Table.Tr>
                               <Table.Th>Categoría</Table.Th>
-                              <Table.Th style={{ width: 110, textAlign: "right" }}>Directos</Table.Th>
-                              <Table.Th style={{ width: 110, textAlign: "right" }}>Indirectos</Table.Th>
+                              <Table.Th
+                                style={{ width: 110, textAlign: "right" }}
+                              >
+                                Directos
+                              </Table.Th>
+                              <Table.Th
+                                style={{ width: 110, textAlign: "right" }}
+                              >
+                                Indirectos
+                              </Table.Th>
                               <Table.Th>Observaciones</Table.Th>
                             </Table.Tr>
                           </Table.Thead>
@@ -632,24 +664,39 @@ export default function ProyectoDetallePage(props: PageProps) {
                               <Table.Tr key={i}>
                                 <Table.Td>
                                   <Stack gap={1}>
-                                    <Text size="xs" fw={500}>{b.categoria_nombre ?? "—"}</Text>
+                                    <Text size="xs" fw={500}>
+                                      {b.categoria_nombre ?? "—"}
+                                    </Text>
                                     {b.categoria_grupo && (
-                                      <Text size="xs" c="dimmed">{b.categoria_grupo}</Text>
+                                      <Text size="xs" c="dimmed">
+                                        {b.categoria_grupo}
+                                      </Text>
                                     )}
                                   </Stack>
                                 </Table.Td>
-                                <Table.Td style={{ textAlign: "right", fontWeight: 600 }}>
+                                <Table.Td
+                                  style={{
+                                    textAlign: "right",
+                                    fontWeight: 600,
+                                  }}
+                                >
                                   {b.cantidad_directos != null
-                                    ? b.cantidad_directos.toLocaleString("es-EC")
+                                    ? b.cantidad_directos.toLocaleString(
+                                        "es-EC",
+                                      )
                                     : "—"}
                                 </Table.Td>
                                 <Table.Td style={{ textAlign: "right" }}>
                                   {b.cantidad_indirectos != null
-                                    ? b.cantidad_indirectos.toLocaleString("es-EC")
+                                    ? b.cantidad_indirectos.toLocaleString(
+                                        "es-EC",
+                                      )
                                     : "—"}
                                 </Table.Td>
                                 <Table.Td>
-                                  <Text size="xs" c="dimmed">{b.observaciones ?? "—"}</Text>
+                                  <Text size="xs" c="dimmed">
+                                    {b.observaciones ?? "—"}
+                                  </Text>
                                 </Table.Td>
                               </Table.Tr>
                             ))}
@@ -666,7 +713,7 @@ export default function ProyectoDetallePage(props: PageProps) {
             <Paper
               p="lg"
               radius="lg"
-              style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+              style={{ border: "1px solid var(--mantine-color-default-border)" }}
             >
               <HitosList proyectoId={id} />
             </Paper>
@@ -681,9 +728,9 @@ export default function ProyectoDetallePage(props: PageProps) {
               <Paper
                 p="lg"
                 radius="lg"
-                style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+                style={{ border: "1px solid var(--mantine-color-default-border)" }}
               >
-                <Title order={5} c="gray.7" mb="md">
+                <Title order={5} mb="md">
                   ODS alineados
                 </Title>
                 <Stack gap="sm">
@@ -711,9 +758,9 @@ export default function ProyectoDetallePage(props: PageProps) {
             <Paper
               p="lg"
               radius="lg"
-              style={{ border: "1px solid var(--mantine-color-gray-3)" }}
+              style={{ border: "1px solid var(--mantine-color-default-border)" }}
             >
-              <Title order={5} c="gray.7" mb="md">
+              <Title order={5} mb="md">
                 Información del registro
               </Title>
               <Stack gap="md">

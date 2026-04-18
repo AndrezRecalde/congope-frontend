@@ -1,31 +1,29 @@
-'use client'
+"use client";
 
-import {
-  Group, TextInput, Select, Button, Paper,
-} from '@mantine/core';
-import { IconSearch, IconX } from '@tabler/icons-react';
-import { useDebouncedValue }  from '@mantine/hooks';
-import { useEffect, useState } from 'react';
-import type { RedFiltros } from '@/types/red.types';
+import { Group, TextInput, Select, Button, Paper } from "@mantine/core";
+import { IconSearch, IconX } from "@tabler/icons-react";
+import { useDebouncedValue } from "@mantine/hooks";
+import { useEffect, useState } from "react";
+import type { RedFiltros } from "@/types/red.types";
 
 const OPCIONES_TIPO = [
-  { value: '',             label: 'Todos los tipos' },
-  { value: 'Regional',     label: 'Regional' },
-  { value: 'Nacional',     label: 'Nacional' },
-  { value: 'Internacional',label: 'Internacional' },
-  { value: 'Temática',     label: 'Temática' },
+  { value: "", label: "Todos los tipos" },
+  { value: "Regional", label: "Regional" },
+  { value: "Nacional", label: "Nacional" },
+  { value: "Internacional", label: "Internacional" },
+  { value: "Temática", label: "Temática" },
 ];
 
 const OPCIONES_ROL = [
-  { value: '',            label: 'Todos los roles' },
-  { value: 'Miembro',     label: 'Miembro' },
-  { value: 'Coordinador', label: 'Coordinador' },
-  { value: 'Observador',  label: 'Observador' },
+  { value: "", label: "Todos los roles" },
+  { value: "Miembro", label: "Miembro" },
+  { value: "Coordinador", label: "Coordinador" },
+  { value: "Observador", label: "Observador" },
 ];
 
 interface RedesFiltrosProps {
-  filtros:   RedFiltros;
-  onChange:  (f: RedFiltros) => void;
+  filtros: RedFiltros;
+  onChange: (f: RedFiltros) => void;
   onLimpiar: () => void;
 }
 
@@ -34,9 +32,7 @@ export function RedesFiltros({
   onChange,
   onLimpiar,
 }: RedesFiltrosProps) {
-  const [searchInput, setSearchInput] = useState(
-    filtros.search ?? ''
-  );
+  const [searchInput, setSearchInput] = useState(filtros.search ?? "");
   const [debounced] = useDebouncedValue(searchInput, 400);
 
   useEffect(() => {
@@ -49,39 +45,27 @@ export function RedesFiltros({
   }, [debounced]);
 
   const hayFiltros =
-    !!filtros.search ||
-    !!filtros.tipo ||
-    !!filtros.rol_congope;
+    !!filtros.search || !!filtros.tipo || !!filtros.rol_congope;
 
   return (
-    <Paper
-      p="md"
-      mb="md"
-      radius="md"
-      style={{
-        border: '1px solid var(--mantine-color-gray-3)',
-        background: 'var(--mantine-color-gray-0)',
-      }}
-    >
+    <Paper p="md" mb="md" radius="md">
       <Group gap="sm" wrap="wrap">
         <TextInput
           placeholder="Buscar por nombre u objetivo..."
           leftSection={<IconSearch size={15} />}
           value={searchInput}
-          onChange={(e) =>
-            setSearchInput(e.currentTarget.value)
-          }
+          onChange={(e) => setSearchInput(e.currentTarget.value)}
           style={{ flex: 1, minWidth: 220 }}
           size="sm"
         />
         <Select
           placeholder="Tipo de red"
           data={OPCIONES_TIPO}
-          value={filtros.tipo ?? ''}
+          value={filtros.tipo ?? ""}
           onChange={(val) =>
             onChange({
               ...filtros,
-              tipo: val as RedFiltros['tipo'],
+              tipo: val as RedFiltros["tipo"],
               page: 1,
             })
           }
@@ -91,12 +75,11 @@ export function RedesFiltros({
         <Select
           placeholder="Rol de CONGOPE"
           data={OPCIONES_ROL}
-          value={filtros.rol_congope ?? ''}
+          value={filtros.rol_congope ?? ""}
           onChange={(val) =>
             onChange({
               ...filtros,
-              rol_congope:
-                val as RedFiltros['rol_congope'],
+              rol_congope: val as RedFiltros["rol_congope"],
               page: 1,
             })
           }
@@ -110,7 +93,7 @@ export function RedesFiltros({
             size="sm"
             leftSection={<IconX size={14} />}
             onClick={() => {
-              setSearchInput('');
+              setSearchInput("");
               onLimpiar();
             }}
           >

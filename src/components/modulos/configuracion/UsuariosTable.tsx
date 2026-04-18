@@ -73,7 +73,7 @@ export function UsuariosTable({
       styles={{
         header: {
           backgroundColor:
-            'var(--mantine-color-gray-1)',
+            'var(--mantine-color-default)',
         },
       }}
       columns={[

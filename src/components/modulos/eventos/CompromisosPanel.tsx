@@ -187,7 +187,7 @@ export function CompromisosPanel({
     <Stack gap="md">
       <Group justify="space-between">
         <Group gap="xs">
-          <Title order={5} c="gray.7">
+          <Title order={5}>
             Compromisos
           </Title>
           {pendientes > 0 && (
@@ -228,16 +228,16 @@ export function CompromisosPanel({
               style={{
                 border: `1px solid ${
                   comp.resuelto
-                    ? 'var(--mantine-color-green-3)'
+                    ? 'var(--mantine-color-green-light-color)'
                     : comp.vencido
-                    ? 'var(--mantine-color-red-3)'
-                    : 'var(--mantine-color-gray-3)'
+                    ? 'var(--mantine-color-red-light-color)'
+                    : 'var(--mantine-color-default-border)'
                 }`,
-                background: comp.resuelto
-                  ? 'var(--mantine-color-green-0)'
+                backgroundColor: comp.resuelto
+                  ? 'var(--mantine-color-green-light)'
                   : comp.vencido
-                  ? 'var(--mantine-color-red-0)'
-                  : 'white',
+                  ? 'var(--mantine-color-red-light)'
+                  : 'var(--mantine-color-body)',
               }}
             >
               <Group
@@ -266,7 +266,7 @@ export function CompromisosPanel({
                       size="xs"
                       c={
                         comp.vencido && !comp.resuelto
-                          ? 'red.6'
+                          ? 'var(--mantine-color-red-light-color)'
                           : 'dimmed'
                       }
                       fw={

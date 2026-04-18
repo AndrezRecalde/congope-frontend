@@ -1,12 +1,16 @@
 /* Variables CSS globales del sistema CONGOPE */
 :root {
-  --color-primary:   #1A3A5C;
-  --color-secondary: #2E6DA4;
-  --color-accent:    #E8A020;
-  --color-success:   #059669;
-  --color-warning:   #D97706;
-  --color-error:     #DC2626;
-  --color-bg-page:   #FAFAFA;
+  --color-primary: #1a3a5c;
+  --color-secondary: #2e6da4;
+  --color-accent: #e8a020;
+  --color-success: #059669;
+  --color-warning: #d97706;
+  --color-error: #dc2626;
+  --color-bg-page: #fafafa;
+}
+
+[data-mantine-color-scheme="dark"] {
+  --color-bg-page: var(--mantine-color-dark-8);
 }
 
 *,
@@ -24,18 +28,25 @@ body {
 
 /* Scrollbar personalizado — sutil y limpio */
 ::-webkit-scrollbar {
-  width:  6px;
+  width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background:    var(--mantine-color-gray-4);
+  background: var(--mantine-color-gray-4);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--mantine-color-gray-5);
+}
+
+[data-mantine-color-scheme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--mantine-color-dark-4);
+}
+[data-mantine-color-scheme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--mantine-color-dark-3);
 }
 
 /* Orden de capas CSS — crítico para que
@@ -59,6 +70,34 @@ textarea {
   transition: none;
 }
 
+/* Mejora de visibilidad de Hover en Menús y NavLinks */
+.mantine-Menu-item:hover,
+.mantine-Menu-item[data-hovered],
+.mantine-NavLink-root:not([data-active]):hover {
+  background-color: var(--mantine-color-gray-3) !important;
+}
+
+[data-mantine-color-scheme="dark"] .mantine-Menu-item:hover,
+[data-mantine-color-scheme="dark"] .mantine-Menu-item[data-hovered],
+[data-mantine-color-scheme="dark"]
+  .mantine-NavLink-root:not([data-active]):hover {
+  background-color: var(--mantine-color-dark-5) !important;
+}
+
+/* Forzar estilos de cabecera y paginación en DataTables para Modo Oscuro y Claro */
+.mantine-Table-thead th {
+  background-color: var(--mantine-color-gray-1) !important;
+}
+[data-mantine-color-scheme="dark"] .mantine-Table-thead th {
+  background-color: var(--mantine-color-dark-6) !important;
+  color: var(--mantine-color-dark-0) !important;
+}
+
+[data-mantine-color-scheme="dark"] .mantine-datatable-pagination {
+  background-color: var(--mantine-color-dark-7) !important;
+  border-top-color: var(--mantine-color-dark-4) !important;
+}
+
 /* Mantine 8 Global Patches for Active States (Theme Override) */
 .mantine-Tabs-tab[data-active],
 .mantine-NavLink-root[data-active] {
@@ -67,25 +106,23 @@ textarea {
 
 /* ── Portal Público ── */
 :root {
-  --portal-navy:    #0B1F3A;
-  --portal-blue:    #1E4D8C;
-  --portal-gold:    #C9A84C;
-  --portal-gold-lt: #F0D080;
-  --portal-white:   #FAFAFA;
-  --portal-cream:   #F5F0E8;
-  --portal-slate:   #4A5568;
+  --portal-navy: #0b1f3a;
+  --portal-blue: #1e4d8c;
+  --portal-gold: #c9a84c;
+  --portal-gold-lt: #f0d080;
+  --portal-white: #fafafa;
+  --portal-cream: #f5f0e8;
+  --portal-slate: #4a5568;
 
-  --portal-map-0:   #E2E8F0;  /* sin proyectos */
-  --portal-map-1:   #DBEAFE;  /* 1 proyecto */
-  --portal-map-2:   #93C5FD;  /* pocos */
-  --portal-map-3:   #3B82F6;  /* varios */
-  --portal-map-4:   #1E4D8C;  /* muchos */
-  --portal-map-5:   #0B1F3A;  /* máximo */
+  --portal-map-0: #e2e8f0; /* sin proyectos */
+  --portal-map-1: #dbeafe; /* 1 proyecto */
+  --portal-map-2: #93c5fd; /* pocos */
+  --portal-map-3: #3b82f6; /* varios */
+  --portal-map-4: #1e4d8c; /* muchos */
+  --portal-map-5: #0b1f3a; /* máximo */
 
-  --portal-font-display: 'Playfair Display', Georgia,
-    serif;
-  --portal-font-body:    'DM Sans', system-ui,
-    sans-serif;
+  --portal-font-display: "Playfair Display", Georgia, serif;
+  --portal-font-body: "DM Sans", system-ui, sans-serif;
 }
 
 /* Animaciones de entrada */
@@ -101,8 +138,12 @@ textarea {
 }
 
 @keyframes portalFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .portal-animate-up {

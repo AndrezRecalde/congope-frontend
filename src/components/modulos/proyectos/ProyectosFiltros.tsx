@@ -75,15 +75,7 @@ export function ProyectosFiltros({
     !!filtros.provincia_id;
 
   return (
-    <Paper
-      p="md"
-      mb="md"
-      radius="md"
-      style={{
-        border: "1px solid var(--mantine-color-gray-3)",
-        background: "var(--mantine-color-gray-0)",
-      }}
-    >
+    <Paper p="md" mb="md" radius="md">
       <Group gap="sm" wrap="wrap">
         <TextInput
           placeholder="Buscar por nombre o código..."

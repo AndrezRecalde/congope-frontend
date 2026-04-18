@@ -150,7 +150,7 @@ export function AuditoriaTable({
       styles={{
         header: {
           backgroundColor:
-            'var(--mantine-color-gray-1)',
+            'var(--mantine-color-default)',
         },
       }}
       rowExpansion={{
@@ -167,7 +167,7 @@ export function AuditoriaTable({
             radius="md"
             style={{
               background:
-                'var(--mantine-color-gray-0)',
+                'var(--mantine-color-default)',
               border:
                 '1px solid var(--mantine-color-gray-3)',
             }}

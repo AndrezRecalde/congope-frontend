@@ -51,10 +51,10 @@ export function ProyectoKanbanCard({
           mb="xs"
           style={{
             ...provided.draggableProps.style,
-            border: '1px solid var(--mantine-color-gray-3)',
-            background: snapshot.isDragging
-              ? 'var(--mantine-color-congope-0)'
-              : 'white',
+            border: '1px solid var(--mantine-color-default-border)',
+            backgroundColor: snapshot.isDragging
+              ? 'var(--mantine-color-congope-light)'
+              : 'var(--mantine-color-body)',
             boxShadow: snapshot.isDragging
               ? 'var(--mantine-shadow-lg)'
               : 'var(--mantine-shadow-xs)',
@@ -130,7 +130,7 @@ export function ProyectoKanbanCard({
 
             {/* Monto */}
             {proyecto.monto_total && (
-              <Text size="xs" fw={500} c="congope.8">
+              <Text size="xs" fw={500} style={{ color: 'var(--mantine-color-congope-light-color)' }}>
                 {proyecto.monto_formateado}
               </Text>
             )}

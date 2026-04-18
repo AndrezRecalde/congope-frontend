@@ -224,10 +224,10 @@ export default function EventoDetallePage(
             <Paper p="lg" radius="lg"
               style={{
                 border:
-                  '1px solid var(--mantine-color-gray-3)',
+                  '1px solid var(--mantine-color-default-border)',
               }}>
               <Group justify="space-between" mb="md">
-                <Title order={5} c="gray.7">
+                <Title order={5}>
                   Información del evento
                 </Title>
                 <Badge
@@ -314,7 +314,7 @@ export default function EventoDetallePage(
             <Paper p="lg" radius="lg"
               style={{
                 border:
-                  '1px solid var(--mantine-color-gray-3)',
+                  '1px solid var(--mantine-color-default-border)',
               }}>
               <CompromisosPanel eventoId={id} />
             </Paper>
@@ -326,7 +326,7 @@ export default function EventoDetallePage(
           <Paper p="lg" radius="lg"
             style={{
               border:
-                '1px solid var(--mantine-color-gray-3)',
+                '1px solid var(--mantine-color-default-border)',
             }}>
             <ParticipantesPanel
               eventoId={id}

@@ -64,15 +64,7 @@ export function PracticasFiltros({
     !!filtros.es_destacada;
 
   return (
-    <Paper
-      p="md"
-      mb="md"
-      radius="md"
-      style={{
-        border: "1px solid var(--mantine-color-gray-3)",
-        background: "var(--mantine-color-gray-0)",
-      }}
-    >
+    <Paper p="md" mb="md" radius="md">
       <Group gap="sm" wrap="wrap" align="center">
         <TextInput
           placeholder="Buscar por título o descripción..."

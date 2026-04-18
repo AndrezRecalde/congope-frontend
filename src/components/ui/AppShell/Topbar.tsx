@@ -126,7 +126,6 @@ export function Topbar() {
         <Text
           fw={600}
           size="sm"
-          c="gray.8"
           style={{
             whiteSpace: "nowrap",
             overflow: "hidden",
@@ -146,19 +145,19 @@ export function Topbar() {
               align-items: center;
               padding: 4px 12px 4px 4px;
               border-radius: 40px;
-              background-color: var(--mantine-color-gray-0);
-              border: 1px solid var(--mantine-color-gray-2);
+              background-color: var(--mantine-color-default);
+              border: 1px solid var(--mantine-color-default-border);
               transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
               cursor: pointer;
             }
             .user-profile-btn:hover {
-              background-color: var(--mantine-color-white);
-              border-color: var(--mantine-color-gray-3);
+              background-color: var(--mantine-color-default-hover);
+              border-color: var(--mantine-color-default-border);
               box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
               transform: translateY(-1px);
             }
             .user-avatar-modern {
-              border: 2px solid white;
+              border: 2px solid var(--mantine-color-body);
               box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             }
           `,
@@ -219,7 +218,7 @@ export function Topbar() {
                   {iniciales}
                 </Avatar>
                 <Box visibleFrom="sm">
-                  <Text size="sm" fw={600} lh={1.1} c="dark.8">
+                  <Text size="sm" fw={600} lh={1.1}>
                     {usuario?.name?.split(" ")[0] ?? "Usuario"}
                   </Text>
                   <Text size="xs" c="dimmed" lh={1.1} mt={4} tt="capitalize">
@@ -242,8 +241,8 @@ export function Topbar() {
               py="md"
               style={{
                 margin: "-4px -4px 4px -4px",
-                background: "var(--mantine-color-gray-0)",
-                borderBottom: "1px solid var(--mantine-color-gray-2)",
+                background: "var(--mantine-color-default)",
+                borderBottom: "1px solid var(--mantine-color-default-border)",
                 borderTopLeftRadius: "calc(var(--mantine-radius-md) - 2px)",
                 borderTopRightRadius: "calc(var(--mantine-radius-md) - 2px)",
               }}
@@ -254,14 +253,14 @@ export function Topbar() {
                   radius="xl"
                   size={38}
                   style={{
-                    border: "1px solid var(--mantine-color-gray-3)",
+                    border: "1px solid var(--mantine-color-default-border)",
                     boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
                   }}
                 >
                   {iniciales}
                 </Avatar>
                 <Box style={{ flex: 1, minWidth: 0 }}>
-                  <Text size="sm" fw={600} c="dark.8" lh={1.2} truncate>
+                  <Text size="sm" fw={600} lh={1.2} truncate>
                     {usuario?.name}
                   </Text>
                   <Text size="xs" c="dimmed" lh={1.2} mt={2} truncate>
@@ -282,6 +281,40 @@ export function Topbar() {
               onClick={() => router.push("/configuracion")}
             >
               Configuración
+            </Menu.Item>
+
+            <Menu.Item
+              closeMenuOnClick={false}
+              leftSection={
+                computedColorScheme === "dark" ? (
+                  <IconMoon
+                    size={16}
+                    stroke={1.5}
+                    color="var(--mantine-color-blue-5)"
+                  />
+                ) : (
+                  <IconSun
+                    size={16}
+                    stroke={1.5}
+                    color="var(--mantine-color-yellow-5)"
+                  />
+                )
+              }
+              rightSection={
+                <Switch
+                  checked={computedColorScheme === "dark"}
+                  onChange={() => toggleColorScheme()}
+                  size="sm"
+                  color="dark.4"
+                  style={{ cursor: "pointer", pointerEvents: "none" }}
+                />
+              }
+              onClick={(e) => {
+                e.preventDefault();
+                toggleColorScheme();
+              }}
+            >
+              Modo oscuro
             </Menu.Item>
 
             <Divider my="xs" />

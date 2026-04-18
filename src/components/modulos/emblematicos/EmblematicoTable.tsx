@@ -1,31 +1,35 @@
-'use client'
+"use client";
 
-import { DataTable }   from 'mantine-datatable';
+import { DataTable } from "mantine-datatable";
 import {
-  Group, Text, Badge, Stack,
-  ActionIcon, Tooltip, Anchor, Switch,
-} from '@mantine/core';
-import {
-  IconEye, IconEdit, IconTrash,
-} from '@tabler/icons-react';
-import Link from 'next/link';
-import { formatFecha } from '@/utils/formatters';
-import type { ProyectoEmblematico } from '@/services/axios';
+  Group,
+  Text,
+  Badge,
+  Stack,
+  ActionIcon,
+  Tooltip,
+  Anchor,
+  Switch,
+} from "@mantine/core";
+import { IconEye, IconEdit, IconTrash } from "@tabler/icons-react";
+import Link from "next/link";
+import { formatFecha } from "@/utils/formatters";
+import type { ProyectoEmblematico } from "@/services/axios";
 
 interface EmblematicoTableProps {
-  emblematicos:      ProyectoEmblematico[];
-  total:             number;
-  page:              number;
-  perPage:           number;
-  isLoading:         boolean;
-  onPageChange:      (page: number) => void;
-  onEditar:          (e: ProyectoEmblematico) => void;
-  onEliminar:        (e: ProyectoEmblematico) => void;
-  onPublicar:        (e: ProyectoEmblematico) => void;
-  puedeEditar:       boolean;
-  puedeEliminar:     boolean;
-  puedePublicar:     boolean;
-  publicandoId?:     string | null;
+  emblematicos: ProyectoEmblematico[];
+  total: number;
+  page: number;
+  perPage: number;
+  isLoading: boolean;
+  onPageChange: (page: number) => void;
+  onEditar: (e: ProyectoEmblematico) => void;
+  onEliminar: (e: ProyectoEmblematico) => void;
+  onPublicar: (e: ProyectoEmblematico) => void;
+  puedeEditar: boolean;
+  puedeEliminar: boolean;
+  puedePublicar: boolean;
+  publicandoId?: string | null;
 }
 
 export function EmblematicoTable({
@@ -64,22 +68,22 @@ export function EmblematicoTable({
       }
       styles={{
         header: {
-          backgroundColor: 'var(--mantine-color-gray-1)',
+          backgroundColor: "var(--mantine-color-default)",
         },
       }}
       columns={[
         {
-          accessor: 'titulo',
-          title:    'Título',
-          render:   (e) => (
+          accessor: "titulo",
+          title: "Título",
+          render: (e) => (
             <Stack gap={2}>
               <Anchor
                 component={Link}
                 href={`/emblematicos/${e.id}`}
                 size="sm"
                 fw={500}
-                c="congope.8"
-                style={{ textDecoration: 'none' }}
+                c="congope.6"
+                style={{ textDecoration: "none" }}
                 lineClamp={2}
               >
                 {e.titulo}
@@ -93,20 +97,16 @@ export function EmblematicoTable({
           ),
         },
         {
-          accessor: 'provincia',
-          title:    'Provincia',
-          width:    130,
-          render:   (e) => (
-            <Text size="sm">
-              {e.provincia?.nombre ?? '—'}
-            </Text>
-          ),
+          accessor: "provincia",
+          title: "Provincia",
+          width: 130,
+          render: (e) => <Text size="sm">{e.provincia?.nombre ?? "—"}</Text>,
         },
         {
-          accessor: 'proyecto',
-          title:    'Proyecto',
-          width:    180,
-          render:   (e) => (
+          accessor: "proyecto",
+          title: "Proyecto",
+          width: 180,
+          render: (e) =>
             e.proyecto ? (
               <Stack gap={2}>
                 <Text size="xs" fw={500} truncate>
@@ -117,35 +117,32 @@ export function EmblematicoTable({
                 </Text>
               </Stack>
             ) : (
-              <Text size="xs" c="dimmed">—</Text>
-            )
-          ),
+              <Text size="xs" c="dimmed">
+                —
+              </Text>
+            ),
         },
         {
-          accessor:  'reconocimientos_count',
-          title:     'Reconocimientos',
-          width:     130,
-          textAlign: 'center',
-          render:    (e) => (
+          accessor: "reconocimientos_count",
+          title: "Reconocimientos",
+          width: 130,
+          textAlign: "center",
+          render: (e) => (
             <Badge variant="light" color="yellow" size="sm">
-              {e.reconocimientos_count ??
-               e.reconocimientos?.length ??
-               0}
+              {e.reconocimientos_count ?? e.reconocimientos?.length ?? 0}
             </Badge>
           ),
         },
         {
-          accessor: 'es_publico',
-          title:    'Público',
-          width:    90,
-          textAlign:'center',
-          render:   (e) =>
+          accessor: "es_publico",
+          title: "Público",
+          width: 90,
+          textAlign: "center",
+          render: (e) =>
             puedePublicar ? (
               <Tooltip
                 label={
-                  e.es_publico
-                    ? 'Visible en portal público'
-                    : 'No publicado'
+                  e.es_publico ? "Visible en portal público" : "No publicado"
                 }
               >
                 <Switch
@@ -159,18 +156,18 @@ export function EmblematicoTable({
             ) : (
               <Badge
                 variant="light"
-                color={e.es_publico ? 'green' : 'gray'}
+                color={e.es_publico ? "green" : "gray"}
                 size="xs"
               >
-                {e.es_publico ? 'Público' : 'Privado'}
+                {e.es_publico ? "Público" : "Privado"}
               </Badge>
             ),
         },
         {
-          accessor: 'created_at',
-          title:    'Registrado',
-          width:    110,
-          render:   (e) => (
+          accessor: "created_at",
+          title: "Registrado",
+          width: 110,
+          render: (e) => (
             <Text size="xs" c="dimmed">
               {/* NOTA: created_at en ISO 8601 completo */}
               {formatFecha(e.created_at)}
@@ -178,11 +175,11 @@ export function EmblematicoTable({
           ),
         },
         {
-          accessor:  'acciones',
-          title:     '',
-          width:     100,
-          textAlign: 'right',
-          render:    (e) => (
+          accessor: "acciones",
+          title: "",
+          width: 100,
+          textAlign: "right",
+          render: (e) => (
             <Group gap={4} justify="flex-end" wrap="nowrap">
               <Tooltip label="Ver detalle">
                 <ActionIcon

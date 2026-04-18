@@ -113,8 +113,8 @@ export function ProyectosKanban({
                 w={280}
                 style={{
                   flexShrink: 0,
-                  border: "1px solid var(--mantine-color-gray-3)",
-                  background: "var(--mantine-color-gray-0)",
+                  border: "1px solid var(--mantine-color-default-border)",
+                  backgroundColor: "var(--mantine-color-default)",
                   minHeight: 400,
                 }}
               >
