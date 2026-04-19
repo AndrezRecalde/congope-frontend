@@ -19,6 +19,7 @@ import {
   Alert,
   ThemeIcon,
   Table,
+  Tabs,
 } from "@mantine/core";
 import {
   IconArrowLeft,
@@ -30,12 +31,16 @@ import {
   IconAlertCircle,
   IconRefresh,
   IconUsers,
+  IconInfoCircle,
+  IconFlag,
+  IconHistory,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { modals } from "@mantine/modals";
 import { PageHeader } from "@/components/ui/PageHeader/PageHeader";
 import { StatusBadge } from "@/components/ui/StatusBadge/StatusBadge";
 import { HitosList } from "@/components/modulos/proyectos/HitosList";
+import { HistorialProyecto } from "@/components/modulos/proyectos/historial/HistorialProyecto";
 import {
   useProyecto,
   useEliminarProyecto,
@@ -278,9 +283,41 @@ export default function ProyectoDetallePage(props: PageProps) {
         }
       />
 
-      <Grid gutter="md">
-        {/* ── Columna principal ── */}
-        <Grid.Col span={{ base: 12, md: 8 }}>
+      <Tabs defaultValue="informacion" mt="md">
+        <Tabs.List mb="lg">
+          <Tabs.Tab
+            value="informacion"
+            leftSection={<IconInfoCircle size={16} />}
+          >
+            Información general
+          </Tabs.Tab>
+
+          <Tabs.Tab
+            value="hitos"
+            leftSection={<IconFlag size={16} />}
+          >
+            Hitos
+            {(proyecto.hitos?.length ?? 0) > 0 && (
+              <Badge size="xs" variant="light" color="gray" ml="xs">
+                {proyecto.hitos?.length}
+              </Badge>
+            )}
+          </Tabs.Tab>
+
+          {can("proyectos.ver") && (
+            <Tabs.Tab
+              value="historial"
+              leftSection={<IconHistory size={16} />}
+            >
+              Historial
+            </Tabs.Tab>
+          )}
+        </Tabs.List>
+
+        <Tabs.Panel value="informacion">
+          <Grid gutter="md">
+            {/* ── Columna principal ── */}
+            <Grid.Col span={{ base: 12, md: 8 }}>
           <Stack gap="md">
             {/* Información general */}
             <Paper
@@ -709,14 +746,7 @@ export default function ProyectoDetallePage(props: PageProps) {
               </Paper>
             )}
 
-            {/* Hitos del proyecto */}
-            <Paper
-              p="lg"
-              radius="lg"
-              style={{ border: "1px solid var(--mantine-color-default-border)" }}
-            >
-              <HitosList proyectoId={id} />
-            </Paper>
+            {/* Hitos movidos al Tab "hitos" */}
           </Stack>
         </Grid.Col>
 
@@ -773,6 +803,20 @@ export default function ProyectoDetallePage(props: PageProps) {
           </Stack>
         </Grid.Col>
       </Grid>
+        </Tabs.Panel>
+
+        <Tabs.Panel value="hitos">
+          <Paper p="lg" radius="lg" style={{ border: "1px solid var(--mantine-color-default-border)" }}>
+            <HitosList proyectoId={id} />
+          </Paper>
+        </Tabs.Panel>
+
+        <Tabs.Panel value="historial">
+          <Paper p="lg" radius="lg" style={{ border: "1px solid var(--mantine-color-default-border)" }}>
+            <HistorialProyecto proyectoId={id} />
+          </Paper>
+        </Tabs.Panel>
+      </Tabs>
     </>
   );
 }

@@ -1,67 +1,61 @@
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query';
-import { notifications } from '@mantine/notifications';
-import { queryKeys }      from '@/lib/query-client';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { notifications } from "@mantine/notifications";
+import { queryKeys } from "@/lib/query-client";
 import {
   proyectosService,
   type ProyectosParams,
-} from '@/services/proyectos.service';
-import { getErrorMessage } from '@/services/axios';
+} from "@/services/proyectos.service";
+import { getErrorMessage } from "@/services/axios";
 import type {
   CreateProyectoDto,
   UpdateProyectoDto,
   CreateHitoDto,
-} from '@/services/axios';
-import type { EstadoProyecto } from '@/types/proyecto.types';
+} from "@/services/axios";
+import type { EstadoProyecto } from "@/types/proyecto.types";
 
 export function useProyectos(params: ProyectosParams = {}) {
   return useQuery({
     queryKey: queryKeys.proyectos.list(params),
-    queryFn:  () => proyectosService.listar(params),
+    queryFn: () => proyectosService.listar(params),
     placeholderData: (prev) => prev,
   });
 }
 
 export function useProyecto(id: string | null) {
   return useQuery({
-    queryKey: queryKeys.proyectos.detail(id ?? ''),
-    queryFn:  () => proyectosService.obtener(id!),
-    enabled:  !!id,
+    queryKey: queryKeys.proyectos.detail(id ?? ""),
+    queryFn: () => proyectosService.obtener(id!),
+    enabled: !!id,
   });
 }
 
 export function useHitosProyecto(proyectoId: string | null) {
   return useQuery({
-    queryKey: queryKeys.proyectos.hitos(proyectoId ?? ''),
-    queryFn:  () =>
-      proyectosService.listarHitos(proyectoId!),
-    enabled:  !!proyectoId,
+    queryKey: queryKeys.proyectos.hitos(proyectoId ?? ""),
+    queryFn: () => proyectosService.listarHitos(proyectoId!),
+    enabled: !!proyectoId,
   });
 }
 
 export function useCrearProyecto() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (datos: CreateProyectoDto) =>
-      proyectosService.crear(datos),
+    mutationFn: (datos: CreateProyectoDto) => proyectosService.crear(datos),
     onSuccess: () => {
       qc.invalidateQueries({
         queryKey: queryKeys.proyectos.all,
       });
       notifications.show({
-        title:   'Proyecto creado',
-        message: 'El proyecto fue registrado correctamente.',
-        color:   'green',
+        title: "Proyecto creado",
+        message: "El proyecto fue registrado correctamente.",
+        color: "green",
       });
     },
     onError: (error) =>
       notifications.show({
-        title:   'Error al crear',
+        title: "Error al crear",
         message: getErrorMessage(error),
-        color:   'red',
+        color: "red",
         autoClose: 6000,
       }),
   });
@@ -70,29 +64,24 @@ export function useCrearProyecto() {
 export function useActualizarProyecto() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      id,
-      datos,
-    }: {
-      id: string;
-      datos: UpdateProyectoDto;
-    }) => proyectosService.actualizar(id, datos),
+    mutationFn: ({ id, datos }: { id: string; datos: UpdateProyectoDto }) =>
+      proyectosService.actualizar(id, datos),
     onSuccess: (_, { id }) => {
       qc.invalidateQueries({ queryKey: queryKeys.proyectos.all });
       qc.invalidateQueries({
         queryKey: queryKeys.proyectos.detail(id),
       });
       notifications.show({
-        title:   'Proyecto actualizado',
-        message: 'Los datos del proyecto fueron actualizados.',
-        color:   'green',
+        title: "Proyecto actualizado",
+        message: "Los datos del proyecto fueron actualizados.",
+        color: "green",
       });
     },
     onError: (error) =>
       notifications.show({
-        title:   'Error al actualizar',
+        title: "Error al actualizar",
         message: getErrorMessage(error),
-        color:   'red',
+        color: "red",
         autoClose: 6000,
       }),
   });
@@ -105,16 +94,16 @@ export function useEliminarProyecto() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.proyectos.all });
       notifications.show({
-        title:   'Proyecto eliminado',
-        message: 'El proyecto fue eliminado correctamente.',
-        color:   'orange',
+        title: "Proyecto eliminado",
+        message: "El proyecto fue eliminado correctamente.",
+        color: "orange",
       });
     },
     onError: (error) =>
       notifications.show({
-        title:   'Error al eliminar',
+        title: "Error al eliminar",
         message: getErrorMessage(error),
-        color:   'red',
+        color: "red",
         autoClose: 6000,
       }),
   });
@@ -123,29 +112,24 @@ export function useEliminarProyecto() {
 export function useCambiarEstadoProyecto() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      id,
-      estado,
-    }: {
-      id: string;
-      estado: EstadoProyecto;
-    }) => proyectosService.cambiarEstado(id, estado),
+    mutationFn: ({ id, estado }: { id: string; estado: EstadoProyecto }) =>
+      proyectosService.cambiarEstado(id, estado),
     onSuccess: (_, { id }) => {
       qc.invalidateQueries({ queryKey: queryKeys.proyectos.all });
       qc.invalidateQueries({
         queryKey: queryKeys.proyectos.detail(id),
       });
       notifications.show({
-        title:   'Estado actualizado',
-        message: 'El estado del proyecto fue actualizado.',
-        color:   'blue',
+        title: "Estado actualizado",
+        message: "El estado del proyecto fue actualizado.",
+        color: "blue",
       });
     },
     onError: (error) =>
       notifications.show({
-        title:   'Error al cambiar estado',
+        title: "Error al cambiar estado",
         message: getErrorMessage(error),
-        color:   'red',
+        color: "red",
         autoClose: 6000,
       }),
   });
@@ -163,16 +147,16 @@ export function useCrearHito(proyectoId: string) {
         queryKey: queryKeys.proyectos.hitos(proyectoId),
       });
       notifications.show({
-        title:   'Hito creado',
-        message: 'El hito fue registrado correctamente.',
-        color:   'green',
+        title: "Hito creado",
+        message: "El hito fue registrado correctamente.",
+        color: "green",
       });
     },
     onError: (error) =>
       notifications.show({
-        title:   'Error al crear hito',
+        title: "Error al crear hito",
         message: getErrorMessage(error),
-        color:   'red',
+        color: "red",
         autoClose: 6000,
       }),
   });
@@ -188,16 +172,16 @@ export function useEliminarHito(proyectoId: string) {
         queryKey: queryKeys.proyectos.hitos(proyectoId),
       });
       notifications.show({
-        title:   'Hito eliminado',
-        message: 'El hito fue eliminado.',
-        color:   'orange',
+        title: "Hito eliminado",
+        message: "El hito fue eliminado.",
+        color: "orange",
       });
     },
     onError: (error) =>
       notifications.show({
-        title:   'Error al eliminar hito',
+        title: "Error al eliminar hito",
         message: getErrorMessage(error),
-        color:   'red',
+        color: "red",
         autoClose: 6000,
       }),
   });
@@ -213,17 +197,37 @@ export function useCompletarHito(proyectoId: string) {
         queryKey: queryKeys.proyectos.hitos(proyectoId),
       });
       notifications.show({
-        title:   'Hito completado',
-        message: '¡El hito fue marcado como completado!',
-        color:   'teal',
+        title: "Hito completado",
+        message: "¡El hito fue marcado como completado!",
+        color: "teal",
       });
     },
     onError: (error) =>
       notifications.show({
-        title:   'Error',
+        title: "Error",
         message: getErrorMessage(error),
-        color:   'red',
+        color: "red",
         autoClose: 6000,
       }),
+  });
+}
+
+import { historialService } from "@/services/historial.service";
+
+export function useHistorialProyecto(
+  proyectoId: string | null,
+  page: number = 1,
+) {
+  return useQuery({
+    queryKey: ["proyectos", "historial", proyectoId, page],
+    queryFn: () =>
+      historialService.obtenerHistorialProyecto(proyectoId!, {
+        page,
+        per_page: 15,
+      }),
+    enabled: !!proyectoId,
+    // El historial es dinámico — revalidar cada
+    // vez que se navega a la página
+    staleTime: 0,
   });
 }

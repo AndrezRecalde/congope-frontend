@@ -119,7 +119,7 @@ export default function ConfiguracionPage() {
   const { mutate: asignarProvincias, isPending: asignandoProv } =
     useAsignarProvincias();
   const { mutate: cambiarEstado } = useCambiarEstado();
-  const { mutate: resetPassword, isPending: reseteandoPassword } = useResetPassword();
+  const { mutateAsync: resetPasswordAsync } = useResetPassword();
 
   const usuarios = usuariosData?.data ?? [];
   const auditoria = auditoriaData?.data ?? [];
@@ -263,62 +263,36 @@ export default function ConfiguracionPage() {
   };
 
   const abrirModalResetPassword = (u: UsuarioListado) => {
-    let enviarCorreo = true;
-
     modals.open({
       title: "Resetear Contraseña",
       size: "sm",
       children: (
-        <Stack gap="md" p="sm">
-          <Text size="sm">
-            Se generará una nueva contraseña segura para el usuario <strong>{u.name}</strong>.
-          </Text>
-          <div style={{ paddingBottom: '10px' }}>
-            {/* Opcional: Usar Checkbox sin controlled state para un form rápido */}
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px' }}>
-              <input 
-                type="checkbox" 
-                defaultChecked={enviarCorreo}
-                onChange={(e) => { enviarCorreo = e.target.checked; }}
-              />
-              Enviar nueva contraseña por correo
-            </label>
-          </div>
-          <Group justify="flex-end" gap="sm">
-            <Button variant="subtle" color="gray" onClick={() => modals.closeAll()}>
-              Cancelar
-            </Button>
-            <Button
-              color="orange"
-              onClick={() => {
-                resetPassword(
-                  { id: u.id, enviar_correo: enviarCorreo },
-                  {
-                    onSuccess: (res) => {
-                      modals.closeAll();
-                      if (!enviarCorreo && res.password_generada) {
-                        modals.open({
-                          title: "Contraseña generada",
-                          children: (
-                            <Stack gap="sm">
-                              <Text size="sm">Por favor comparte la siguiente contraseña temporal con el usuario de forma segura:</Text>
-                              <Paper p="sm" withBorder style={{ backgroundColor: 'var(--mantine-color-gray-0)', textAlign: 'center' }}>
-                                <Text size="lg" fw={700} style={{ fontFamily: 'monospace' }}>{res.password_generada}</Text>
-                              </Paper>
-                              <Button fullWidth onClick={() => modals.closeAll()}>Cerrar</Button>
-                            </Stack>
-                          )
-                        });
-                      }
-                    },
-                  }
-                );
-              }}
-            >
-              Resetear
-            </Button>
-          </Group>
-        </Stack>
+        <ResetPasswordForm
+          u={u}
+          onCancel={() => modals.closeAll()}
+          onConfirm={async (enviarCorreo) => {
+            try {
+              const res = await resetPasswordAsync({ id: u.id, enviar_correo: enviarCorreo });
+              modals.closeAll();
+              if (!enviarCorreo && res.password_generada) {
+                modals.open({
+                  title: "Contraseña generada",
+                  children: (
+                    <Stack gap="sm">
+                      <Text size="sm">Por favor comparte la siguiente contraseña temporal con el usuario de forma segura:</Text>
+                      <Paper p="sm" withBorder style={{ backgroundColor: 'var(--mantine-color-gray-0)', textAlign: 'center' }}>
+                        <Text size="lg" fw={700} style={{ fontFamily: 'monospace' }}>{res.password_generada}</Text>
+                      </Paper>
+                      <Button fullWidth onClick={() => modals.closeAll()}>Cerrar</Button>
+                    </Stack>
+                  )
+                });
+              }
+            } catch (error) {
+              // El error ya se maneja en el hook
+            }
+          }}
+        />
       ),
     });
   };
@@ -537,6 +511,56 @@ function AsignarProvinciasForm({
           onClick={() => onGuardar(seleccionadas)}
         >
           Guardar provincias
+        </Button>
+      </Group>
+    </Stack>
+  );
+}
+
+function ResetPasswordForm({
+  u,
+  onCancel,
+  onConfirm,
+}: {
+  u: UsuarioListado;
+  onCancel: () => void;
+  onConfirm: (enviar: boolean) => Promise<void>;
+}) {
+  const [enviarCorreo, setEnviarCorreo] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  return (
+    <Stack gap="md" p="sm">
+      <Text size="sm">
+        Se generará una nueva contraseña segura para el usuario <strong>{u.name}</strong>.
+      </Text>
+      <div style={{ paddingBottom: '10px' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px' }}>
+          <input 
+            type="checkbox" 
+            checked={enviarCorreo}
+            onChange={(e) => setEnviarCorreo(e.target.checked)}
+          />
+          Enviar nueva contraseña por correo
+        </label>
+      </div>
+      <Group justify="flex-end" gap="sm">
+        <Button variant="subtle" color="gray" onClick={onCancel} disabled={loading}>
+          Cancelar
+        </Button>
+        <Button
+          color="orange"
+          loading={loading}
+          onClick={async () => {
+            setLoading(true);
+            try {
+              await onConfirm(enviarCorreo);
+            } finally {
+              setLoading(false);
+            }
+          }}
+        >
+          Resetear
         </Button>
       </Group>
     </Stack>
