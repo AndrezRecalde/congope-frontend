@@ -83,7 +83,11 @@ export default function LoginPage() {
       );
 
       // 4. Redirigir
-      router.push(redirectTo);
+      if (data.user.requires_password_change) {
+        router.push("/cambiar-password");
+      } else {
+        router.push(redirectTo);
+      }
     } catch (err) {
       setErrorMsg(getErrorMessage(err));
     } finally {

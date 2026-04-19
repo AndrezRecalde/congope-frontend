@@ -7,7 +7,7 @@ import {
 } from '@mantine/core';
 import {
   IconEdit, IconTrash, IconShield,
-  IconMapPin, IconUser,
+  IconMapPin, IconUser, IconPower, IconKey,
 } from '@tabler/icons-react';
 import { formatFecha }  from '@/utils/formatters';
 import {
@@ -27,6 +27,8 @@ interface UsuariosTableProps {
   onEliminar:        (u: UsuarioListado) => void;
   onCambiarRol:      (u: UsuarioListado) => void;
   onAsignarProvincia:(u: UsuarioListado) => void;
+  onCambiarEstado:   (u: UsuarioListado) => void;
+  onResetPassword:   (u: UsuarioListado) => void;
   puedeEditar:       boolean;
   puedeEliminar:     boolean;
   puedeAsignarRol:   boolean;
@@ -45,6 +47,8 @@ export function UsuariosTable({
   onEliminar,
   onCambiarRol,
   onAsignarProvincia,
+  onCambiarEstado,
+  onResetPassword,
   puedeEditar,
   puedeEliminar,
   puedeAsignarRol,
@@ -117,9 +121,23 @@ export function UsuariosTable({
           ),
         },
         {
+          accessor: 'cargo',
+          title:    'Cargo / Entidad',
+          render:   (u) => (
+            <Stack gap={2}>
+              <Text size="sm">{u.cargo}</Text>
+              {u.entidad && (
+                <Text size="xs" c="dimmed">
+                  {u.entidad}
+                </Text>
+              )}
+            </Stack>
+          ),
+        },
+        {
           accessor: 'rol',
           title:    'Rol',
-          width:    180,
+          width:    160,
           render:   (u) => {
             const rolNombre =
               u.roles?.[0]?.name as RolSistema;
@@ -138,57 +156,33 @@ export function UsuariosTable({
           },
         },
         {
-          accessor: 'provincias',
-          title:    'Provincias',
-          width:    160,
-          render:   (u) => {
-            const count = u.provincias?.length ?? 0;
-            if (count === 0) return (
-              <Text size="xs" c="dimmed">
-                Todas
-              </Text>
-            );
-            return (
-              <Group gap={4}>
-                <IconMapPin
-                  size={12}
-                  color="var(--mantine-color-gray-5)"
-                />
-                <Text size="xs">
-                  {count} provincia
-                  {count !== 1 ? 's' : ''}
-                </Text>
-              </Group>
-            );
-          },
-        },
-        {
-          accessor:  'created_at',
-          title:     'Registrado',
-          width:     120,
-          render:    (u) => (
-            <Text size="xs" c="dimmed">
-              {formatFecha(u.created_at)}
-            </Text>
+          accessor: 'activo',
+          title:    'Estado',
+          width:    100,
+          render:   (u) => (
+            <Badge
+              color={u.activo ? 'green' : 'red'}
+              variant="light"
+              size="sm"
+            >
+              {u.activo ? 'Activo' : 'Inactivo'}
+            </Badge>
           ),
         },
         {
           accessor:  'acciones',
           title:     '',
-          width:     130,
+          width:     180,
           textAlign: 'right',
           render:    (u) => (
-            <Group gap={4} justify="flex-end"
-              wrap="nowrap">
+            <Group gap={4} justify="flex-end" wrap="nowrap">
               {puedeAsignarProv && (
                 <Tooltip label="Asignar provincias">
                   <ActionIcon
                     variant="subtle"
                     color="teal"
                     size="sm"
-                    onClick={() =>
-                      onAsignarProvincia(u)
-                    }
+                    onClick={() => onAsignarProvincia(u)}
                   >
                     <IconMapPin size={15} />
                   </ActionIcon>
@@ -207,6 +201,31 @@ export function UsuariosTable({
                 </Tooltip>
               )}
               {puedeEditar && (
+                <Tooltip label={u.activo ? "Desactivar usuario" : "Activar usuario"}>
+                  <ActionIcon
+                    variant="subtle"
+                    color={u.activo ? "red" : "green"}
+                    size="sm"
+                    onClick={() => onCambiarEstado(u)}
+                    disabled={u.id === usuarioActualId} // No desactivarse a sí mismo
+                  >
+                    <IconPower size={15} />
+                  </ActionIcon>
+                </Tooltip>
+              )}
+              {puedeEditar && (
+                <Tooltip label="Resetear contraseña">
+                  <ActionIcon
+                    variant="subtle"
+                    color="orange"
+                    size="sm"
+                    onClick={() => onResetPassword(u)}
+                  >
+                    <IconKey size={15} />
+                  </ActionIcon>
+                </Tooltip>
+              )}
+              {puedeEditar && (
                 <Tooltip label="Editar">
                   <ActionIcon
                     variant="subtle"
@@ -218,8 +237,7 @@ export function UsuariosTable({
                   </ActionIcon>
                 </Tooltip>
               )}
-              {puedeEliminar &&
-               u.id !== usuarioActualId && (
+              {puedeEliminar && u.id !== usuarioActualId && (
                 <Tooltip label="Eliminar">
                   <ActionIcon
                     variant="subtle"

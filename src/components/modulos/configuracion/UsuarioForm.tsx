@@ -1,14 +1,17 @@
 "use client";
 
+import React from "react";
+
 import {
   Stack,
   TextInput,
-  PasswordInput,
   Select,
   MultiSelect,
   Button,
   Group,
   Divider,
+  Switch,
+  Checkbox,
 } from "@mantine/core";
 import { useForm, isNotEmpty, isEmail } from "@mantine/form";
 import { useQuery } from "@tanstack/react-query";
@@ -21,7 +24,7 @@ import type {
   UsuarioFormValues,
 } from "@/types/usuario.types";
 import { LABEL_ROL } from "@/types/usuario.types";
-import type { CreateUsuarioDto } from "@/services/usuarios.service";
+import type { CreateUsuarioDto, UpdateUsuarioDto } from "@/services/usuarios.service";
 
 const ROLES_OPCIONES = (
   Object.entries(LABEL_ROL) as [RolSistema, string][]
@@ -29,7 +32,7 @@ const ROLES_OPCIONES = (
 
 interface UsuarioFormProps {
   usuario?: UsuarioListado;
-  onSubmit: (datos: CreateUsuarioDto) => void;
+  onSubmit: (datos: any) => Promise<void> | void;
   onCancel: () => void;
   isLoading?: boolean;
 }
@@ -40,6 +43,7 @@ export function UsuarioForm({
   onCancel,
   isLoading = false,
 }: UsuarioFormProps) {
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const esEdicion = !!usuario;
 
   const { data: provinciasData } = useQuery({
@@ -66,34 +70,57 @@ export function UsuarioForm({
     initialValues: {
       name: usuario?.name ?? "",
       email: usuario?.email ?? "",
-      password: "",
+      telefono: usuario?.telefono ?? "",
+      cargo: usuario?.cargo ?? "",
+      activo: usuario?.activo ?? false,
+      entidad: usuario?.entidad ?? "",
+      dni: usuario?.dni ?? "",
+      enviar_correo: true,
       rol: rolActual,
       provincia_ids: provinciasActuales,
     },
     validate: {
       name: isNotEmpty("El nombre es requerido"),
       email: isEmail("Ingresa un email válido"),
-      password: (value) => {
-        if (esEdicion) return null; // opcional en edición
-        if (!value || value.length < 8) {
-          return "La contraseña debe tener al menos 8 caracteres";
-        }
-        return null;
-      },
+      telefono: isNotEmpty("El teléfono es requerido"),
+      cargo: isNotEmpty("El cargo es requerido"),
       rol: isNotEmpty("Selecciona el rol del usuario"),
     },
   });
 
-  const handleSubmit = (values: UsuarioFormValues) => {
-    const dto: CreateUsuarioDto = {
-      name: values.name,
-      email: values.email,
-      password: values.password,
-      rol: values.rol as RolSistema,
-      provincia_ids:
-        values.provincia_ids.length > 0 ? values.provincia_ids : undefined,
-    };
-    onSubmit(dto);
+  const handleSubmit = async (values: UsuarioFormValues) => {
+    setIsSubmitting(true);
+    try {
+      if (esEdicion) {
+        const dto: UpdateUsuarioDto = {
+          name: values.name,
+          email: values.email,
+          telefono: values.telefono,
+          cargo: values.cargo,
+          activo: values.activo,
+          entidad: values.entidad || null,
+          dni: values.dni || null,
+        };
+        await onSubmit(dto);
+      } else {
+        const dto: CreateUsuarioDto = {
+          name: values.name,
+          email: values.email,
+          telefono: values.telefono,
+          cargo: values.cargo,
+          activo: values.activo,
+          entidad: values.entidad || null,
+          dni: values.dni || null,
+          enviar_correo: values.enviar_correo,
+          rol: values.rol as RolSistema,
+          provincia_ids:
+            values.provincia_ids.length > 0 ? values.provincia_ids : undefined,
+        };
+        await onSubmit(dto);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -114,16 +141,55 @@ export function UsuarioForm({
           {...form.getInputProps("email")}
         />
 
-        <PasswordInput
-          label={esEdicion ? "Nueva contraseña" : "Contraseña"}
-          placeholder={
-            esEdicion
-              ? "Dejar en blanco para no cambiar"
-              : "Mínimo 8 caracteres"
-          }
-          required={!esEdicion}
-          {...form.getInputProps("password")}
-        />
+        <Group grow>
+          <TextInput
+            label="Teléfono"
+            placeholder="Ej: 0991234567"
+            required
+            {...form.getInputProps("telefono")}
+          />
+          <TextInput
+            label="DNI"
+            placeholder="Ej: 1712345678"
+            {...form.getInputProps("dni")}
+          />
+        </Group>
+
+        <Group grow>
+          <TextInput
+            label="Cargo"
+            placeholder="Ej: Analista de Proyectos"
+            required
+            {...form.getInputProps("cargo")}
+          />
+          <TextInput
+            label="Entidad"
+            placeholder="Ej: CONGOPE"
+            {...form.getInputProps("entidad")}
+          />
+        </Group>
+
+        {esEdicion && (
+          <Switch
+            label="Usuario Activo"
+            description="Si está inactivo, no podrá acceder al sistema"
+            color="teal"
+            checked={form.values.activo}
+            onChange={(e) => form.setFieldValue("activo", e.currentTarget.checked)}
+          />
+        )}
+
+        {!esEdicion && (
+          <>
+            <Divider label="Generación de Credenciales" labelPosition="left" />
+            <Checkbox
+              label="Enviar credenciales autogeneradas por correo electrónico"
+              description="La contraseña se autogenerará y el usuario deberá cambiarla en su primer inicio de sesión."
+              checked={form.values.enviar_correo}
+              onChange={(e) => form.setFieldValue("enviar_correo", e.currentTarget.checked)}
+            />
+          </>
+        )}
 
         <Divider label="Permisos y acceso" labelPosition="left" />
 
@@ -133,6 +199,7 @@ export function UsuarioForm({
           data={ROLES_OPCIONES}
           required
           {...form.getInputProps("rol")}
+          disabled={esEdicion} // El rol se cambia en otra acción
         />
 
         {/* Provincias — solo si el rol es provincial */}
@@ -145,6 +212,7 @@ export function UsuarioForm({
             description="Deja vacío para acceso a todas las provincias"
             data={opcionesProvincias}
             searchable
+            disabled={esEdicion} // Las provincias se asignan en otra acción
             {...form.getInputProps("provincia_ids")}
           />
         )}
@@ -154,11 +222,11 @@ export function UsuarioForm({
             variant="subtle"
             color="gray"
             onClick={onCancel}
-            disabled={isLoading}
+            disabled={isLoading || isSubmitting}
           >
             Cancelar
           </Button>
-          <Button type="submit" color="congope" loading={isLoading}>
+          <Button type="submit" color="congope" loading={isLoading || isSubmitting}>
             {esEdicion ? "Guardar cambios" : "Crear usuario"}
           </Button>
         </Group>

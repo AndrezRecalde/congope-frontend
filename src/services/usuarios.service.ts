@@ -18,7 +18,12 @@ export interface UsuariosParams {
 export interface CreateUsuarioDto {
   name:          string;
   email:         string;
-  password:      string;
+  telefono:      string;
+  cargo:         string;
+  activo?:       boolean;
+  entidad?:      string | null;
+  dni?:          string | null;
+  enviar_correo?: boolean;
   rol:           RolSistema;
   provincia_ids?: string[];
 }
@@ -26,7 +31,17 @@ export interface CreateUsuarioDto {
 export interface UpdateUsuarioDto {
   name?:     string;
   email?:    string;
-  password?: string;
+  telefono?: string;
+  cargo?:    string;
+  activo?:   boolean;
+  entidad?:  string | null;
+  dni?:      string | null;
+}
+
+export interface UpdatePasswordDto {
+  current_password:      string;
+  password:              string;
+  password_confirmation: string;
 }
 
 export const usuariosService = {
@@ -63,8 +78,6 @@ export const usuariosService = {
 
   /**
    * POST /api/v1/usuarios
-   * Required: name, email, password, rol
-   * Optional: provincia_ids[]
    */
   crear: async (
     datos: CreateUsuarioDto
@@ -75,9 +88,6 @@ export const usuariosService = {
 
   /**
    * PUT /api/v1/usuarios/:id
-   * Solo name, email, password.
-   * NO cambia rol ni provincias.
-   * id es INTEGER en el path.
    */
   actualizar: async (
     id:    number,
@@ -127,5 +137,28 @@ export const usuariosService = {
       `/usuarios/${id}/provincias`,
       { provincia_ids }
     );
+  },
+
+  /**
+   * PATCH /api/v1/usuarios/:id/estado
+   */
+  cambiarEstado: async (id: number): Promise<UsuarioListado> => {
+    const res = await apiClient.patch(`/usuarios/${id}/estado`);
+    return extractData<UsuarioListado>(res);
+  },
+
+  /**
+   * POST /api/v1/usuarios/:id/reset-password
+   */
+  resetPassword: async (id: number, enviar_correo: boolean): Promise<UsuarioListado> => {
+    const res = await apiClient.post(`/usuarios/${id}/reset-password`, { enviar_correo });
+    return extractData<UsuarioListado>(res);
+  },
+
+  /**
+   * POST /api/v1/usuarios/me/password
+   */
+  updatePassword: async (datos: UpdatePasswordDto): Promise<void> => {
+    await apiClient.post(`/usuarios/me/password`, datos);
   },
 };

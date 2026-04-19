@@ -52,6 +52,7 @@ export interface Usuario {
   id: number;
   name: string;
   email: string;
+  requires_password_change: boolean;
   email_verified_at: string | null;
   roles: string[];
   permissions: string[];

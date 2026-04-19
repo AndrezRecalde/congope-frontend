@@ -10,6 +10,7 @@ import {
   type UsuariosParams,
   type CreateUsuarioDto,
   type UpdateUsuarioDto,
+  type UpdatePasswordDto,
 } from '@/services/usuarios.service';
 import {
   auditoriaService,
@@ -170,6 +171,71 @@ export function useAsignarProvincias() {
         title:   'Error al asignar provincias',
         message: getErrorMessage(error),
         color:   'red',
+        autoClose: 6000,
+      }),
+  });
+}
+
+export function useCambiarEstado() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => usuariosService.cambiarEstado(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.usuarios.all });
+      notifications.show({
+        title: 'Estado actualizado',
+        message: 'El estado del usuario ha sido actualizado.',
+        color: 'green',
+      });
+    },
+    onError: (error) =>
+      notifications.show({
+        title: 'Error al cambiar estado',
+        message: getErrorMessage(error),
+        color: 'red',
+        autoClose: 6000,
+      }),
+  });
+}
+
+export function useResetPassword() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, enviar_correo }: { id: number; enviar_correo: boolean }) =>
+      usuariosService.resetPassword(id, enviar_correo),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.usuarios.all });
+      notifications.show({
+        title: 'Contraseña reseteada',
+        message: 'La contraseña del usuario ha sido reseteada exitosamente.',
+        color: 'green',
+      });
+    },
+    onError: (error) =>
+      notifications.show({
+        title: 'Error al resetear contraseña',
+        message: getErrorMessage(error),
+        color: 'red',
+        autoClose: 6000,
+      }),
+  });
+}
+
+export function useUpdatePassword() {
+  return useMutation({
+    mutationFn: (datos: UpdatePasswordDto) => usuariosService.updatePassword(datos),
+    onSuccess: () => {
+      notifications.show({
+        title: 'Contraseña actualizada',
+        message: 'Tu contraseña ha sido actualizada correctamente.',
+        color: 'green',
+      });
+    },
+    onError: (error) =>
+      notifications.show({
+        title: 'Error al actualizar contraseña',
+        message: getErrorMessage(error),
+        color: 'red',
         autoClose: 6000,
       }),
   });

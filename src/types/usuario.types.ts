@@ -29,6 +29,13 @@ export interface UsuarioListado {
   id:                number;   // INTEGER
   name:              string;
   email:             string;
+  telefono:          string;
+  cargo:             string;
+  activo:            boolean;
+  entidad:           string | null;
+  dni:               string | null;
+  requires_password_change: boolean;
+  password_generada?: string;
   email_verified_at: string | null;
   created_at:        string;   // ISO 8601
   updated_at:        string;   // ISO 8601
@@ -52,6 +59,12 @@ export interface UsuarioDetalle {
   id:                number;
   name:              string;
   email:             string;
+  telefono:          string;
+  cargo:             string;
+  activo:            boolean;
+  entidad:           string | null;
+  dni:               string | null;
+  requires_password_change: boolean;
   two_factor_enabled:null;
   roles:             string[];      // solo nombres
   provincias:        ProvinciaBasica[];
@@ -97,7 +110,12 @@ export const COLOR_ACCION: Record<string, string> = {
 export interface UsuarioFormValues {
   name:         string;
   email:        string;
-  password:     string;
+  telefono:     string;
+  cargo:        string;
+  activo:       boolean;
+  entidad:      string;
+  dni:          string;
+  enviar_correo: boolean;
   rol:          RolSistema | '';
   provincia_ids:string[];
 }
@@ -105,5 +123,10 @@ export interface UsuarioFormValues {
 export interface EditarUsuarioValues {
   name:     string;
   email:    string;
-  password: string;
+}
+
+export interface UpdatePasswordValues {
+  current_password:      string;
+  password:              string;
+  password_confirmation: string;
 }
