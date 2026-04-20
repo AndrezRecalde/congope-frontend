@@ -33,6 +33,7 @@ import { GraficaOds } from "@/components/dashboard/GraficaOds";
 import { GraficaActores } from "@/components/dashboard/GraficaActores";
 import { CompromisosPendientes } from "@/components/dashboard/CompromisosPendientes";
 import { ProyectosDestacados } from "@/components/dashboard/ProyectosDestacados";
+import { MapaCalorOds } from "@/components/modulos/dashboard/MapaCalorOds";
 import { useDashboard } from "@/queries/dashboard.queries";
 import { useAppSelector } from "@/store/hooks";
 import { selectUsuario } from "@/store/slices/authSlice";
@@ -280,6 +281,13 @@ export default function DashboardPage() {
           {/* Proyectos Destacados */}
           <Grid.Col span={{ base: 12, lg: 8 }}>
             <ProyectosDestacados />
+          </Grid.Col>
+
+          {/* ── Mapa de calor ODS × Provincia ── */}
+          <Grid.Col span={12}>
+            <div className="scroll-reveal">
+              <MapaCalorOds />
+            </div>
           </Grid.Col>
         </Grid>
       </div>
