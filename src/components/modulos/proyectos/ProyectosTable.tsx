@@ -14,6 +14,8 @@ import {
 import { IconEye, IconEdit, IconTrash, IconRefresh } from "@tabler/icons-react";
 import Link from "next/link";
 import { StatusBadge } from "@/components/ui/StatusBadge/StatusBadge";
+import { RiesgoBadge } from "@/components/ui/RiesgoBadge/RiesgoBadge";
+import { calcularRiesgoSimple } from "@/utils/riesgo";
 import { formatFecha } from "@/utils/formatters";
 import { getColorOds } from "@/utils/colores-ods";
 import type { Proyecto } from "@/services/axios";
@@ -118,6 +120,35 @@ export function ProyectosTable({
           title: "Estado",
           width: 130,
           render: (p) => <StatusBadge estado={p.estado} tipo="proyecto" />,
+        },
+        {
+          accessor: "riesgo",
+          title: "Riesgo",
+          width: 130,
+          textAlign: "center",
+          render: (p) => {
+            if (p.estado === "Finalizado" || p.estado === "Suspendido") {
+              return null;
+            }
+
+            const resultado = calcularRiesgoSimple(
+              p.estado,
+              p.fecha_fin_planificada ?? null,
+              p.fecha_inicio ?? null
+            );
+
+            return (
+              <RiesgoBadge
+                datos={{
+                  estado: p.estado,
+                  fecha_fin_planificada: p.fecha_fin_planificada ?? null,
+                  fecha_inicio: p.fecha_inicio ?? null,
+                }}
+                variante="badge"
+                resultado={resultado}
+              />
+            );
+          },
         },
         {
           accessor: "provincias",

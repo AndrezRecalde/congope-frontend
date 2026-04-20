@@ -10,6 +10,7 @@ import {
 } from '@tabler/icons-react';
 import Link from 'next/link';
 import { getColorOds }   from '@/utils/colores-ods';
+import { RiesgoBadge }   from '@/components/ui/RiesgoBadge/RiesgoBadge';
 import type { Proyecto } from '@/services/axios';
 
 interface ProyectoKanbanCardProps {
@@ -187,6 +188,21 @@ export function ProyectoKanbanCard({
                   .map((p) => p.nombre)
                   .join(', ')}
               </Text>
+            )}
+
+            {/* Semáforo de Riesgo */}
+            {proyecto.estado !== 'Finalizado' &&
+             proyecto.estado !== 'Suspendido' && (
+              <div style={{ marginTop: 4 }}>
+                <RiesgoBadge
+                  datos={{
+                    estado:               proyecto.estado,
+                    fecha_fin_planificada:proyecto.fecha_fin_planificada ?? null,
+                    fecha_inicio:         proyecto.fecha_inicio ?? null,
+                  }}
+                  variante="badge"
+                />
+              </div>
             )}
           </Stack>
         </Paper>

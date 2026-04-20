@@ -39,6 +39,7 @@ import Link from "next/link";
 import { modals } from "@mantine/modals";
 import { PageHeader } from "@/components/ui/PageHeader/PageHeader";
 import { StatusBadge } from "@/components/ui/StatusBadge/StatusBadge";
+import { RiesgoBadge } from "@/components/ui/RiesgoBadge/RiesgoBadge";
 import { HitosList } from "@/components/modulos/proyectos/HitosList";
 import { HistorialProyecto } from "@/components/modulos/proyectos/historial/HistorialProyecto";
 import {
@@ -331,6 +332,19 @@ export default function ProyectoDetallePage(props: PageProps) {
                 </Title>
                 <Group gap="xs">
                   <StatusBadge estado={proyecto.estado} tipo="proyecto" />
+                  {proyecto.estado !== 'Finalizado' &&
+                   proyecto.estado !== 'Suspendido' && (
+                    <RiesgoBadge
+                      datos={{
+                        estado:               proyecto.estado,
+                        fecha_fin_planificada:proyecto.fecha_fin_planificada ?? null,
+                        fecha_inicio:         proyecto.fecha_inicio ?? null,
+                        // @ts-ignore - The api response has it but type might not yet
+                        avance:               proyecto.avance ?? null,
+                      }}
+                      variante="detalle"
+                    />
+                  )}
                   <Badge variant="outline" color="gray" size="sm">
                     {proyecto.codigo}
                   </Badge>
