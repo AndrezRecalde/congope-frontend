@@ -28,12 +28,14 @@ interface FiltrosPortal {
   provincia_id: string;
   canton_id: string;
   actor_id: string;
+  search: string;
 }
 
 const FILTROS_VACÍOS: FiltrosPortal = {
   provincia_id: "",
   canton_id: "",
   actor_id: "",
+  search: "",
 };
 
 export default function PortalPage() {
@@ -45,7 +47,8 @@ export default function PortalPage() {
   );
 
   // Filtros y resultados
-  const [filtros, setFiltros] = useState<FiltrosPortal>(FILTROS_VACÍOS);
+  const [filtrosAplicados, setFiltrosAplicados] =
+    useState<FiltrosPortal>(FILTROS_VACÍOS);
   const [resultados, setResultados] = useState<ResultadosFiltro | null>(null);
   const [cargandoFiltros, setCargandoFiltros] = useState(false);
 
@@ -59,9 +62,10 @@ export default function PortalPage() {
   const [proyectoDrawerId, setProyectoDrawerId] = useState<string | null>(null);
 
   const hayFiltros = !!(
-    filtros.provincia_id ||
-    filtros.canton_id ||
-    filtros.actor_id
+    filtrosAplicados.provincia_id ||
+    filtrosAplicados.canton_id ||
+    filtrosAplicados.actor_id ||
+    filtrosAplicados.search
   );
 
   // ── Carga inicial ──────────────────────────────
@@ -88,16 +92,17 @@ export default function PortalPage() {
     }
     setCargandoFiltros(true);
     const params = {
-      provincia_id: filtros.provincia_id || undefined,
-      canton_id: filtros.canton_id || undefined,
-      actor_id: filtros.actor_id || undefined,
+      provincia_id: filtrosAplicados.provincia_id || undefined,
+      canton_id: filtrosAplicados.canton_id || undefined,
+      actor_id: filtrosAplicados.actor_id || undefined,
+      search: filtrosAplicados.search || undefined,
     };
     portalService
       .mapaFiltrar(params)
       .then(setResultados)
       .catch(console.error)
       .finally(() => setCargandoFiltros(false));
-  }, [filtros, hayFiltros]);
+  }, [filtrosAplicados, hayFiltros]);
 
   // ── Scroll reveal ──────────────────────────────
   useEffect(() => {
@@ -125,9 +130,13 @@ export default function PortalPage() {
     [],
   );
 
-  const limpiarFiltros = () => {
-    setFiltros(FILTROS_VACÍOS);
-  };
+  const handleBuscar = useCallback((filtros: FiltrosPortal) => {
+    setFiltrosAplicados(filtros);
+  }, []);
+
+  const limpiarFiltros = useCallback(() => {
+    setFiltrosAplicados(FILTROS_VACÍOS);
+  }, []);
 
   const totalPins = resultados?.resumen?.total_proyectos ?? 0;
 
@@ -159,7 +168,7 @@ export default function PortalPage() {
           {catalogos && (
             <PortalMapa
               catalogos={catalogos}
-              filtros={filtros}
+              filtros={filtrosAplicados}
               resultados={resultados}
               hayFiltros={hayFiltros}
               onClickPin={setProyectoDrawerId}
@@ -172,10 +181,11 @@ export default function PortalPage() {
         {catalogos && (
           <PortalFiltros
             opciones={catalogos.opciones_filtro}
-            filtros={filtros}
-            onChange={setFiltros}
+            filtrosAplicados={filtrosAplicados}
+            onBuscar={handleBuscar}
             onLimpiar={limpiarFiltros}
             hayFiltros={hayFiltros}
+            cargando={cargandoFiltros}
             totalPins={totalPins}
           />
         )}

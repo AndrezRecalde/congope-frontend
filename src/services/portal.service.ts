@@ -124,10 +124,11 @@ export interface ResultadosFiltro {
   emblematicos:     EmblematicoPortal[];
   buenas_practicas: BuenaPracticaPortal[];
   resumen: {
-    total_proyectos:       number;
-    total_emblematicos:    number;
-    total_buenas_practicas:number;
-    provincia_resaltada:   string | null;
+    total_proyectos:        number;
+    total_emblematicos:     number;
+    total_buenas_practicas: number;
+    provincia_resaltada:    string | null;
+    search_aplicado:        string | null;
   };
 }
 
@@ -255,10 +256,11 @@ export const portalService = {
     provincia_id?: string;
     canton_id?:    string;
     actor_id?:     string;
+    search?:       string;
   }): Promise<ResultadosFiltro> => {
     const params = Object.fromEntries(
       Object.entries(filtros).filter(
-        ([, v]) => v !== '' && v !== undefined
+        ([, v]) => v !== '' && v !== undefined && v !== null
       )
     );
     const res = await portalClient.get(

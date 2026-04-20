@@ -1,338 +1,413 @@
-'use client'
+"use client";
 
-import { useState } from 'react';
-import type {
-  OpcionesFiltro,
-} from '@/services/portal.service';
+import { useState, useEffect } from "react";
+import {
+  TextInput,
+  Select,
+  Button,
+  ActionIcon,
+  Collapse,
+  Text,
+  Divider,
+  Group,
+  Stack,
+  Box,
+} from "@mantine/core";
+import { useForm } from "@mantine/form";
+import {
+  IconSearch,
+  IconX,
+  IconChevronUp,
+  IconChevronDown,
+} from "@tabler/icons-react";
+import type { OpcionesFiltro } from "@/services/portal.service";
+
+// ── Tipos ───────────────────────────────────────
 
 interface FiltrosPortal {
   provincia_id: string;
-  canton_id:    string;
-  actor_id:     string;
+  canton_id: string;
+  actor_id: string;
+  search: string;
 }
 
-interface PortalFiltrosProps {
-  opciones:  OpcionesFiltro;
-  filtros:   FiltrosPortal;
-  onChange:  (f: FiltrosPortal) => void;
+interface FiltrosPortalProps {
+  opciones: OpcionesFiltro;
+  filtrosAplicados: FiltrosPortal;
+  onBuscar: (filtros: FiltrosPortal) => void;
   onLimpiar: () => void;
-  hayFiltros:boolean;
+  hayFiltros: boolean;
+  cargando: boolean;
   totalPins: number;
 }
 
+// ── Componente ───────────────────────────────────
+
 export function PortalFiltros({
   opciones,
-  filtros,
-  onChange,
+  filtrosAplicados,
+  onBuscar,
   onLimpiar,
   hayFiltros,
+  cargando,
   totalPins,
-}: PortalFiltrosProps) {
+}: FiltrosPortalProps) {
   const [abierto, setAbierto] = useState(true);
 
-  // Cantones filtrados por provincia seleccionada
-  const cantonesFiltrados = filtros.provincia_id
+  // Usamos el hook de formulario de Mantine
+  const form = useForm<FiltrosPortal>({
+    initialValues: filtrosAplicados,
+  });
+
+  // Si los filtros aplicados cambian desde afuera, sincronizamos el form
+  useEffect(() => {
+    form.setInitialValues(filtrosAplicados);
+    form.setValues(filtrosAplicados);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtrosAplicados]);
+
+  // Cantones filtrados por provincia seleccionada en el formulario
+  const cantonesFiltrados = form.values.provincia_id
     ? opciones.cantones.filter(
-        (c) => c.provincia_id === filtros.provincia_id
+        (c) => c.provincia_id === form.values.provincia_id,
       )
     : opciones.cantones;
 
-  const selectStyle = {
-    width:           '100%',
-    padding:         '10px 14px',
-    border:          '1px solid rgba(11, 31, 58, 0.15)',
-    borderRadius:    10,
-    fontSize:        13,
-    color:           '#0B1F3A',
-    background:      'white',
-    appearance:      'none' as const,
-    WebkitAppearance:'none' as const,
-    outline:         'none',
-    cursor:          'pointer',
-    fontFamily:      'var(--font-dm-sans)',
-    transition:      'border-color 200ms ease',
+  // Detectar si el formulario difiere de lo aplicado
+  const tieneCambiosPendientes = form.isDirty();
+
+  // ── Handlers ────────────────────────────────
+
+  const handleCambioProvincia = (valor: string | null) => {
+    form.setFieldValue("provincia_id", valor || "");
+    form.setFieldValue("canton_id", ""); // resetear cantón
   };
 
+  const handleBuscar = form.onSubmit((values) => {
+    onBuscar(values);
+  });
+
+  const handleLimpiar = () => {
+    form.setValues({
+      provincia_id: "",
+      canton_id: "",
+      actor_id: "",
+      search: "",
+    });
+    onLimpiar();
+  };
+
+  // ── Render ───────────────────────────────────
+
   return (
-    <div className="portal-filtros">
-      {/* Cabecera del panel */}
-      <div style={{
-        padding:         '16px 20px 14px',
-        borderBottom:    abierto
-          ? '1px solid rgba(11, 31, 58, 0.08)'
-          : 'none',
-        display:         'flex',
-        justifyContent:  'space-between',
-        alignItems:      'center',
-        background:      'linear-gradient(135deg, ' +
-          'rgba(11, 31, 58, 0.04) 0%, ' +
-          'rgba(201, 168, 76, 0.04) 100%)',
-      }}>
-        <div>
-          <div style={{
-            fontSize:    13,
-            fontWeight:  700,
-            color:       'var(--portal-navy)',
-            letterSpacing:'0.04em',
-            textTransform:'uppercase',
-          }}>
+    <Box
+      style={{
+        position: "absolute",
+        top: 80,
+        left: 24,
+        zIndex: 20,
+        width: 300,
+        background: "rgba(255,255,255,0.97)",
+        backdropFilter: "blur(12px)",
+        borderRadius: 16,
+        boxShadow: "0 8px 40px rgba(11,31,58,0.25)",
+        border: "1px solid rgba(201,168,76,0.3)",
+        overflow: "hidden",
+        transition: "transform 300ms ease",
+        fontFamily: "var(--font-dm-sans)",
+      }}
+    >
+      {/* ── Cabecera del panel ── */}
+      <Box
+        style={{
+          padding: "14px 18px 12px",
+          borderBottom: abierto ? "1px solid rgba(11,31,58,0.08)" : "none",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          background:
+            "linear-gradient(135deg," +
+            "rgba(11,31,58,0.04) 0%," +
+            "rgba(201,168,76,0.04) 100%)",
+        }}
+      >
+        <Box>
+          <Text
+            style={{
+              fontSize: 13,
+              fontWeight: 700,
+              color: "var(--portal-navy)",
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
+            }}
+          >
             Explorar proyectos
-          </div>
-          {hayFiltros && totalPins > 0 && (
-            <div style={{
-              fontSize:   11,
-              color:      'var(--portal-blue)',
-              marginTop:  2,
-            }}>
-              {totalPins} proyecto
-              {totalPins !== 1 ? 's' : ''} en el mapa
-            </div>
-          )}
-        </div>
-        <button
-          onClick={() => setAbierto((v) => !v)}
-          style={{
-            background:  'none',
-            border:      'none',
-            cursor:      'pointer',
-            padding:     '4px 8px',
-            borderRadius:8,
-            color:       'var(--portal-slate)',
-            fontSize:    12,
-          }}
-        >
-          {abierto ? '▲' : '▼'}
-        </button>
-      </div>
+          </Text>
 
-      {/* Filtros */}
-      {abierto && (
-        <div style={{ padding: '16px 20px 20px' }}>
-          <div style={{
-            display:       'flex',
-            flexDirection: 'column',
-            gap:           10,
-          }}>
-            {/* Select Provincia */}
-            <div>
-              <label style={{
-                fontSize:    11,
-                fontWeight:  600,
-                color:       'var(--portal-slate)',
-                letterSpacing:'0.06em',
-                textTransform:'uppercase',
-                display:     'block',
-                marginBottom:5,
-              }}>
-                Provincia
-              </label>
-              <div style={{ position: 'relative' }}>
-                <select
-                  style={selectStyle}
-                  value={filtros.provincia_id}
-                  onChange={(e) =>
-                    onChange({
-                      ...filtros,
-                      provincia_id: e.target.value,
-                      canton_id:    '', // reset cantón
-                    })
-                  }
-                >
-                  <option value="">
-                    Todas las provincias
-                  </option>
-                  {opciones.provincias.map((p) => (
-                    <option key={p.value} value={p.value}>
-                      {p.label}
-                    </option>
-                  ))}
-                </select>
-                <span style={{
-                  position:  'absolute',
-                  right:     12,
-                  top:       '50%',
-                  transform: 'translateY(-50%)',
-                  fontSize:  10,
-                  color:     'var(--portal-slate)',
-                  pointerEvents: 'none',
-                }}>▼</span>
-              </div>
-            </div>
-
-            {/* Select Cantón */}
-            <div>
-              <label style={{
-                fontSize:    11,
-                fontWeight:  600,
-                color:       'var(--portal-slate)',
-                letterSpacing:'0.06em',
-                textTransform:'uppercase',
-                display:     'block',
-                marginBottom:5,
-              }}>
-                Cantón
-              </label>
-              <div style={{ position: 'relative' }}>
-                <select
+          {/* Estado de resultados */}
+          {hayFiltros && !cargando && (
+            <Text
+              style={{
+                fontSize: 11,
+                marginTop: 2,
+                color: totalPins > 0 ? "var(--portal-blue)" : "#EF4444",
+              }}
+            >
+              {totalPins > 0
+                ? `${totalPins} proyecto${totalPins !== 1 ? "s" : ""} en el mapa`
+                : "Sin resultados"}
+              {filtrosAplicados.search && (
+                <Text
+                  span
                   style={{
-                    ...selectStyle,
-                    opacity: !filtros.provincia_id
-                      ? 0.5 : 1,
+                    color: "var(--portal-slate)",
+                    opacity: 0.7,
                   }}
-                  value={filtros.canton_id}
-                  disabled={!filtros.provincia_id}
-                  onChange={(e) =>
-                    onChange({
-                      ...filtros,
-                      canton_id: e.target.value,
-                    })
-                  }
                 >
-                  <option value="">
-                    {filtros.provincia_id
-                      ? 'Todos los cantones'
-                      : 'Selecciona una provincia'}
-                  </option>
-                  {cantonesFiltrados.map((c) => (
-                    <option key={c.value} value={c.value}>
-                      {c.label}
-                    </option>
-                  ))}
-                </select>
-                <span style={{
-                  position:  'absolute',
-                  right:     12,
-                  top:       '50%',
-                  transform: 'translateY(-50%)',
-                  fontSize:  10,
-                  color:     'var(--portal-slate)',
-                  pointerEvents: 'none',
-                }}>▼</span>
-              </div>
-            </div>
+                  {` · "${filtrosAplicados.search}"`}
+                </Text>
+              )}
+            </Text>
+          )}
 
-            {/* Select Actor */}
-            <div>
-              <label style={{
-                fontSize:    11,
-                fontWeight:  600,
-                color:       'var(--portal-slate)',
-                letterSpacing:'0.06em',
-                textTransform:'uppercase',
-                display:     'block',
-                marginBottom:5,
-              }}>
-                Actor Cooperante
-              </label>
-              <div style={{ position: 'relative' }}>
-                <select
-                  style={selectStyle}
-                  value={filtros.actor_id}
-                  onChange={(e) =>
-                    onChange({
-                      ...filtros,
-                      actor_id: e.target.value,
-                    })
-                  }
-                >
-                  <option value="">
-                    Todos los actores
-                  </option>
-                  {opciones.actores.map((a) => (
-                    <option key={a.value} value={a.value}>
-                      {a.label}
-                    </option>
-                  ))}
-                </select>
-                <span style={{
-                  position:  'absolute',
-                  right:     12,
-                  top:       '50%',
-                  transform: 'translateY(-50%)',
-                  fontSize:  10,
-                  color:     'var(--portal-slate)',
-                  pointerEvents: 'none',
-                }}>▼</span>
-              </div>
-            </div>
+          {/* Indicador de carga */}
+          {cargando && (
+            <Text
+              style={{
+                fontSize: 11,
+                color: "var(--portal-slate)",
+                opacity: 0.6,
+                marginTop: 2,
+              }}
+            >
+              Buscando...
+            </Text>
+          )}
+        </Box>
 
-            {/* Botón limpiar */}
-            {hayFiltros && (
-              <button
-                onClick={onLimpiar}
+        {/* Toggle colapsar */}
+        <ActionIcon
+          variant="transparent"
+          color="gray"
+          onClick={() => setAbierto((v) => !v)}
+          title={abierto ? "Colapsar" : "Expandir"}
+          style={{ color: "var(--portal-slate)" }}
+        >
+          {abierto ? (
+            <IconChevronUp size={18} />
+          ) : (
+            <IconChevronDown size={18} />
+          )}
+        </ActionIcon>
+      </Box>
+
+      {/* ── Cuerpo del panel (colapsable) ── */}
+      <Collapse in={abierto}>
+        <form onSubmit={handleBuscar}>
+          <Stack gap={12} p="16px 18px 18px">
+            {/* ── Input de búsqueda por texto ── */}
+            <TextInput
+              label="Buscar proyecto"
+              placeholder="Nombre, código o sector..."
+              leftSection={<IconSearch size={14} opacity={0.6} />}
+              rightSection={
+                form.values.search ? (
+                  <ActionIcon
+                    variant="transparent"
+                    color="gray"
+                    onClick={() => form.setFieldValue("search", "")}
+                    title="Limpiar texto"
+                  >
+                    <IconX size={14} opacity={0.6} />
+                  </ActionIcon>
+                ) : null
+              }
+              {...form.getInputProps("search")}
+            />
+
+            {/* ── Separador ── */}
+            <Divider color="rgba(11,31,58,0.07)" />
+
+            {/* ── Select Provincia ── */}
+            <Select
+              label="Provincia"
+              placeholder="Todas las provincias"
+              data={opciones.provincias.map((p) => ({
+                value: p.value,
+                label: p.label,
+              }))}
+              clearable
+              searchable
+              {...form.getInputProps("provincia_id")}
+              value={form.values.provincia_id || null}
+              onChange={handleCambioProvincia}
+            />
+
+            {/* ── Select Cantón ── */}
+            <Select
+              label="Cantón"
+              placeholder={
+                form.values.provincia_id
+                  ? "Todos los cantones"
+                  : "Primero selecciona una provincia"
+              }
+              data={cantonesFiltrados.map((c) => ({
+                value: c.value,
+                label: c.label,
+              }))}
+              clearable
+              searchable
+              disabled={!form.values.provincia_id}
+              {...form.getInputProps("canton_id")}
+              value={form.values.canton_id || null}
+            />
+
+            {/* ── Select Actor ── */}
+            <Select
+              label="Actor Cooperante"
+              placeholder="Todos los actores"
+              data={opciones.actores.map((a) => ({
+                value: a.value,
+                label: a.label,
+              }))}
+              clearable
+              searchable
+              {...form.getInputProps("actor_id")}
+              value={form.values.actor_id || null}
+            />
+
+            {/* ── Indicador de cambios pendientes ── */}
+            {tieneCambiosPendientes && !cargando && (
+              <Text
                 style={{
-                  background:  'none',
-                  border:      '1px solid rgba(11,31,58,0.2)',
-                  borderRadius:10,
-                  padding:     '9px 14px',
-                  fontSize:    12,
-                  fontWeight:  600,
-                  color:       'var(--portal-slate)',
-                  cursor:      'pointer',
-                  letterSpacing:'0.04em',
-                  transition:  'all 200ms ease',
-                  marginTop:   4,
+                  fontSize: 11,
+                  color: "var(--portal-slate)",
+                  opacity: 0.6,
+                  textAlign: "center",
+                  fontStyle: "italic",
                 }}
               >
-                × Limpiar filtros
-              </button>
+                Presiona Buscar para aplicar los filtros
+              </Text>
             )}
-          </div>
-        </div>
-      )}
 
-      {/* Leyenda compacta */}
-      <div style={{
-        padding:      '12px 20px',
-        borderTop:    '1px solid rgba(11, 31, 58, 0.08)',
-        background:   'rgba(11, 31, 58, 0.02)',
-      }}>
-        <div style={{
-          fontSize:    10,
-          fontWeight:  600,
-          color:       'var(--portal-slate)',
-          letterSpacing:'0.06em',
-          textTransform:'uppercase',
-          marginBottom: 8,
-        }}>
+            {/* ── BOTÓN PRINCIPAL: Buscar ── */}
+            <Button
+              type="submit"
+              disabled={cargando}
+              loading={cargando}
+              leftSection={!cargando && <IconSearch size={16} />}
+              style={{
+                width: "100%",
+                padding: "11px 16px",
+                height: "auto",
+                background: tieneCambiosPendientes
+                  ? "var(--portal-navy)"
+                  : "var(--portal-blue)",
+                color: "white",
+                borderRadius: 10,
+                fontSize: 13,
+                fontWeight: 700,
+                fontFamily: "var(--font-dm-sans)",
+                letterSpacing: "0.04em",
+                transition: "all 200ms ease",
+                boxShadow: tieneCambiosPendientes
+                  ? "0 4px 14px rgba(11,31,58,0.3)"
+                  : "none",
+              }}
+            >
+              Buscar en el mapa
+            </Button>
+
+            {/* Hint Enter */}
+            {!cargando && (
+              <Text
+                style={{
+                  fontSize: 10,
+                  color: "var(--portal-slate)",
+                  opacity: 0.4,
+                  textAlign: "center",
+                }}
+              >
+                También puedes presionar Enter en el buscador
+              </Text>
+            )}
+
+            {/* ── Botón secundario: Limpiar ── */}
+            {(hayFiltros || tieneCambiosPendientes) && (
+              <Button
+                variant="outline"
+                color="gray"
+                onClick={handleLimpiar}
+                disabled={cargando}
+                leftSection={<IconX size={14} />}
+                style={{
+                  border: "1px solid rgba(11,31,58,0.15)",
+                  borderRadius: 10,
+                  height: "auto",
+                  padding: "8px 14px",
+                  fontSize: 12,
+                  fontWeight: 500,
+                  color: "var(--portal-slate)",
+                  letterSpacing: "0.02em",
+                  fontFamily: "var(--font-dm-sans)",
+                }}
+              >
+                Limpiar todos los filtros
+              </Button>
+            )}
+          </Stack>
+        </form>
+      </Collapse>
+
+      {/* ── Leyenda de estados ── */}
+      <Box
+        style={{
+          padding: "10px 18px",
+          borderTop: "1px solid rgba(11,31,58,0.07)",
+          background: "rgba(11,31,58,0.02)",
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 10,
+            fontWeight: 600,
+            color: "var(--portal-slate)",
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+            marginBottom: 6,
+          }}
+        >
           Estado del proyecto
-        </div>
-        <div style={{
-          display:   'flex',
-          flexWrap:  'wrap',
-          gap:       '6px 12px',
-        }}>
-          {Object.entries(COLOR_PIN).map(
-            ([estado, color]) => (
-              <div key={estado} style={{
-                display:    'flex',
-                alignItems: 'center',
-                gap:        5,
-                fontSize:   10,
-                color:      'var(--portal-slate)',
-              }}>
-                <div style={{
-                  width:        8,
-                  height:       8,
-                  borderRadius: '50%',
-                  background:   color,
-                  border:       '1.5px solid white',
-                  boxShadow:    `0 1px 3px ${color}50`,
-                  flexShrink:   0,
-                }} />
+        </Text>
+        <Group gap="10px">
+          {LEYENDA_ESTADOS.map(({ estado, color }) => (
+            <Group key={estado} gap={5}>
+              <Box
+                style={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: "50%",
+                  background: color,
+                  border: "1.5px solid white",
+                  boxShadow: `0 1px 3px ${color}50`,
+                  flexShrink: 0,
+                }}
+              />
+              <Text style={{ fontSize: 10, color: "var(--portal-slate)" }}>
                 {estado}
-              </div>
-            )
-          )}
-        </div>
-      </div>
-    </div>
+              </Text>
+            </Group>
+          ))}
+        </Group>
+      </Box>
+    </Box>
   );
 }
 
-const COLOR_PIN: Record<string, string> = {
-  'En gestión':   '#F59E0B',
-  'En ejecución': '#3B82F6',
-  'Finalizado':   '#10B981',
-  'Suspendido':   '#EF4444',
-};
+const LEYENDA_ESTADOS = [
+  { estado: "En gestión", color: "#F59E0B" },
+  { estado: "En ejecución", color: "#3B82F6" },
+  { estado: "Finalizado", color: "#10B981" },
+  { estado: "Suspendido", color: "#EF4444" },
+];
