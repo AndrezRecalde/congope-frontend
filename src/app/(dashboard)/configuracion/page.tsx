@@ -12,6 +12,8 @@ import {
   Text,
   Badge,
   MultiSelect,
+  Divider,
+  Title,
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
@@ -21,11 +23,14 @@ import {
   IconPlus,
   IconSearch,
   IconMapPin,
+  IconMap,
 } from "@tabler/icons-react";
 import { PageHeader } from "@/components/ui/PageHeader/PageHeader";
 import { UsuariosTable } from "@/components/modulos/configuracion/UsuariosTable";
 import { AuditoriaTable } from "@/components/modulos/configuracion/AuditoriaTable";
 import { UsuarioForm } from "@/components/modulos/configuracion/UsuarioForm";
+import { TablaProvincias } from "@/components/modulos/configuracion/territorios/TablaProvincias";
+import { TablaCantones } from "@/components/modulos/configuracion/territorios/TablaCantones";
 import {
   useUsuarios,
   useCrearUsuario,
@@ -87,6 +92,13 @@ export default function ConfiguracionPage() {
   const { confirmar } = useConfirm();
   const usuarioActual = useAppSelector(selectUsuario);
 
+  const esSuperAdmin = usuarioActual?.roles?.some(
+    (r: string | { name: string }) =>
+      typeof r === "string"
+        ? r === "super_admin"
+        : r.name === "super_admin"
+  ) ?? false;
+
   // Permisos
   const puedeVerUsuarios = can("usuarios.ver");
   const puedeCrear = can("usuarios.crear");
@@ -97,7 +109,7 @@ export default function ConfiguracionPage() {
   const puedeVerAuditoria = can("usuarios.ver_auditoria");
 
   // ── Queries de usuarios ──────────────────────────
-  const { data: usuariosData, isLoading: cargandoUsuarios } = useUsuarios({
+  const { data: usuariosData, isFetching: fetchingUsuarios } = useUsuarios({
     search: debouncedSearch,
     rol: rolFiltro,
     page: pageUsuarios,
@@ -105,7 +117,7 @@ export default function ConfiguracionPage() {
   });
 
   // ── Queries de auditoría ─────────────────────────
-  const { data: auditoriaData, isLoading: cargandoAuditoria } = useAuditoria({
+  const { data: auditoriaData, isFetching: fetchingAuditoria } = useAuditoria({
     accion: accionFiltro,
     page: pageAuditoria,
     per_page: 20,
@@ -325,6 +337,9 @@ export default function ConfiguracionPage() {
               Auditoría
             </Tabs.Tab>
           )}
+          <Tabs.Tab value="territorios" leftSection={<IconMap size={16} />}>
+            Territorios
+          </Tabs.Tab>
         </Tabs.List>
 
         {/* ── Tab Usuarios ── */}
@@ -380,7 +395,7 @@ export default function ConfiguracionPage() {
                 total={usuariosData?.meta?.total ?? 0}
                 page={pageUsuarios}
                 perPage={15}
-                isLoading={cargandoUsuarios}
+                isLoading={fetchingUsuarios}
                 onPageChange={setPageUsuarios}
                 onEditar={abrirModalEditar}
                 onEliminar={(u) =>
@@ -442,12 +457,56 @@ export default function ConfiguracionPage() {
                 total={auditoriaData?.meta?.total ?? 0}
                 page={pageAuditoria}
                 perPage={20}
-                isLoading={cargandoAuditoria}
+                isLoading={fetchingAuditoria}
                 onPageChange={setPageAuditoria}
               />
             </Stack>
           </Tabs.Panel>
         )}
+
+        {/* ── Tab Territorios ── */}
+        <Tabs.Panel value="territorios">
+          <Stack gap="xl">
+            {/* Sección Provincias */}
+            <div>
+              <Group gap="xs" mb="md">
+                <Title order={5} c="gray.7">
+                  Provincias del Ecuador
+                </Title>
+                <Badge variant="light" color="gray" size="sm">
+                  24
+                </Badge>
+              </Group>
+              <TablaProvincias puedeEditar={esSuperAdmin} />
+            </div>
+
+            {/* Separador visual */}
+            <Divider
+              label={
+                <Group gap="xs">
+                  <IconMap size={14} />
+                  <Text size="xs" fw={600}>
+                    Cantones
+                  </Text>
+                </Group>
+              }
+              labelPosition="left"
+            />
+
+            {/* Sección Cantones */}
+            <div>
+              <Group gap="xs" mb="md">
+                <Title order={5} c="gray.7">
+                  Cantones del Ecuador
+                </Title>
+                <Badge variant="light" color="gray" size="sm">
+                  221
+                </Badge>
+              </Group>
+              <TablaCantones puedeEditar={esSuperAdmin} />
+            </div>
+          </Stack>
+        </Tabs.Panel>
       </Tabs>
     </>
   );
