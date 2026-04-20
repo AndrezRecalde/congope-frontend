@@ -24,6 +24,7 @@ import {
   IconSearch,
   IconMapPin,
   IconMap,
+  IconDeviceFloppy,
 } from "@tabler/icons-react";
 import { PageHeader } from "@/components/ui/PageHeader/PageHeader";
 import { UsuariosTable } from "@/components/modulos/configuracion/UsuariosTable";
@@ -31,6 +32,7 @@ import { AuditoriaTable } from "@/components/modulos/configuracion/AuditoriaTabl
 import { UsuarioForm } from "@/components/modulos/configuracion/UsuarioForm";
 import { TablaProvincias } from "@/components/modulos/configuracion/territorios/TablaProvincias";
 import { TablaCantones } from "@/components/modulos/configuracion/territorios/TablaCantones";
+import { TablaBackups } from "@/components/modulos/configuracion/backups/TablaBackups";
 import {
   useUsuarios,
   useCrearUsuario,
@@ -340,6 +342,14 @@ export default function ConfiguracionPage() {
           <Tabs.Tab value="territorios" leftSection={<IconMap size={16} />}>
             Territorios
           </Tabs.Tab>
+          {esSuperAdmin && (
+            <Tabs.Tab
+              value="backups"
+              leftSection={<IconDeviceFloppy size={16} />}
+            >
+              Backups
+            </Tabs.Tab>
+          )}
         </Tabs.List>
 
         {/* ── Tab Usuarios ── */}
@@ -507,6 +517,12 @@ export default function ConfiguracionPage() {
             </div>
           </Stack>
         </Tabs.Panel>
+
+        {esSuperAdmin && (
+          <Tabs.Panel value="backups">
+            <TablaBackups />
+          </Tabs.Panel>
+        )}
       </Tabs>
     </>
   );
