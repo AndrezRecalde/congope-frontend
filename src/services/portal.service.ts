@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { env } from '@/lib/env';
+import type { EstadisticasProvincia } from '@/types/comparador.types';
 
 // Cliente HTTP PÚBLICO — sin token de autenticación
 // El portal es accesible sin login.
@@ -336,5 +337,23 @@ export const portalService = {
       { params: { page, per_page: 9 } }
     );
     return res.data;
+  },
+
+  /**
+   * GET /api/v1/publico/comparar
+   * Estadísticas comparativas de 2 o 3 provincias.
+   */
+  compararProvincias: async (
+    provinciaIds: string[]
+  ): Promise<EstadisticasProvincia[]> => {
+    // Construir query string con array
+    const params = new URLSearchParams();
+    provinciaIds.forEach((id) =>
+      params.append('provincia_ids[]', id)
+    );
+    const res = await portalClient.get(
+      `/publico/comparar?${params.toString()}`
+    );
+    return res.data.data as EstadisticasProvincia[];
   },
 };

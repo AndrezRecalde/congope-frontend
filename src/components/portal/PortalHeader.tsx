@@ -82,36 +82,49 @@ export function PortalHeader() {
             { href: '#estadisticas',label: 'Estadísticas' },
             { href: '#emblematicos',label: 'Emblemáticos' },
             { href: '#practicas',   label: 'Buenas Prácticas' },
-          ].map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              style={{
-                color:         'rgba(255,255,255,0.8)',
-                textDecoration:'none',
-                fontSize:      13,
-                fontWeight:    500,
-                padding:       '6px 14px',
-                borderRadius:  100,
-                transition:    'all 200ms ease',
-                letterSpacing: '0.02em',
-              }}
-              onMouseEnter={(e) => {
-                (e.target as HTMLElement).style.background =
-                  'rgba(255,255,255,0.1)';
-                (e.target as HTMLElement).style.color =
-                  'white';
-              }}
-              onMouseLeave={(e) => {
-                (e.target as HTMLElement).style.background =
-                  'transparent';
-                (e.target as HTMLElement).style.color =
-                  'rgba(255,255,255,0.8)';
-              }}
-            >
-              {item.label}
-            </a>
-          ))}
+            { href: '/comparar',    label: 'Comparar', esLink: true },
+          ].map((item) => {
+            const estiloNav = {
+              color:         'rgba(255,255,255,0.8)',
+              textDecoration:'none',
+              fontSize:      13,
+              fontWeight:    500,
+              padding:       '6px 14px',
+              borderRadius:  100,
+              transition:    'all 200ms ease',
+              letterSpacing: '0.02em',
+            };
+            const hoverProps = {
+              onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
+                (e.target as HTMLElement).style.background = 'rgba(255,255,255,0.1)';
+                (e.target as HTMLElement).style.color = 'white';
+              },
+              onMouseLeave: (e: React.MouseEvent<HTMLElement>) => {
+                (e.target as HTMLElement).style.background = 'transparent';
+                (e.target as HTMLElement).style.color = 'rgba(255,255,255,0.8)';
+              }
+            };
+            
+            return item.esLink ? (
+              <Link
+                key={item.href}
+                href={item.href}
+                style={estiloNav}
+                {...hoverProps}
+              >
+                {item.label}
+              </Link>
+            ) : (
+              <a
+                key={item.href}
+                href={item.href}
+                style={estiloNav}
+                {...hoverProps}
+              >
+                {item.label}
+              </a>
+            );
+          })}
           {/* Acceso al dashboard */}
           <Link
             href="/dashboard"
