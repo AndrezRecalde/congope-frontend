@@ -1,6 +1,6 @@
 "use client";
 
-import { Stack, Text, Group, Code, Badge } from "@mantine/core";
+import { Stack, Text, Group, Code } from "@mantine/core";
 
 // Campos que NO se muestran al usuario
 // (son metadatos técnicos sin valor para el lector)

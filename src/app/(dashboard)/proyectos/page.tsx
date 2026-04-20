@@ -115,11 +115,13 @@ export default function ProyectosPage() {
 
   const handleExportar = async (_formato: "pdf" | "excel" | "csv") => {
     setExportando(true);
+    console.log({ _formato });
     try {
       await proyectosService.exportar({
         search: filtros.search,
         estado: filtros.estado,
         actor_id: filtros.actor_id,
+        format: _formato,
       });
     } finally {
       setExportando(false);

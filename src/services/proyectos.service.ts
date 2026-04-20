@@ -8,16 +8,17 @@ import apiClient, {
   type CreateHitoDto,
   type PaginatedResponse,
   type ApiResponse,
-} from './axios';
-import type { EstadoProyecto } from '@/types/proyecto.types';
+} from "./axios";
+import type { EstadoProyecto } from "@/types/proyecto.types";
 
 export interface ProyectosParams {
-  search?:       string;
-  estado?:       string;
-  actor_id?:     string;
+  search?: string;
+  estado?: string;
+  actor_id?: string;
   provincia_id?: string;
-  page?:         number;
-  per_page?:     number;
+  format?: string;
+  page?: number;
+  per_page?: number;
 }
 
 export const proyectosService = {
@@ -25,14 +26,14 @@ export const proyectosService = {
    * GET /api/v1/proyectos
    */
   listar: async (
-    params: ProyectosParams = {}
+    params: ProyectosParams = {},
   ): Promise<PaginatedResponse<Proyecto>> => {
     const queryParams = Object.fromEntries(
       Object.entries(params).filter(
-        ([, v]) => v !== '' && v !== undefined && v !== null
-      )
+        ([, v]) => v !== "" && v !== undefined && v !== null,
+      ),
     );
-    const res = await apiClient.get('/proyectos', {
+    const res = await apiClient.get("/proyectos", {
       params: queryParams,
     });
     return res.data as PaginatedResponse<Proyecto>;
@@ -53,10 +54,8 @@ export const proyectosService = {
    * sector_tematico, fecha_inicio, fecha_fin_planificada
    * son REQUERIDOS según el OpenAPI.
    */
-  crear: async (
-    datos: CreateProyectoDto
-  ): Promise<Proyecto> => {
-    const res = await apiClient.post('/proyectos', datos);
+  crear: async (datos: CreateProyectoDto): Promise<Proyecto> => {
+    const res = await apiClient.post("/proyectos", datos);
     return extractData<Proyecto>(res);
   },
 
@@ -65,7 +64,7 @@ export const proyectosService = {
    */
   actualizar: async (
     id: string,
-    datos: UpdateProyectoDto
+    datos: UpdateProyectoDto,
   ): Promise<Proyecto> => {
     const res = await apiClient.put(`/proyectos/${id}`, datos);
     return extractData<Proyecto>(res);
@@ -83,32 +82,24 @@ export const proyectosService = {
    */
   cambiarEstado: async (
     id: string,
-    estado: EstadoProyecto
+    estado: EstadoProyecto,
   ): Promise<Proyecto> => {
-    const res = await apiClient.patch(
-      `/proyectos/${id}/estado`,
-      { estado }
-    );
+    const res = await apiClient.patch(`/proyectos/${id}/estado`, { estado });
     return extractData<Proyecto>(res);
   },
 
   /**
    * GET /api/v1/proyectos/exportar
    */
-  exportar: async (
-    params: ProyectosParams = {}
-  ): Promise<void> => {
+  exportar: async (params: ProyectosParams = {}): Promise<void> => {
     const queryString = new URLSearchParams(
       Object.fromEntries(
-        Object.entries(params).filter(
-          ([, v]) => v !== '' && v !== undefined
-        )
-      ) as Record<string, string>
+        Object.entries(params).filter(([, v]) => v !== "" && v !== undefined),
+      ) as Record<string, string>,
     ).toString();
-    const url = `/proyectos/exportar${
-      queryString ? '?' + queryString : ''
-    }`;
-    await descargarBlob(url, undefined, 'proyectos.xlsx');
+    const url = `/proyectos/exportar${queryString ? "?" + queryString : ""}`;
+    const extension = params.format === "pdf" ? "pdf" : params.format === "csv" ? "csv" : "xlsx";
+    await descargarBlob(url, undefined, `proyectos.${extension}`);
   },
 
   // ── HITOS ────────────────────────────────────────────
@@ -117,12 +108,8 @@ export const proyectosService = {
    * GET /api/v1/proyectos/:proyecto/hitos
    * NOTA: Fechas en ISO 8601 completo.
    */
-  listarHitos: async (
-    proyectoId: string
-  ): Promise<HitoProyecto[]> => {
-    const res = await apiClient.get(
-      `/proyectos/${proyectoId}/hitos`
-    );
+  listarHitos: async (proyectoId: string): Promise<HitoProyecto[]> => {
+    const res = await apiClient.get(`/proyectos/${proyectoId}/hitos`);
     const apiRes = res.data as ApiResponse<HitoProyecto[]>;
     return apiRes.data;
   },
@@ -133,12 +120,9 @@ export const proyectosService = {
    */
   crearHito: async (
     proyectoId: string,
-    datos: CreateHitoDto
+    datos: CreateHitoDto,
   ): Promise<HitoProyecto> => {
-    const res = await apiClient.post(
-      `/proyectos/${proyectoId}/hitos`,
-      datos
-    );
+    const res = await apiClient.post(`/proyectos/${proyectoId}/hitos`, datos);
     return extractData<HitoProyecto>(res);
   },
 
@@ -148,11 +132,11 @@ export const proyectosService = {
   actualizarHito: async (
     proyectoId: string,
     hitoId: string,
-    datos: Partial<CreateHitoDto>
+    datos: Partial<CreateHitoDto>,
   ): Promise<HitoProyecto> => {
     const res = await apiClient.put(
       `/proyectos/${proyectoId}/hitos/${hitoId}`,
-      datos
+      datos,
     );
     return extractData<HitoProyecto>(res);
   },
@@ -160,13 +144,8 @@ export const proyectosService = {
   /**
    * DELETE /api/v1/proyectos/:proyecto/hitos/:id
    */
-  eliminarHito: async (
-    proyectoId: string,
-    hitoId: string
-  ): Promise<void> => {
-    await apiClient.delete(
-      `/proyectos/${proyectoId}/hitos/${hitoId}`
-    );
+  eliminarHito: async (proyectoId: string, hitoId: string): Promise<void> => {
+    await apiClient.delete(`/proyectos/${proyectoId}/hitos/${hitoId}`);
   },
 
   /**
@@ -175,10 +154,10 @@ export const proyectosService = {
    */
   completarHito: async (
     proyectoId: string,
-    hitoId: string
+    hitoId: string,
   ): Promise<HitoProyecto> => {
     const res = await apiClient.patch(
-      `/proyectos/${proyectoId}/hitos/${hitoId}/completar`
+      `/proyectos/${proyectoId}/hitos/${hitoId}/completar`,
     );
     return extractData<HitoProyecto>(res);
   },

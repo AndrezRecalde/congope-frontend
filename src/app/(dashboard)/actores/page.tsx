@@ -124,6 +124,7 @@ export default function ActoresPage() {
         search: filtros.search,
         tipo: filtros.tipo,
         estado: filtros.estado,
+        format: _formato,
       });
     } finally {
       setExportando(false);

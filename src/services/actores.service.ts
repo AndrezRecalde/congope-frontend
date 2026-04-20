@@ -5,13 +5,14 @@ import apiClient, {
   type CreateActorDto,
   type UpdateActorDto,
   type PaginatedResponse,
-} from './axios';
+} from "./axios";
 
 export interface ActoresParams {
-  search?:   string;
-  tipo?:     string;
-  estado?:   string;
-  page?:     number;
+  search?: string;
+  tipo?: string;
+  estado?: string;
+  format?: string;
+  page?: number;
   per_page?: number;
 }
 
@@ -21,15 +22,15 @@ export const actoresService = {
    * Lista actores con filtros y paginación.
    */
   listar: async (
-    params: ActoresParams = {}
+    params: ActoresParams = {},
   ): Promise<PaginatedResponse<ActorCooperacion>> => {
     // Limpiar params vacíos antes de enviar
     const queryParams = Object.fromEntries(
       Object.entries(params).filter(
-        ([, v]) => v !== '' && v !== undefined && v !== null
-      )
+        ([, v]) => v !== "" && v !== undefined && v !== null,
+      ),
     );
-    const res = await apiClient.get('/actores', {
+    const res = await apiClient.get("/actores", {
       params: queryParams,
     });
     return res.data as PaginatedResponse<ActorCooperacion>;
@@ -49,13 +50,11 @@ export const actoresService = {
    * POST /api/v1/actores
    * Crea un nuevo actor. nombre, tipo y pais_origen son requeridos.
    */
-  crear: async (
-    datos: CreateActorDto
-  ): Promise<ActorCooperacion> => {
+  crear: async (datos: CreateActorDto): Promise<ActorCooperacion> => {
     const formData = new FormData();
     Object.entries(datos).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
-        if (key === 'areas_tematicas' && Array.isArray(value)) {
+        if (key === "areas_tematicas" && Array.isArray(value)) {
           value.forEach((v) => formData.append(`${key}[]`, v));
         } else {
           formData.append(key, value as string | Blob);
@@ -63,8 +62,8 @@ export const actoresService = {
       }
     });
 
-    const res = await apiClient.post('/actores', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const res = await apiClient.post("/actores", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
     return extractData<ActorCooperacion>(res);
   },
@@ -76,28 +75,34 @@ export const actoresService = {
    */
   actualizar: async (
     id: string,
-    datos: UpdateActorDto
+    datos: UpdateActorDto,
   ): Promise<ActorCooperacion> => {
     const formData = new FormData();
-    formData.append('_method', 'PUT');
+    formData.append("_method", "PUT");
 
     // Campos de texto nullable: enviar string vacío para que el backend
     // los limpie (null no es serializable en multipart/form-data).
-    const NULLABLE_TEXT = ['notas', 'contacto_nombre', 'contacto_email',
-      'contacto_telefono', 'sitio_web', 'identificador_institucional'] as const;
+    const NULLABLE_TEXT = [
+      "notas",
+      "contacto_nombre",
+      "contacto_email",
+      "contacto_telefono",
+      "sitio_web",
+      "identificador_institucional",
+    ] as const;
 
     Object.entries(datos).forEach(([key, value]) => {
       if (value === undefined) return; // campo no incluido → no enviar
 
       if (value === null) {
         // Solo serializar null en campos de texto nullables
-        if (NULLABLE_TEXT.includes(key as typeof NULLABLE_TEXT[number])) {
-          formData.append(key, '');
+        if (NULLABLE_TEXT.includes(key as (typeof NULLABLE_TEXT)[number])) {
+          formData.append(key, "");
         }
         return;
       }
 
-      if (key === 'areas_tematicas' && Array.isArray(value)) {
+      if (key === "areas_tematicas" && Array.isArray(value)) {
         value.forEach((v) => formData.append(`${key}[]`, v));
       } else {
         formData.append(key, value as string | Blob);
@@ -105,7 +110,7 @@ export const actoresService = {
     });
 
     const res = await apiClient.post(`/actores/${id}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { "Content-Type": "multipart/form-data" },
     });
     return extractData<ActorCooperacion>(res);
   },
@@ -122,17 +127,13 @@ export const actoresService = {
    * Descarga el listado completo como archivo.
    * Devuelve text/plain según el OpenAPI.
    */
-  exportar: async (
-    params: ActoresParams = {}
-  ): Promise<void> => {
+  exportar: async (params: ActoresParams = {}): Promise<void> => {
     const queryString = new URLSearchParams(
       Object.fromEntries(
-        Object.entries(params).filter(
-          ([, v]) => v !== '' && v !== undefined
-        )
-      ) as Record<string, string>
+        Object.entries(params).filter(([, v]) => v !== "" && v !== undefined),
+      ) as Record<string, string>,
     ).toString();
-    const url = `/actores/exportar${queryString ? '?' + queryString : ''}`;
-    await descargarBlob(url, undefined, 'actores.xlsx');
+    const url = `/actores/exportar${queryString ? "?" + queryString : ""}`;
+    await descargarBlob(url, undefined, "actores.xlsx");
   },
 };
