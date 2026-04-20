@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react';
 import { DataTable }  from 'mantine-datatable';
 import {
   Group, Text, Badge, Stack,
@@ -7,7 +8,10 @@ import {
 } from '@mantine/core';
 import {
   IconDownload, IconEdit, IconTrash,
+  IconEye, IconEyeOff,
 } from '@tabler/icons-react';
+import { VisorDocumento, DocumentoParaVisor } from './VisorDocumento';
+import { getTipoPreview } from '@/hooks/useDocumentoPreview';
 import { IconoArchivo } from './IconoArchivo';
 import { formatFecha } from '@/utils/formatters';
 import {
@@ -40,16 +44,30 @@ export function DocumentosTable({
   puedePublicar,
   publicandoId,
 }: DocumentosTableProps) {
+  const [docPreview, setDocPreview] = useState<DocumentoParaVisor | null>(null);
+
   const columns = [
     {
       accessor:  'tipo' as const,
       title:     '',
       width:     52,
       render:    (doc: DocumentoItem) => (
-        <IconoArchivo
-          mimeType={doc.mime_type}
-          size={32}
-        />
+        <div
+          onClick={() => {
+            const tipo = getTipoPreview(doc.mime_type);
+            if (tipo !== 'none') setDocPreview(doc as unknown as DocumentoParaVisor);
+          }}
+          title={getTipoPreview(doc.mime_type) !== 'none' ? 'Previsualizar' : undefined}
+          style={{
+            cursor: getTipoPreview(doc.mime_type) !== 'none'
+              ? 'pointer' : 'default',
+          }}
+        >
+          <IconoArchivo
+            mimeType={doc.mime_type}
+            size={32}
+          />
+        </div>
       ),
     },
     {
@@ -190,69 +208,105 @@ export function DocumentosTable({
     {
       accessor:  'acciones' as const,
       title:     '',
-      width:     110,
+      width:     140,
       textAlign: 'right' as const,
-      render:    (doc: DocumentoItem) => (
-        <Group gap={4} justify="flex-end" wrap="nowrap">
-          <Tooltip label="Descargar">
-            <ActionIcon
-              variant="subtle"
-              color="congope"
-              size="sm"
-              onClick={() => onDescargar(doc)}
+      render:    (doc: DocumentoItem) => {
+        const tipo = getTipoPreview(doc.mime_type);
+        const soporta = tipo !== 'none';
+
+        return (
+          <Group gap={4} justify="flex-end" wrap="nowrap">
+            <Tooltip
+              label={
+                soporta
+                  ? 'Previsualizar'
+                  : 'Sin previsualización disponible'
+              }
             >
-              <IconDownload size={15} />
-            </ActionIcon>
-          </Tooltip>
-          {puedeEditar && (
-            <Tooltip label="Editar metadatos">
               <ActionIcon
                 variant="subtle"
-                color="gray"
+                color={soporta ? 'blue' : 'gray'}
                 size="sm"
-                onClick={() => onEditar(doc)}
+                onClick={() =>
+                  soporta ? setDocPreview(doc as unknown as DocumentoParaVisor) : undefined
+                }
+                style={{
+                  opacity: soporta ? 1 : 0.4,
+                  cursor:  soporta ? 'pointer' : 'default',
+                }}
               >
-                <IconEdit size={15} />
+                {soporta
+                  ? <IconEye size={15} />
+                  : <IconEyeOff size={15} />
+                }
               </ActionIcon>
             </Tooltip>
-          )}
-          {puedeEliminar && (
-            <Tooltip label="Eliminar">
+            <Tooltip label="Descargar">
               <ActionIcon
                 variant="subtle"
-                color="red"
+                color="congope"
                 size="sm"
-                onClick={() => onEliminar(doc)}
+                onClick={() => onDescargar(doc)}
               >
-                <IconTrash size={15} />
+                <IconDownload size={15} />
               </ActionIcon>
             </Tooltip>
-          )}
-        </Group>
-      ),
+            {puedeEditar && (
+              <Tooltip label="Editar metadatos">
+                <ActionIcon
+                  variant="subtle"
+                  color="gray"
+                  size="sm"
+                  onClick={() => onEditar(doc)}
+                >
+                  <IconEdit size={15} />
+                </ActionIcon>
+              </Tooltip>
+            )}
+            {puedeEliminar && (
+              <Tooltip label="Eliminar">
+                <ActionIcon
+                  variant="subtle"
+                  color="red"
+                  size="sm"
+                  onClick={() => onEliminar(doc)}
+                >
+                  <IconTrash size={15} />
+                </ActionIcon>
+              </Tooltip>
+            )}
+          </Group>
+        );
+      },
     },
   ];
 
   return (
-    // @ts-expect-error - mantine-datatable has a known TypeScript union inference issue when no pagination is provided
-    <DataTable
-      records={documentos}
-      fetching={isLoading}
-      striped
-      highlightOnHover
-      withTableBorder
-      withColumnBorders={false}
-      borderRadius="md"
-      minHeight={200}
-      noRecordsText="No hay documentos en esta entidad"
-      loadingText="Cargando documentos..."
-      styles={{
-        header: {
-          backgroundColor:
-            'var(--mantine-color-default)',
-        },
-      }}
-      columns={columns}
-    />
+    <>
+      {/* @ts-expect-error - mantine-datatable has a known TypeScript union inference issue when no pagination is provided */}
+      <DataTable
+        records={documentos}
+        fetching={isLoading}
+        striped
+        highlightOnHover
+        withTableBorder
+        withColumnBorders={false}
+        borderRadius="md"
+        minHeight={200}
+        noRecordsText="No hay documentos en esta entidad"
+        loadingText="Cargando documentos..."
+        styles={{
+          header: {
+            backgroundColor:
+              'var(--mantine-color-default)',
+          },
+        }}
+        columns={columns}
+      />
+      <VisorDocumento
+        documento={docPreview}
+        onCerrar={() => setDocPreview(null)}
+      />
+    </>
   );
 }

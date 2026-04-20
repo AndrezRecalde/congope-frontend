@@ -74,7 +74,11 @@ export function PortalFiltros({
     : opciones.cantones;
 
   // Detectar si el formulario difiere de lo aplicado
-  const tieneCambiosPendientes = form.isDirty();
+  const tieneCambiosPendientes =
+    form.values.provincia_id !== filtrosAplicados.provincia_id ||
+    form.values.canton_id !== filtrosAplicados.canton_id ||
+    form.values.actor_id !== filtrosAplicados.actor_id ||
+    form.values.search !== filtrosAplicados.search;
 
   // ── Handlers ────────────────────────────────
 
