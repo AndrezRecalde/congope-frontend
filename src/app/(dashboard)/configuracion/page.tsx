@@ -94,12 +94,10 @@ export default function ConfiguracionPage() {
   const { confirmar } = useConfirm();
   const usuarioActual = useAppSelector(selectUsuario);
 
-  const esSuperAdmin = usuarioActual?.roles?.some(
-    (r: string | { name: string }) =>
-      typeof r === "string"
-        ? r === "super_admin"
-        : r.name === "super_admin"
-  ) ?? false;
+  const esSuperAdmin =
+    usuarioActual?.roles?.some((r: string | { name: string }) =>
+      typeof r === "string" ? r === "super_admin" : r.name === "super_admin",
+    ) ?? false;
 
   // Permisos
   const puedeVerUsuarios = can("usuarios.ver");
@@ -286,20 +284,41 @@ export default function ConfiguracionPage() {
           onCancel={() => modals.closeAll()}
           onConfirm={async (enviarCorreo) => {
             try {
-              const res = await resetPasswordAsync({ id: u.id, enviar_correo: enviarCorreo });
+              const res = await resetPasswordAsync({
+                id: u.id,
+                enviar_correo: enviarCorreo,
+              });
               modals.closeAll();
               if (!enviarCorreo && res.password_generada) {
                 modals.open({
                   title: "Contraseña generada",
                   children: (
                     <Stack gap="sm">
-                      <Text size="sm">Por favor comparte la siguiente contraseña temporal con el usuario de forma segura:</Text>
-                      <Paper p="sm" withBorder style={{ backgroundColor: 'var(--mantine-color-gray-0)', textAlign: 'center' }}>
-                        <Text size="lg" fw={700} style={{ fontFamily: 'monospace' }}>{res.password_generada}</Text>
+                      <Text size="sm">
+                        Por favor comparte la siguiente contraseña temporal con
+                        el usuario de forma segura:
+                      </Text>
+                      <Paper
+                        p="sm"
+                        withBorder
+                        style={{
+                          backgroundColor: "var(--mantine-color-gray-0)",
+                          textAlign: "center",
+                        }}
+                      >
+                        <Text
+                          size="lg"
+                          fw={700}
+                          style={{ fontFamily: "monospace" }}
+                        >
+                          {res.password_generada}
+                        </Text>
                       </Paper>
-                      <Button fullWidth onClick={() => modals.closeAll()}>Cerrar</Button>
+                      <Button fullWidth onClick={() => modals.closeAll()}>
+                        Cerrar
+                      </Button>
                     </Stack>
-                  )
+                  ),
                 });
               }
             } catch (error) {
@@ -357,14 +376,7 @@ export default function ConfiguracionPage() {
           <Tabs.Panel value="usuarios">
             <Stack gap="md">
               {/* Filtros y botón crear */}
-              <Paper
-                p="md"
-                radius="md"
-                style={{
-                  border: "1px solid var(--mantine-color-gray-3)",
-                  background: "var(--mantine-color-gray-0)",
-                }}
-              >
+              <Paper p="md" radius="md">
                 <Group gap="sm" wrap="wrap" justify="space-between">
                   <Group gap="sm" wrap="wrap" style={{ flex: 1 }}>
                     <TextInput
@@ -436,14 +448,7 @@ export default function ConfiguracionPage() {
           <Tabs.Panel value="auditoria">
             <Stack gap="md">
               {/* Filtros auditoría */}
-              <Paper
-                p="md"
-                radius="md"
-                style={{
-                  border: "1px solid var(--mantine-color-gray-3)",
-                  background: "var(--mantine-color-gray-0)",
-                }}
-              >
+              <Paper p="md" radius="md">
                 <Group gap="sm" wrap="wrap">
                   <Select
                     placeholder="Filtrar por acción"
@@ -607,12 +612,21 @@ function ResetPasswordForm({
   return (
     <Stack gap="md" p="sm">
       <Text size="sm">
-        Se generará una nueva contraseña segura para el usuario <strong>{u.name}</strong>.
+        Se generará una nueva contraseña segura para el usuario{" "}
+        <strong>{u.name}</strong>.
       </Text>
-      <div style={{ paddingBottom: '10px' }}>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px' }}>
-          <input 
-            type="checkbox" 
+      <div style={{ paddingBottom: "10px" }}>
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            cursor: "pointer",
+            fontSize: "14px",
+          }}
+        >
+          <input
+            type="checkbox"
             checked={enviarCorreo}
             onChange={(e) => setEnviarCorreo(e.target.checked)}
           />
@@ -620,7 +634,12 @@ function ResetPasswordForm({
         </label>
       </div>
       <Group justify="flex-end" gap="sm">
-        <Button variant="subtle" color="gray" onClick={onCancel} disabled={loading}>
+        <Button
+          variant="subtle"
+          color="gray"
+          onClick={onCancel}
+          disabled={loading}
+        >
           Cancelar
         </Button>
         <Button
