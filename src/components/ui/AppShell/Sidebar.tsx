@@ -22,9 +22,9 @@ import {
   IconFiles,
   IconCalendarEvent,
   IconChartBar,
-  IconUsers,
   IconShield,
   IconCategory,
+  IconSettings,
 } from "@tabler/icons-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { toggleSidebar, selectSidebarAbierto } from "@/store/slices/uiSlice";
@@ -110,9 +110,9 @@ const NAV_HERRAMIENTAS = [
 // Administración del sistema
 const NAV_ADMIN = [
   {
-    href: "/configuracion/usuarios",
-    label: "Usuarios",
-    icon: <IconUsers size={ICON_SIZE} />,
+    href: "/configuracion",
+    label: "Administración",
+    icon: <IconSettings size={ICON_SIZE} />,
     permiso: "usuarios.ver",
   },
   {
