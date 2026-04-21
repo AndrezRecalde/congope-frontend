@@ -10,6 +10,7 @@ import type {
   CreateProyectoDto,
   UpdateProyectoDto,
   CreateHitoDto,
+  Proyecto,
 } from "@/services/axios";
 import type { EstadoProyecto } from "@/types/proyecto.types";
 
@@ -114,6 +115,43 @@ export function useCambiarEstadoProyecto() {
   return useMutation({
     mutationFn: ({ id, estado }: { id: string; estado: EstadoProyecto }) =>
       proyectosService.cambiarEstado(id, estado),
+    onMutate: async ({ id, estado }) => {
+      await qc.cancelQueries({ queryKey: ['proyectos', 'kanban'] });
+
+      let proyectoMovido: Proyecto | null = null;
+
+      // 1. Buscar el proyecto en alguna query y quitarlo
+      qc.setQueriesData(
+        { queryKey: ['proyectos', 'kanban'] },
+        (oldData: unknown) => {
+          const data = oldData as { data?: Proyecto[] } | undefined;
+          if (!data || !data.data) return oldData;
+          
+          const found = data.data.find((p) => p.id === id);
+          if (found && found.estado !== estado) {
+            proyectoMovido = { ...found, estado }; // Copia actualizada
+            return { ...data, data: data.data.filter((p) => p.id !== id) };
+          }
+          return oldData;
+        }
+      );
+
+      // 2. Si lo encontramos, lo insertamos optimísticamente en el nuevo estado
+      if (proyectoMovido) {
+        qc.setQueriesData(
+          { queryKey: ['proyectos', 'kanban', estado] },
+          (oldData: unknown) => {
+            const data = oldData as { data?: Proyecto[] } | undefined;
+            if (!data || !data.data) return oldData;
+            
+            if (!data.data.some((p) => p.id === id)) {
+              return { ...data, data: [proyectoMovido, ...data.data] };
+            }
+            return oldData;
+          }
+        );
+      }
+    },
     onSuccess: (_, { id }) => {
       qc.invalidateQueries({ queryKey: queryKeys.proyectos.all });
       qc.invalidateQueries({
@@ -228,6 +266,81 @@ export function useHistorialProyecto(
     enabled: !!proyectoId,
     // El historial es dinámico — revalidar cada
     // vez que se navega a la página
+    staleTime: 0,
+  });
+}
+
+// ── KANBAN ─────────────────────────────────────────────
+
+import type {
+  FiltrosKanban,
+  ConteosEstado,
+} from '@/types/kanban.types';
+
+const PER_PAGE_KANBAN = 20;
+
+/**
+ * Query para UNA columna del Kanban.
+ * Filtra por estado específico + filtros globales.
+ */
+export function useKanbanColumna(
+  estado:   EstadoProyecto,
+  filtros:  FiltrosKanban,
+  page:     number
+) {
+  const params: Record<string, string | number> = {
+    estado,
+    per_page: PER_PAGE_KANBAN,
+    page,
+  };
+
+  if (filtros.provincia_id) {
+    params.provincia_id = filtros.provincia_id;
+  }
+
+  if (filtros.search) {
+    params.search = filtros.search;
+  }
+
+  return useQuery({
+    queryKey: [
+      'proyectos', 'kanban', estado,
+      filtros, page,
+    ],
+    queryFn:  () =>
+      proyectosService.listar(params),
+    // Mantener datos anteriores al paginar
+    // para evitar parpadeo visual
+    placeholderData: (prev) => prev,
+    staleTime: 0,
+  });
+}
+
+import apiClient from "@/services/axios";
+
+/**
+ * Conteos por estado para las cabeceras.
+ * Se actualiza cuando cambian los filtros globales.
+ */
+export function useConteosKanban(
+  filtros: FiltrosKanban
+) {
+  const params: Record<string, string> = {};
+  if (filtros.provincia_id)
+    params.provincia_id = filtros.provincia_id;
+  if (filtros.search)
+    params.search = filtros.search;
+
+  return useQuery({
+    queryKey: ['proyectos', 'kanban', 'conteos',
+                filtros],
+    queryFn:  async () => {
+      const res = await apiClient.get(
+        '/proyectos/conteos',
+        { params }
+      );
+      return res.data.data as ConteosEstado;
+    },
     staleTime: 0,
   });
 }

@@ -14,7 +14,7 @@ import { PageHeader } from "@/components/ui/PageHeader/PageHeader";
 import { ExportMenu } from "@/components/ui/ExportMenu/ExportMenu";
 import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
 import { ProyectosTable } from "@/components/modulos/proyectos/ProyectosTable";
-import { ProyectosKanban } from "@/components/modulos/proyectos/ProyectosKanban";
+import { KanbanBoard } from "@/components/modulos/proyectos/kanban/KanbanBoard";
 import { ProyectosFiltros } from "@/components/modulos/proyectos/ProyectosFiltros";
 import {
   useProyectos,
@@ -228,13 +228,16 @@ export default function ProyectosPage() {
           puedeCambiarEstado={puedeCambiarEstado}
         />
       ) : (
-        <ProyectosKanban
-          proyectos={proyectos}
-          isLoading={isLoading || eliminando || cambiandoEstado}
-          onCambiarEstado={(id, estado) => cambiarEstado({ id, estado })}
-          onEditar={(p) => router.push(`/proyectos/${p.id}/editar`)}
+        <KanbanBoard
+          filtrosGlobales={{
+            actor_id: filtros.actor_id,
+          }}
+          onEditarProyecto={(proyecto) =>
+            router.push(`/proyectos/${proyecto.id}/editar`)
+          }
           puedeEditar={puedeEditar}
           puedeCambiarEstado={puedeCambiarEstado}
+          onCambiarEstado={(id, estado) => cambiarEstado({ id, estado })}
         />
       )}
     </>
