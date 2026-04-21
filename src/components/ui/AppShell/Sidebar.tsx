@@ -77,6 +77,12 @@ const NAV_PRINCIPAL = [
     icon: <IconMap2 size={ICON_SIZE} />,
     permiso: "mapa.ver",
   },
+  {
+    href: "/analisis/red",
+    label: "Red de Cooperación",
+    icon: <IconNetwork size={ICON_SIZE} />,
+    permiso: "mapa.ver",
+  },
 ];
 
 // Herramientas de trabajo
