@@ -8,7 +8,7 @@ import {
 } from '@mantine/core';
 import {
   IconDownload, IconEdit, IconTrash,
-  IconEye, IconEyeOff,
+  IconEye, IconEyeOff, IconClockHour3, IconFileUpload,
 } from '@tabler/icons-react';
 import { VisorDocumento, DocumentoParaVisor } from './VisorDocumento';
 import { getTipoPreview } from '@/hooks/useDocumentoPreview';
@@ -18,6 +18,9 @@ import {
   COLOR_CATEGORIA,
 } from '@/types/documento.types';
 import type { DocumentoItem } from '@/services/axios';
+import { HistorialVersiones } from './HistorialVersiones';
+import { ModalNuevaVersion, type DocumentoActivo } from './ModalNuevaVersion';
+import { useSubirVersion } from '@/queries/documentos.queries';
 
 interface DocumentosTableProps {
   documentos:    DocumentoItem[];
@@ -45,6 +48,22 @@ export function DocumentosTable({
   publicandoId,
 }: DocumentosTableProps) {
   const [docPreview, setDocPreview] = useState<DocumentoParaVisor | null>(null);
+  const [versionesAbiertas, setVersionesAbiertas] = useState<Set<string>>(new Set());
+  const [docAVersionar, setDocAVersionar] = useState<DocumentoActivo | null>(null);
+
+  const toggleVersiones = (docId: string) => {
+    setVersionesAbiertas((prev) => {
+      const nuevo = new Set(prev);
+      if (nuevo.has(docId)) {
+        nuevo.delete(docId);
+      } else {
+        nuevo.add(docId);
+      }
+      return nuevo;
+    });
+  };
+
+  const { mutate: subirVersion, isPending: subiendo } = useSubirVersion();
 
   const columns = [
     {
@@ -93,7 +112,36 @@ export function DocumentosTable({
             <Text size="xs" c="dimmed">
               {doc.nombre_archivo}
             </Text>
+            {doc.version > 1 && (
+              <Tooltip
+                label={
+                  versionesAbiertas.has(doc.id)
+                    ? 'Ocultar versiones anteriores'
+                    : `Ver historial (v${doc.version} actual)`
+                }
+              >
+                <Badge
+                  size="xs"
+                  variant="light"
+                  color="blue"
+                  style={{ cursor: 'pointer' }}
+                  leftSection={
+                    <IconClockHour3 size={10} />
+                  }
+                  onClick={() => toggleVersiones(doc.id)}
+                >
+                  v{doc.version}
+                </Badge>
+              </Tooltip>
+            )}
           </Group>
+          <HistorialVersiones
+            documentoId={doc.id}
+            abierto={versionesAbiertas.has(doc.id)}
+            onPrevisualizar={(versionDoc) => {
+              setDocPreview(versionDoc as unknown as DocumentoParaVisor);
+            }}
+          />
         </Stack>
       ),
     },
@@ -251,6 +299,28 @@ export function DocumentosTable({
                 <IconDownload size={15} />
               </ActionIcon>
             </Tooltip>
+            {/* Aquí asumimos que si puedeEditar entonces también puedeSubir, 
+                ya que en la UI original se usa can('documentos.subir'). 
+                Como DocumentosTable no recibe puedeSubir, usamos puedeEditar. */}
+            {puedeEditar && (
+              <Tooltip label="Subir nueva versión">
+                <ActionIcon
+                  variant="subtle"
+                  color="violet"
+                  size="sm"
+                  onClick={() => setDocAVersionar({
+                    id:            doc.id,
+                    titulo:        doc.titulo,
+                    version:       doc.version,
+                    tamano_legible:doc.tamano_legible,
+                    nombre_archivo:doc.nombre_archivo,
+                    categoria:     doc.categoria,
+                  })}
+                >
+                  <IconFileUpload size={15} />
+                </ActionIcon>
+              </Tooltip>
+            )}
             {puedeEditar && (
               <Tooltip label="Editar metadatos">
                 <ActionIcon
@@ -306,6 +376,20 @@ export function DocumentosTable({
       <VisorDocumento
         documento={docPreview}
         onCerrar={() => setDocPreview(null)}
+      />
+      <ModalNuevaVersion
+        documento={docAVersionar}
+        abierto={!!docAVersionar}
+        onCerrar={() => setDocAVersionar(null)}
+        subiendo={subiendo}
+        onSubir={(docId, datos) => {
+          subirVersion(
+            { documentoId: docId, datos },
+            {
+              onSuccess: () => setDocAVersionar(null),
+            }
+          );
+        }}
       />
     </>
   );

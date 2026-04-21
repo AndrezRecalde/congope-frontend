@@ -138,3 +138,73 @@ export function usePublicarDocumento() {
       }),
   });
 }
+
+// ── Listar versiones ─────────────────────────────
+
+export function useVersionesDocumento(
+  documentoId: string | null,
+  enabled:     boolean = false
+) {
+  return useQuery({
+    queryKey: ['documentos', 'versiones',
+                documentoId],
+    queryFn:  () =>
+      documentosService.listarVersiones(
+        documentoId!
+      ),
+    enabled:  !!documentoId && enabled,
+    staleTime:0,
+  });
+}
+
+// ── Subir nueva versión ──────────────────────────
+
+export function useSubirVersion() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      documentoId,
+      datos,
+    }: {
+      documentoId: string;
+      datos: {
+        archivo:            File;
+        titulo?:            string;
+        fecha_vencimiento?: string;
+        es_publico?:        boolean;
+      };
+    }) =>
+      documentosService.subirVersion(
+        documentoId, datos
+      ),
+    onSuccess: (nuevoDoc) => {
+      // Invalidar listado principal
+      qc.invalidateQueries({
+        queryKey: queryKeys.documentos.all,
+      });
+      // Invalidar versiones del documento
+      qc.invalidateQueries({
+        queryKey: [
+          'documentos', 'versiones',
+          nuevoDoc.documento_padre_id ?? nuevoDoc.id,
+        ],
+      });
+      notifications.show({
+        title:   `✅ Versión ${nuevoDoc.version} subida`,
+        message: `${nuevoDoc.titulo} · ` +
+                 `v${nuevoDoc.version} · ` +
+                 `${nuevoDoc.tamano_legible}`,
+        color:    'green',
+        autoClose:5000,
+      });
+    },
+    onError: (error) =>
+      notifications.show({
+        title:   'Error al subir versión',
+        message: getErrorMessage(error),
+        color:   'red',
+        autoClose:6000,
+      }),
+  });
+}

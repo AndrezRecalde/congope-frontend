@@ -10,6 +10,35 @@ export type {
   EntidadDocumento,
 };
 
+export interface VersionDocumento {
+  id:                 string;
+  titulo:             string;
+  categoria:          string;
+  nombre_archivo:     string;
+  mime_type:          string;
+  tamano_bytes:       number;
+  tamano_legible:     string;
+  es_publico:         boolean;
+  fecha_vencimiento:  string | null;
+  provincia_id:       string | null;
+  version:            number;
+  version_activa:     boolean;
+  documento_padre_id: string | null;
+  dias_para_vencer:   number | null;
+  vencido:            boolean;
+  url_descarga:       string;
+  created_at:         string;
+}
+
+export interface VersionesResponse {
+  data: VersionDocumento[];
+  meta: {
+    total:               number;
+    version_actual:      number;
+    documento_padre_id:  string;
+  };
+}
+
 export interface DocumentoFiltro {
   entidad_tipo: EntidadDocumento | '';
   entidad_id:   string;

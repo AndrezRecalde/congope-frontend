@@ -5,6 +5,10 @@ import apiClient, {
   type EntidadDocumento,
   descargarBlob,
 } from './axios';
+import type {
+  VersionesResponse,
+  VersionDocumento,
+} from '@/types/documento.types';
 
 export interface SubirDocumentoDto {
   entidad_tipo:       EntidadDocumento;
@@ -160,5 +164,61 @@ export const documentosService = {
       { es_publico }
     );
     return extractData<DocumentoItem>(res);
+  },
+
+  /**
+   * GET /api/v1/documentos/{id}/versiones
+   */
+  listarVersiones: async (
+    documentoId: string
+  ): Promise<VersionesResponse> => {
+    const res = await apiClient.get(
+      `/documentos/${documentoId}/versiones`
+    );
+    return res.data as VersionesResponse;
+  },
+
+  /**
+   * POST /api/v1/documentos/{id}/versiones
+   * Sube una nueva versión del documento.
+   */
+  subirVersion: async (
+    documentoId: string,
+    datos: {
+      archivo:            File;
+      titulo?:            string;
+      fecha_vencimiento?: string;
+      es_publico?:        boolean;
+    }
+  ): Promise<VersionDocumento> => {
+    const formData = new FormData();
+    formData.append('archivo', datos.archivo);
+    if (datos.titulo)
+      formData.append('titulo', datos.titulo);
+    if (datos.fecha_vencimiento)
+      formData.append(
+        'fecha_vencimiento',
+        datos.fecha_vencimiento
+      );
+    if (datos.es_publico !== undefined)
+      formData.append(
+        'es_publico',
+        datos.es_publico ? '1' : '0'
+      );
+
+    const res = await apiClient.post(
+      `/documentos/${documentoId}/versiones`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    const api = res.data as {
+      success: boolean;
+      data:    VersionDocumento;
+    };
+    return api.data;
   },
 };
