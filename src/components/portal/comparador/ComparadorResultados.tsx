@@ -1,11 +1,11 @@
 'use client'
 
 import dynamic from 'next/dynamic';
+import { SimpleGrid, Paper, Title, Text, Box, Group } from '@mantine/core';
 import type { EstadisticasProvincia } from '@/types/comparador.types';
 import { COLORES_PROVINCIAS } from '@/types/comparador.types';
 import { TarjetaComparacion } from './TarjetaComparacion';
 
-// ECharts con SSR desactivado
 const ReactECharts = dynamic(
   () => import('echarts-for-react'),
   { ssr: false }
@@ -19,14 +19,8 @@ export function ComparadorResultados({
   resultados,
 }: ComparadorResultadosProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-
-      {/* ── Tarjetas KPI lado a lado ── */}
-      <div style={{
-        display:             'grid',
-        gridTemplateColumns: `repeat(${resultados.length}, 1fr)`,
-        gap: 20,
-      }}>
+    <Box style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+      <SimpleGrid cols={{ base: 1, md: resultados.length }} spacing="xl">
         {resultados.map((prov, i) => (
           <TarjetaComparacion
             key={prov.id}
@@ -35,45 +29,29 @@ export function ComparadorResultados({
             index={i}
           />
         ))}
-      </div>
+      </SimpleGrid>
 
-      {/* ── Gráfica Radar — Perfil comparativo ── */}
       <SeccionRadar resultados={resultados} />
-
-      {/* ── Distribución por flujo ── */}
       <SeccionFlujos resultados={resultados} />
-
-      {/* ── ODS más activos ── */}
       <SeccionOds resultados={resultados} />
-
-    </div>
+    </Box>
   );
 }
 
-// ── Radar chart ──────────────────────────────────
+function TituloSeccion({ children }: { children: React.ReactNode }) {
+  return (
+    <Title order={3} style={{ fontFamily: 'var(--font-playfair)', color: 'var(--portal-navy)' }} mb="xs">
+      {children}
+    </Title>
+  );
+}
 
-function SeccionRadar({
-  resultados,
-}: {
-  resultados: EstadisticasProvincia[];
-}) {
-  // Normalizar cada dimensión al máximo del grupo
-  // para que el radar sea comparable
-  const maxProyectos = Math.max(
-    ...resultados.map((p) => p.proyectos.total), 1
-  );
-  const maxMonto = Math.max(
-    ...resultados.map((p) => p.monto_total), 1
-  );
-  const maxActores = Math.max(
-    ...resultados.map((p) => p.actores_count), 1
-  );
-  const maxEmblematicos = Math.max(
-    ...resultados.map((p) => p.emblematicos_count), 1
-  );
-  const maxPracticas = Math.max(
-    ...resultados.map((p) => p.practicas_count), 1
-  );
+function SeccionRadar({ resultados }: { resultados: EstadisticasProvincia[] }) {
+  const maxProyectos = Math.max(...resultados.map((p) => p.proyectos.total), 1);
+  const maxMonto = Math.max(...resultados.map((p) => p.monto_total), 1);
+  const maxActores = Math.max(...resultados.map((p) => p.actores_count), 1);
+  const maxEmblematicos = Math.max(...resultados.map((p) => p.emblematicos_count), 1);
+  const maxPracticas = Math.max(...resultados.map((p) => p.practicas_count), 1);
 
   const indicadores = [
     { name: 'Proyectos',     max: maxProyectos },
@@ -156,41 +134,17 @@ function SeccionRadar({
   };
 
   return (
-    <div style={{
-      background:   'white',
-      borderRadius: 20,
-      padding:      '32px',
-      boxShadow:    '0 4px 24px rgba(11,31,58,0.06)',
-      border:       '1px solid rgba(11,31,58,0.06)',
-    }}>
-      <TituloSeccion>
-        Perfil comparativo
-      </TituloSeccion>
-      <p style={{
-        fontSize:     13,
-        color:        'var(--portal-slate)',
-        margin:       '0 0 24px',
-      }}>
-        Cada eje está normalizado al máximo del grupo.
-        Una provincia que ocupa más área tiene
-        mayor actividad en esa dimensión.
-      </p>
-      <ReactECharts
-        option={option}
-        style={{ height: 420 }}
-        opts={{ renderer: 'canvas' }}
-      />
-    </div>
+    <Paper radius="xl" p={{ base: 'md', sm: 'xl' }} shadow="sm" withBorder>
+      <TituloSeccion>Perfil comparativo</TituloSeccion>
+      <Text size="sm" c="dimmed" mb="xl">
+        Cada eje está normalizado al máximo del grupo. Una provincia que ocupa más área tiene mayor actividad en esa dimensión.
+      </Text>
+      <ReactECharts option={option} style={{ height: 420 }} opts={{ renderer: 'canvas' }} />
+    </Paper>
   );
 }
 
-// ── Distribución por flujo ───────────────────────
-
-function SeccionFlujos({
-  resultados,
-}: {
-  resultados: EstadisticasProvincia[];
-}) {
+function SeccionFlujos({ resultados }: { resultados: EstadisticasProvincia[] }) {
   const flujos = [
     'Norte-Sur', 'Sur-Sur', 'Triangular',
     'Interna', 'Descentralizada',
@@ -253,145 +207,70 @@ function SeccionFlujos({
   };
 
   return (
-    <div style={{
-      background:   'white',
-      borderRadius: 20,
-      padding:      '32px',
-      boxShadow:    '0 4px 24px rgba(11,31,58,0.06)',
-      border:       '1px solid rgba(11,31,58,0.06)',
-    }}>
-      <TituloSeccion>
-        Flujos de cooperación
-      </TituloSeccion>
-      <ReactECharts
-        option={option}
-        style={{ height: 300 }}
-        opts={{ renderer: 'canvas' }}
-      />
-    </div>
+    <Paper radius="xl" p={{ base: 'md', sm: 'xl' }} shadow="sm" withBorder>
+      <TituloSeccion>Flujos de cooperación</TituloSeccion>
+      <ReactECharts option={option} style={{ height: 300 }} opts={{ renderer: 'canvas' }} />
+    </Paper>
   );
 }
 
-// ── ODS más activos ──────────────────────────────
-
-function SeccionOds({
-  resultados,
-}: {
-  resultados: EstadisticasProvincia[];
-}) {
+function SeccionOds({ resultados }: { resultados: EstadisticasProvincia[] }) {
   return (
-    <div style={{
-      background:   'white',
-      borderRadius: 20,
-      padding:      '32px',
-      boxShadow:    '0 4px 24px rgba(11,31,58,0.06)',
-      border:       '1px solid rgba(11,31,58,0.06)',
-    }}>
-      <TituloSeccion>
-        ODS más activos por provincia
-      </TituloSeccion>
-      <div style={{
-        display:             'grid',
-        gridTemplateColumns: `repeat(${resultados.length}, 1fr)`,
-        gap: 20,
-        marginTop: 20,
-      }}>
+    <Paper radius="xl" p={{ base: 'md', sm: 'xl' }} shadow="sm" withBorder>
+      <TituloSeccion>ODS más activos por provincia</TituloSeccion>
+      <SimpleGrid cols={{ base: 1, md: resultados.length }} spacing="xl" mt="xl">
         {resultados.map((prov, i) => (
-          <div key={prov.id}>
-            <div style={{
-              fontSize:    12,
-              fontWeight:  700,
-              color:       COLORES_PROVINCIAS[i],
-              letterSpacing:'0.04em',
-              textTransform:'uppercase',
-              marginBottom: 12,
-              paddingBottom:8,
-              borderBottom: `2px solid ${COLORES_PROVINCIAS[i]}30`,
-            }}>
-              {prov.nombre}
-            </div>
+          <Box key={prov.id}>
+            <Box
+              style={{
+                borderBottom: `2px solid ${COLORES_PROVINCIAS[i]}30`,
+              }}
+              pb="xs"
+              mb="md"
+            >
+              <Text size="xs" fw={700} tt="uppercase" style={{ letterSpacing: '0.04em', color: COLORES_PROVINCIAS[i] }}>
+                {prov.nombre}
+              </Text>
+            </Box>
+
             {prov.ods_top.length === 0 ? (
-              <p style={{
-                fontSize: 12,
-                color:    '#9CA3AF',
-                margin:   0,
-              }}>
-                Sin proyectos registrados
-              </p>
+              <Text size="xs" c="dimmed">Sin proyectos registrados</Text>
             ) : (
-              <div style={{
-                display:       'flex',
-                flexDirection: 'column',
-                gap:           8,
-              }}>
+              <Box style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {prov.ods_top.map((ods) => (
-                  <div
-                    key={ods.id}
-                    style={{
-                      display:    'flex',
-                      alignItems: 'center',
-                      gap:        10,
-                    }}
-                  >
-                    <div style={{
-                      width:        28,
-                      height:       28,
-                      borderRadius: 6,
-                      background:   ods.color_hex,
-                      display:      'flex',
-                      alignItems:   'center',
-                      justifyContent:'center',
-                      fontSize:     11,
-                      fontWeight:   700,
-                      color:        'white',
-                      flexShrink:   0,
-                    }}>
-                      {ods.numero}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{
-                        fontSize:   12,
-                        fontWeight: 600,
-                        color:      'var(--portal-navy)',
-                        lineHeight: 1.2,
-                      }}>
-                        {ods.nombre}
-                      </div>
-                      <div style={{
+                  <Group key={ods.id} gap="sm" wrap="nowrap">
+                    <Box
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: 6,
+                        background: ods.color_hex,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white',
+                        fontWeight: 700,
                         fontSize: 11,
-                        color:    '#9CA3AF',
-                        marginTop:1,
-                      }}>
+                        flexShrink: 0,
+                      }}
+                    >
+                      {ods.numero}
+                    </Box>
+                    <Box flex={1}>
+                      <Text size="xs" fw={600} style={{ color: 'var(--portal-navy)', lineHeight: 1.2 }}>
+                        {ods.nombre}
+                      </Text>
+                      <Text style={{ fontSize: 11 }} c="dimmed" mt={1}>
                         {ods.total_proyectos} proyecto{ods.total_proyectos !== 1 ? 's' : ''}
-                      </div>
-                    </div>
-                  </div>
+                      </Text>
+                    </Box>
+                  </Group>
                 ))}
-              </div>
+              </Box>
             )}
-          </div>
+          </Box>
         ))}
-      </div>
-    </div>
-  );
-}
-
-// ── Helper de título de sección ──────────────────
-
-function TituloSeccion({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <h3 style={{
-      fontFamily: 'var(--font-playfair)',
-      fontSize:   20,
-      fontWeight: 700,
-      color:      'var(--portal-navy)',
-      margin:     '0 0 8px',
-    }}>
-      {children}
-    </h3>
+      </SimpleGrid>
+    </Paper>
   );
 }

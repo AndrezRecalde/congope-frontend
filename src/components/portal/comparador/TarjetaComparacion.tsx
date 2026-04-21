@@ -1,5 +1,15 @@
 'use client'
 
+import { Card, Group, Text, Badge, ThemeIcon, Stack, Divider, Box } from '@mantine/core';
+import { 
+  IconFolderOpen, 
+  IconPlayerPlay, 
+  IconCheck, 
+  IconCoin, 
+  IconUsers, 
+  IconTrophy, 
+  IconBulb 
+} from '@tabler/icons-react';
 import type { EstadisticasProvincia } from '@/types/comparador.types';
 
 interface TarjetaComparacionProps {
@@ -17,183 +27,99 @@ export function TarjetaComparacion({
     {
       etiqueta: 'Total proyectos',
       valor:    provincia.proyectos.total,
-      sub:      null,
-      icono:    '📁',
+      icono:    <IconFolderOpen size={16} />,
     },
     {
       etiqueta: 'En ejecución',
       valor:    provincia.proyectos.en_ejecucion,
-      sub:      null,
-      icono:    '▶️',
+      icono:    <IconPlayerPlay size={16} />,
     },
     {
       etiqueta: 'Finalizados',
       valor:    provincia.proyectos.finalizado,
-      sub:      null,
-      icono:    '✅',
+      icono:    <IconCheck size={16} />,
     },
     {
       etiqueta: 'Inversión',
       valor:    provincia.monto_formateado,
-      sub:      null,
-      icono:    '💰',
+      icono:    <IconCoin size={16} />,
     },
     {
       etiqueta: 'Actores',
       valor:    provincia.actores_count,
-      sub:      null,
-      icono:    '🤝',
+      icono:    <IconUsers size={16} />,
     },
     {
       etiqueta: 'Emblemáticos',
       valor:    provincia.emblematicos_count,
-      sub:      null,
-      icono:    '🏆',
+      icono:    <IconTrophy size={16} />,
     },
     {
       etiqueta: 'Buenas Prácticas',
       valor:    provincia.practicas_count,
-      sub:      null,
-      icono:    '💡',
+      icono:    <IconBulb size={16} />,
     },
   ];
 
   return (
-    <div style={{
-      background:   'white',
-      borderRadius: 20,
-      overflow:     'hidden',
-      boxShadow:    '0 4px 24px rgba(11,31,58,0.08)',
-      border:       '1px solid rgba(11,31,58,0.06)',
-    }}>
-      {/* Header de la tarjeta */}
-      <div style={{
+    <Card radius="xl" p={0} withBorder shadow="sm">
+      {/* Header */}
+      <Box p="lg" style={{
         background: `linear-gradient(135deg, ${color}15 0%, ${color}08 100%)`,
         borderBottom: `3px solid ${color}`,
-        padding:      '24px 24px 20px',
       }}>
-        <div style={{
-          display:     'flex',
-          alignItems:  'center',
-          gap:         10,
-          marginBottom:4,
-        }}>
-          {/* Índice circular */}
-          <div style={{
-            width:          28,
-            height:         28,
-            borderRadius:   '50%',
-            background:     color,
-            color:          'white',
-            fontSize:       12,
-            fontWeight:     700,
-            display:        'flex',
-            alignItems:     'center',
-            justifyContent: 'center',
-            flexShrink:     0,
-          }}>
-            {index + 1}
-          </div>
-          <h3 style={{
-            fontFamily: 'var(--font-playfair)',
-            fontSize:   20,
-            fontWeight: 700,
-            color:      'var(--portal-navy)',
-            margin:     0,
-            lineHeight: 1.2,
-          }}>
+        <Group wrap="nowrap" mb={4}>
+          <ThemeIcon size={28} radius="xl" style={{ background: color, color: 'white' }}>
+            <Text fw={700} size="sm">{index + 1}</Text>
+          </ThemeIcon>
+          <Text
+            fw={700}
+            size="xl"
+            style={{ fontFamily: 'var(--font-playfair)', color: 'var(--portal-navy)', lineHeight: 1.2 }}
+          >
             {provincia.nombre}
-          </h3>
-        </div>
-        <p style={{
-          fontSize:   12,
-          color:      'var(--portal-slate)',
-          margin:     '4px 0 0',
-        }}>
-          Capital: {provincia.capital}
-          {' · '}Código: {provincia.codigo}
-        </p>
-      </div>
+          </Text>
+        </Group>
+        <Text size="xs" c="dimmed" mt="xs">
+          Capital: {provincia.capital} {' · '} Código: {provincia.codigo}
+        </Text>
+      </Box>
 
       {/* KPIs */}
-      <div style={{ padding: '20px 24px 24px' }}>
-        <div style={{
-          display:       'flex',
-          flexDirection: 'column',
-          gap:           12,
-        }}>
-          {kpis.map((kpi) => (
-            <div
-              key={kpi.etiqueta}
-              style={{
-                display:        'flex',
-                justifyContent: 'space-between',
-                alignItems:     'center',
-                padding:        '8px 0',
-                borderBottom:   '1px solid rgba(11,31,58,0.05)',
-              }}
-            >
-              <div style={{
-                display:    'flex',
-                alignItems: 'center',
-                gap:        8,
-                fontSize:   13,
-                color:      'var(--portal-slate)',
-              }}>
-                <span style={{ fontSize: 14 }}>
-                  {kpi.icono}
-                </span>
-                {kpi.etiqueta}
-              </div>
-              <span style={{
-                fontSize:   14,
-                fontWeight: 700,
-                color:      color,
-              }}>
-                {kpi.valor}
-              </span>
-            </div>
-          ))}
-        </div>
+      <Stack gap={0} p="lg">
+        {kpis.map((kpi, i) => (
+          <Box key={kpi.etiqueta}>
+            <Group justify="space-between" py="sm">
+              <Group gap="xs">
+                <Text c="dimmed" display="flex" style={{ alignItems: 'center' }}>{kpi.icono}</Text>
+                <Text size="sm" c="dimmed">{kpi.etiqueta}</Text>
+              </Group>
+              <Text size="sm" fw={700} style={{ color }}>{kpi.valor}</Text>
+            </Group>
+            {i < kpis.length - 1 && <Divider color="gray.1" />}
+          </Box>
+        ))}
 
-        {/* Sector temático top */}
         {provincia.sectores_top.length > 0 && (
-          <div style={{ marginTop: 16 }}>
-            <div style={{
-              fontSize:      10,
-              fontWeight:    600,
-              color:         'var(--portal-slate)',
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              marginBottom:  8,
-            }}>
+          <Box mt="md">
+            <Text size="xs" fw={600} c="dimmed" tt="uppercase" mb="xs" style={{ letterSpacing: '0.06em' }}>
               Sectores principales
-            </div>
-            <div style={{
-              display:  'flex',
-              flexWrap: 'wrap',
-              gap:      6,
-            }}>
+            </Text>
+            <Group gap="xs">
               {provincia.sectores_top.map((s) => (
-                <span
+                <Badge
                   key={s.sector}
-                  style={{
-                    background:   `${color}12`,
-                    border:       `1px solid ${color}30`,
-                    borderRadius: 100,
-                    padding:      '3px 10px',
-                    fontSize:     11,
-                    fontWeight:   600,
-                    color:        color,
-                  }}
+                  variant="light"
+                  color={color}
+                  style={{ backgroundColor: `${color}15` }}
                 >
                   {s.sector} ({s.total})
-                </span>
+                </Badge>
               ))}
-            </div>
-          </div>
+            </Group>
+          </Box>
         )}
-      </div>
-    </div>
+      </Stack>
+    </Card>
   );
 }
