@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import {
   Group,
@@ -51,6 +52,7 @@ const TITULOS: Record<string, string> = {
   "/configuracion": "Configuración",
   "/configuracion/usuarios": "Gestión de Usuarios",
   "/configuracion/auditoria": "Auditoría del Sistema",
+  "/perfil": "Mi Perfil",
 };
 
 function getTitulo(pathname: string): string {
@@ -275,8 +277,12 @@ export function Topbar() {
 
             <Menu.Label>Opciones de cuenta</Menu.Label>
 
-            <Menu.Item leftSection={<IconUser size={16} stroke={1.5} />}>
-              Mi perfil
+            <Menu.Item
+              leftSection={<IconUser size={16} stroke={1.5} />}
+              component={Link}
+              href="/perfil"
+            >
+              Mi Perfil
             </Menu.Item>
 
             <Menu.Item

@@ -562,7 +562,12 @@ apiClient.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
-      if (typeof window !== 'undefined') {
+      // No redirigir si el error viene del propio endpoint de login —
+      // en ese caso el 401 significa credenciales incorrectas, no sesión expirada.
+      const url = error.config?.url ?? '';
+      const esLogin = url.includes('/auth/login');
+
+      if (!esLogin && typeof window !== 'undefined') {
         localStorage.removeItem('congope_token');
         document.cookie =
           'congope_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';

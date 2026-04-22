@@ -52,11 +52,18 @@ export default function LoginPage() {
     },
   });
 
-  const handleSubmit = async (values: typeof form.values) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // Validar sin resetear el formulario
+    const result = form.validate();
+    if (result.hasErrors) return;
+
     setLoading(true);
     setErrorMsg(null);
 
     try {
+      const values = form.values;
       const data = await authService.login({
         email: values.email,
         password: values.password,
@@ -89,6 +96,7 @@ export default function LoginPage() {
         router.push(redirectTo);
       }
     } catch (err) {
+      // Los campos NO se limpian — solo se muestra el error
       setErrorMsg(getErrorMessage(err));
     } finally {
       setLoading(false);
@@ -133,7 +141,7 @@ export default function LoginPage() {
       )}
 
       {/* Formulario */}
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <form onSubmit={handleSubmit}>
         <Stack gap="md">
           <TextInput
             label="Correo electrónico"
