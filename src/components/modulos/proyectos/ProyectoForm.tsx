@@ -1,11 +1,16 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useEditor } from "@tiptap/react";
+import { StarterKit } from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
+import { RichTextEditor, Link as MantineLink } from "@mantine/tiptap";
 import {
   Stack,
   Tabs,
   TextInput,
-  Textarea,
   Select,
   MultiSelect,
   NumberInput,
@@ -17,6 +22,7 @@ import {
   ActionIcon,
   Paper,
   Divider,
+  Input,
 } from "@mantine/core";
 import { useForm, isNotEmpty } from "@mantine/form";
 import { IconX, IconPlus, IconMapPin } from "@tabler/icons-react";
@@ -73,6 +79,91 @@ const MONEDAS = [
   { value: "USD", label: "USD — Dólar americano" },
   { value: "EUR", label: "EUR — Euro" },
 ];
+
+// ── Sub-componente: Editor de descripción (Rich Text) ───────────
+
+interface DescripcionEditorProps {
+  value: string;
+  onChange: (html: string) => void;
+  error?: string;
+}
+
+function DescripcionEditor({ value, onChange, error }: DescripcionEditorProps) {
+  const editor = useEditor({
+    immediatelyRender: false,
+    extensions: [
+      StarterKit,
+      Underline,
+      MantineLink,
+      Link.configure({ openOnClick: false }),
+      Placeholder.configure({ placeholder: "Descripción general del proyecto..." }),
+    ],
+    content: value,
+    onUpdate: ({ editor: e }) => {
+      // Guardar HTML vacío como string vacío para no contaminar el DTO
+      const html = e.getHTML();
+      onChange(html === "<p></p>" ? "" : html);
+    },
+  });
+
+  // Sincronizar cuando el valor externo cambia (modo edición)
+  useEffect(() => {
+    if (!editor) return;
+    const current = editor.getHTML();
+    const incoming = value || "";
+    if (current !== incoming) {
+      editor.commands.setContent(incoming);
+    }
+  }, [value, editor]);
+
+  return (
+    <Input.Wrapper label="Descripción" error={error}>
+      <RichTextEditor
+        editor={editor}
+        mt={4}
+        style={{
+          border: error
+            ? "1px solid var(--mantine-color-error)"
+            : "1px solid var(--mantine-color-default-border)",
+          borderRadius: "var(--mantine-radius-sm)",
+        }}
+      >
+        <RichTextEditor.Toolbar sticky stickyOffset={0}>
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.Bold />
+            <RichTextEditor.Italic />
+            <RichTextEditor.Underline />
+            <RichTextEditor.Strikethrough />
+            <RichTextEditor.ClearFormatting />
+          </RichTextEditor.ControlsGroup>
+
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.H2 />
+            <RichTextEditor.H3 />
+            <RichTextEditor.H4 />
+          </RichTextEditor.ControlsGroup>
+
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.BulletList />
+            <RichTextEditor.OrderedList />
+          </RichTextEditor.ControlsGroup>
+
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.Link />
+            <RichTextEditor.Unlink />
+          </RichTextEditor.ControlsGroup>
+
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.Blockquote />
+            <RichTextEditor.Hr />
+          </RichTextEditor.ControlsGroup>
+        </RichTextEditor.Toolbar>
+
+        <RichTextEditor.Content mih={120} />
+      </RichTextEditor>
+    </Input.Wrapper>
+  );
+}
 
 // ── Props del componente ─────────────────────────────
 
@@ -398,11 +489,10 @@ export function ProyectoForm({
               {...form.getInputProps("actor_ids")}
             />
 
-            <Textarea
-              label="Descripción"
-              placeholder="Descripción general del proyecto..."
-              rows={3}
-              {...form.getInputProps("descripcion")}
+            <DescripcionEditor
+              value={form.values.descripcion}
+              onChange={(html) => form.setFieldValue("descripcion", html)}
+              error={form.errors.descripcion as string | undefined}
             />
 
             <Divider

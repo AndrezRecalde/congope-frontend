@@ -443,11 +443,14 @@ export function ProyectoDrawerPortal({
             {proyecto.descripcion && (
               <div style={{ marginBottom: 20 }}>
                 <div style={LABEL}><IcoInfo /> Descripción</div>
-                <p style={{ fontSize: 13, color: 'var(--portal-slate)', lineHeight: 1.65, margin: 0 }}>
-                  {proyecto.descripcion}
-                </p>
+                <div
+                  dangerouslySetInnerHTML={{ __html: proyecto.descripcion }}
+                  className="portal-descripcion-html"
+                  style={{ fontSize: 13, color: 'var(--portal-slate)', lineHeight: 1.65 }}
+                />
               </div>
             )}
+
 
           </div>
         )}
