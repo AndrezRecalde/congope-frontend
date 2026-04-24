@@ -111,7 +111,7 @@ export function PortalFiltros({
         left: 24,
         zIndex: 20,
         width: 300,
-        background: "rgba(255,255,255,0.97)",
+        background: "var(--mantine-color-body)",
         backdropFilter: "blur(12px)",
         borderRadius: 16,
         boxShadow: "0 8px 40px rgba(11,31,58,0.25)",
@@ -140,7 +140,6 @@ export function PortalFiltros({
             style={{
               fontSize: 13,
               fontWeight: 700,
-              color: "var(--portal-navy)",
               letterSpacing: "0.04em",
               textTransform: "uppercase",
             }}
@@ -352,7 +351,6 @@ export function PortalFiltros({
                   padding: "8px 14px",
                   fontSize: 12,
                   fontWeight: 500,
-                  color: "var(--portal-slate)",
                   letterSpacing: "0.02em",
                   fontFamily: "var(--font-dm-sans)",
                 }}
@@ -376,7 +374,6 @@ export function PortalFiltros({
           style={{
             fontSize: 10,
             fontWeight: 600,
-            color: "var(--portal-slate)",
             letterSpacing: "0.06em",
             textTransform: "uppercase",
             marginBottom: 6,
@@ -398,9 +395,7 @@ export function PortalFiltros({
                   flexShrink: 0,
                 }}
               />
-              <Text style={{ fontSize: 10, color: "var(--portal-slate)" }}>
-                {estado}
-              </Text>
+              <Text style={{ fontSize: 10 }}>{estado}</Text>
             </Group>
           ))}
         </Group>
