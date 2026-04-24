@@ -29,15 +29,36 @@ export interface PerfilUsuario {
   email_verified_at: string | null;
 }
 
+/**
+ * Normaliza el campo `provincias` que el backend puede devolver
+ * como objeto plano { uuid: nombre } en lugar de Array<{ id, nombre }>.
+ */
+function normalizarPerfil(raw: unknown): PerfilUsuario {
+  const data = raw as PerfilUsuario & {
+    provincias: Array<{ id: string; nombre: string }> | Record<string, string>;
+  };
+
+  const provincias: Array<{ id: string; nombre: string }> = Array.isArray(
+    data.provincias,
+  )
+    ? data.provincias
+    : Object.entries(data.provincias ?? {}).map(([id, nombre]) => ({
+        id: id as string,
+        nombre: nombre as string,
+      }));
+
+  return { ...data, provincias };
+}
+
 export const perfilService = {
   obtener: async (): Promise<PerfilUsuario> => {
     const res = await apiClient.get("/auth/me");
-    return res.data.data as PerfilUsuario;
+    return normalizarPerfil(res.data.data);
   },
 
   actualizar: async (datos: ActualizarPerfilDto): Promise<PerfilUsuario> => {
     const res = await apiClient.put("/auth/perfil", datos);
-    return res.data.data as PerfilUsuario;
+    return normalizarPerfil(res.data.data);
   },
 
   cambiarPassword: async (datos: CambiarPasswordDto): Promise<void> => {

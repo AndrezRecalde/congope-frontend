@@ -249,7 +249,7 @@ function TabInformacion({
             leftSection={<IconMail size={16} />}
             {...form.getInputProps("email")}
             disabled={isPending}
-            description="Si cambias tu email, deberás verificarlo."
+            //description="Si cambias tu email, deberás verificarlo."
           />
         </SimpleGrid>
 
@@ -644,7 +644,7 @@ export default function PerfilPage() {
               <Divider my="sm" />
 
               {/* Estadísticas rápidas */}
-              <SimpleGrid cols={2} spacing="xs">
+              <SimpleGrid cols={2} spacing="xs" mb="sm">
                 <div>
                   <Text fw={700} size="lg">
                     {perfil.permissions.length}
@@ -664,6 +664,54 @@ export default function PerfilPage() {
                   </Text>
                 </div>
               </SimpleGrid>
+
+              {/* Provincias asignadas */}
+              {perfil.provincias.length > 0 ? (
+                <>
+                  <Divider
+                    label={
+                      <Text size="xs" c="dimmed" fw={600}>
+                        Provincias asignadas
+                      </Text>
+                    }
+                    labelPosition="left"
+                    mb="xs"
+                  />
+                  <Group gap={6} justify="center" wrap="wrap">
+                    {perfil.provincias.map((p) => (
+                      <Badge
+                        key={p.id}
+                        size="sm"
+                        variant="light"
+                        color="blue"
+                        leftSection={<IconMapPin size={10} />}
+                      >
+                        {p.nombre}
+                      </Badge>
+                    ))}
+                  </Group>
+                </>
+              ) : (
+                <>
+                  <Divider
+                    label={
+                      <Text size="xs" c="dimmed" fw={600}>
+                        Cobertura
+                      </Text>
+                    }
+                    labelPosition="left"
+                    mb="xs"
+                  />
+                  <Badge
+                    size="sm"
+                    variant="light"
+                    color="teal"
+                    leftSection={<IconMap size={10} />}
+                  >
+                    Acceso global — todas las provincias
+                  </Badge>
+                </>
+              )}
             </Paper>
 
             {/* Información de la cuenta */}
@@ -691,7 +739,7 @@ export default function PerfilPage() {
                     Activo
                   </Badge>
                 </Group>
-                <Group justify="space-between">
+                {/* <Group justify="space-between">
                   <Text size="xs" c="dimmed">
                     Email verificado
                   </Text>
@@ -704,7 +752,7 @@ export default function PerfilPage() {
                       Sin verificar
                     </Badge>
                   )}
-                </Group>
+                </Group> */}
               </Stack>
             </Paper>
           </Stack>
