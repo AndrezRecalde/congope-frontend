@@ -1,6 +1,7 @@
 "use client";
 
 import { AppShell } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { useAppSelector } from "@/store/hooks";
 import { selectSidebarAbierto } from "@/store/slices/uiSlice";
 import { Sidebar } from "./Sidebar";
@@ -9,13 +10,22 @@ import { Topbar } from "./Topbar";
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const sidebarAbierto = useAppSelector(selectSidebarAbierto);
 
+  // Estado independiente para el drawer móvil (empieza cerrado)
+  const [mobileOpened, { toggle: toggleMobile, close: closeMobile }] =
+    useDisclosure(false);
+
   return (
     <AppShell
       header={{ height: 60 }}
       navbar={{
         width: sidebarAbierto ? 260 : 68,
         breakpoint: "sm",
-        collapsed: { mobile: !sidebarAbierto },
+        collapsed: {
+          // Móvil: controlado por mobileOpened (drawer)
+          mobile: !mobileOpened,
+          // Desktop: nunca colapsar totalmente, siempre muestra iconos o expandido
+          desktop: false,
+        },
       }}
       padding="md"
       styles={{
@@ -37,11 +47,11 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       }}
     >
       <AppShell.Header>
-        <Topbar />
+        <Topbar mobileOpened={mobileOpened} toggleMobile={toggleMobile} />
       </AppShell.Header>
 
       <AppShell.Navbar>
-        <Sidebar />
+        <Sidebar onNavigate={closeMobile} mobileDrawerOpen={mobileOpened} />
       </AppShell.Navbar>
 
       <AppShell.Main>{children}</AppShell.Main>

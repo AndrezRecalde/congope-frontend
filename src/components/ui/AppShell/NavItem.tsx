@@ -10,6 +10,8 @@ interface NavItemProps {
   icon:      React.ReactNode;
   badge?:    number;
   collapsed?: boolean;
+  /** Callback para cerrar el drawer móvil al navegar */
+  onNavigate?: () => void;
 }
 
 export function NavItem({
@@ -18,6 +20,7 @@ export function NavItem({
   icon,
   badge,
   collapsed = false,
+  onNavigate,
 }: NavItemProps) {
   const pathname = usePathname();
 
@@ -54,6 +57,7 @@ export function NavItem({
           </Badge>
         ) : undefined
       }
+      onClick={onNavigate}
       style={{
         borderRadius: 8,
         marginBottom: 2,

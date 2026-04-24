@@ -13,11 +13,11 @@ import {
   Box,
   UnstyledButton,
   Switch,
+  Burger,
   useMantineColorScheme,
   useComputedColorScheme,
 } from "@mantine/core";
 import {
-  IconMenu2,
   IconBell,
   IconUser,
   IconLogout,
@@ -72,7 +72,12 @@ function getIniciales(nombre: string): string {
     .join("");
 }
 
-export function Topbar() {
+interface TopbarProps {
+  mobileOpened: boolean;
+  toggleMobile: () => void;
+}
+
+export function Topbar({ mobileOpened, toggleMobile }: TopbarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const dispatch = useAppDispatch();
@@ -118,14 +123,38 @@ export function Topbar() {
     <Group h="100%" px="md" justify="space-between" wrap="nowrap">
       {/* ── Lado izquierdo ── */}
       <Group gap="sm" wrap="nowrap">
+        {/* Burger para móvil (visible solo < sm) */}
+        <Burger
+          opened={mobileOpened}
+          onClick={toggleMobile}
+          hiddenFrom="sm"
+          size="sm"
+          aria-label="Toggle navigation"
+        />
+
+        {/* Botón colapsar sidebar para desktop (visible solo >= sm) */}
         <ActionIcon
           variant="subtle"
           color="gray"
           size="md"
           onClick={() => dispatch(toggleSidebar())}
           aria-label="Toggle sidebar"
+          visibleFrom="sm"
         >
-          <IconMenu2 size={18} />
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="4" y1="6" x2="20" y2="6" />
+            <line x1="4" y1="12" x2="20" y2="12" />
+            <line x1="4" y1="18" x2="20" y2="18" />
+          </svg>
         </ActionIcon>
 
         <Text
@@ -152,23 +181,28 @@ export function Topbar() {
               border-radius: 40px;
               background-color: var(--mantine-color-default);
               border: 1px solid var(--mantine-color-default-border);
-              transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+              transition: background-color 0.2s ease, box-shadow 0.2s ease;
               cursor: pointer;
             }
             .user-profile-btn:hover {
               background-color: var(--mantine-color-default-hover);
-              border-color: var(--mantine-color-default-border);
               box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-              transform: translateY(-1px);
             }
             .user-avatar-modern {
               border: 2px solid var(--mantine-color-body);
               box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             }
+            /* En móvil, simplificar el botón de perfil */
+            @media (max-width: 48em) {
+              .user-profile-btn {
+                padding: 4px 8px 4px 4px;
+                border-radius: 40px;
+              }
+            }
           `,
         }}
       />
-      <Group gap="md" wrap="nowrap">
+      <Group gap="xs" wrap="nowrap">
         {/* Notificaciones */}
         <Indicator
           color="red"
@@ -191,11 +225,13 @@ export function Topbar() {
           shadow="lg"
           width={240}
           position="bottom-end"
-          withArrow
-          arrowPosition="center"
+          offset={8}
           radius="md"
           transitionProps={{ transition: "pop-top-right", duration: 150 }}
           styles={{
+            dropdown: {
+              zIndex: 1000,
+            },
             item: {
               paddingTop: 8,
               paddingBottom: 8,
@@ -203,7 +239,7 @@ export function Topbar() {
               marginBottom: 2,
             },
             label: {
-              textTransform: "none", // Quita el uppercase por defecto
+              textTransform: "none",
               fontSize: "var(--mantine-font-size-sm)",
               fontWeight: 600,
               paddingTop: 12,

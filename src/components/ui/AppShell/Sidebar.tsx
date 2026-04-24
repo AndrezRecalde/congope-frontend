@@ -129,16 +129,28 @@ const NAV_ADMIN = [
   },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  /** Callback para cerrar el drawer móvil al navegar */
+  onNavigate?: () => void;
+  /** Indica si el drawer móvil está abierto */
+  mobileDrawerOpen?: boolean;
+}
+
+export function Sidebar({ onNavigate, mobileDrawerOpen = false }: SidebarProps) {
   const dispatch = useAppDispatch();
   const sidebarAbierto = useAppSelector(selectSidebarAbierto);
   const { can } = usePermisos();
 
+  // En móvil, el drawer siempre muestra labels expandidos.
+  // En desktop, respeta el estado Redux de colapso.
+  const showExpanded = mobileDrawerOpen || sidebarAbierto;
+  const isCollapsed = !showExpanded;
+
   return (
     <Stack h="100%" gap={0}>
-      {/* Cabecera del sidebar con logo y botón colapsar */}
+      {/* Cabecera del sidebar con logo y botón colapsar (solo desktop) */}
       <Group
-        justify={sidebarAbierto ? "space-between" : "center"}
+        justify={showExpanded ? "space-between" : "center"}
         p="sm"
         mb="xs"
         style={{
@@ -147,7 +159,7 @@ export function Sidebar() {
           flexShrink: 0,
         }}
       >
-        {sidebarAbierto && (
+        {showExpanded && (
           <Group gap="xs">
             <Box
               style={{
@@ -176,12 +188,14 @@ export function Sidebar() {
           </Group>
         )}
 
+        {/* Botón colapsar/expandir: solo visible en desktop */}
         <ActionIcon
           variant="subtle"
           color="gray"
           size="sm"
           onClick={() => dispatch(toggleSidebar())}
           aria-label={sidebarAbierto ? "Colapsar sidebar" : "Expandir sidebar"}
+          visibleFrom="sm"
         >
           {sidebarAbierto ? (
             <IconChevronLeft size={16} />
@@ -208,7 +222,8 @@ export function Sidebar() {
               href={item.href}
               label={item.label}
               icon={item.icon}
-              collapsed={!sidebarAbierto}
+              collapsed={isCollapsed}
+              onNavigate={onNavigate}
             />
           ))}
         </Stack>
@@ -223,7 +238,8 @@ export function Sidebar() {
               href={item.href}
               label={item.label}
               icon={item.icon}
-              collapsed={!sidebarAbierto}
+              collapsed={isCollapsed}
+              onNavigate={onNavigate}
             />
           ))}
         </Stack>
@@ -233,7 +249,7 @@ export function Sidebar() {
           <>
             <Divider my="xs" />
             <Stack gap={2}>
-              {sidebarAbierto && (
+              {showExpanded && (
                 <Text
                   size="xs"
                   fw={600}
@@ -255,7 +271,8 @@ export function Sidebar() {
                   href={item.href}
                   label={item.label}
                   icon={item.icon}
-                  collapsed={!sidebarAbierto}
+                  collapsed={isCollapsed}
+                  onNavigate={onNavigate}
                 />
               ))}
             </Stack>
