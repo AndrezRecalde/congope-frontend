@@ -83,6 +83,7 @@ const GRUPOS_PERMISOS = [
   { grupo: "Documentos", icono: IconFiles, prefijo: "documentos" },
   { grupo: "Eventos", icono: IconCalendar, prefijo: "eventos" },
   { grupo: "Mapa", icono: IconMap, prefijo: "mapa" },
+  { grupo: "Análisis", icono: IconFileAnalytics, prefijo: "analisis" },
   { grupo: "Dashboard", icono: IconLayoutDashboard, prefijo: "dashboard" },
   { grupo: "Reportes", icono: IconFileAnalytics, prefijo: "reportes" },
   { grupo: "Usuarios", icono: IconUsers, prefijo: "usuarios" },

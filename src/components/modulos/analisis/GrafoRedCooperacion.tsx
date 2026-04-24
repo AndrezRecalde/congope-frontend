@@ -20,6 +20,7 @@ import {
   SimpleGrid,
   ActionIcon,
   Tooltip,
+  SegmentedControl,
   useComputedColorScheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -30,7 +31,9 @@ import {
   IconFilter,
   IconMapPin,
   IconBuildingBank,
+  IconShieldCheck,
 } from "@tabler/icons-react";
+import { usePermisos } from "@/hooks/usePermisos";
 import { useRedCooperacion } from "@/queries/red-cooperacion.queries";
 import type {
   NodoGrafo,
@@ -247,6 +250,16 @@ export function GrafoRedCooperacion() {
   });
   const isDark = computedColorScheme === "dark";
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { can } = usePermisos();
+
+  // Estado del toggle de alcance geográfico
+  // 'true'  → solo mis provincias (modo estricto por defecto)
+  // 'false' → contexto completo (todas las provincias de mis proyectos)
+  const [soloMiProvincia, setSoloMiProvincia] = useState<"true" | "false">(
+    "true",
+  );
+
   const [filtros, setFiltros] = useState<Partial<FiltrosGrafo>>({});
   const [filtrosBorrador, setFiltrosBorrador] = useState<Partial<FiltrosGrafo>>(
     {},
@@ -257,7 +270,17 @@ export function GrafoRedCooperacion() {
   const [drawerAbierto, { open: abrirDrawer, close: cerrarDrawer }] =
     useDisclosure(false);
 
-  const { data, isLoading, isError, refetch } = useRedCooperacion(filtros);
+  const { data, isLoading, isError, refetch } = useRedCooperacion({
+    ...filtros,
+    solo_mi_provincia: soloMiProvincia,
+  });
+
+  // El toggle SOLO aparece cuando el backend confirma que el usuario
+  // tiene provincias asignadas Y NO tiene vista global
+  const mostrarToggle =
+    data !== undefined &&
+    !data.meta.vista_global &&
+    data.meta.provincias_usuario.length > 0;
 
   // Mapa de nodos para búsqueda rápida
   const nodosMap = useMemo(() => {
@@ -522,6 +545,7 @@ export function GrafoRedCooperacion() {
   const limpiarFiltros = () => {
     setFiltrosBorrador({});
     setFiltros({});
+    setSoloMiProvincia("true"); // resetear toggle al modo estricto por defecto
   };
 
   // ── Loading / Error ──────────────────────────
@@ -594,127 +618,268 @@ export function GrafoRedCooperacion() {
 
           {/* KPIs */}
           {data && (
-            <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="sm">
-              {[
-                {
-                  valor: data.meta.total_proyectos,
-                  etiqueta: "Proyectos",
-                  color: "blue",
-                },
-                {
-                  valor: data.meta.total_actores,
-                  etiqueta: "Actores",
-                  color: "indigo",
-                },
-                {
-                  valor: data.meta.total_provincias,
-                  etiqueta: "Provincias",
-                  color: "yellow",
-                },
-                {
-                  valor: data.meta.monto_formateado,
-                  etiqueta: "Cooperación",
-                  color: "green",
-                },
-              ].map((kpi) => (
-                <Paper
-                  key={kpi.etiqueta}
-                  p="md"
-                  radius="lg"
-                  withBorder
-                  style={{ textAlign: "center" }}
+            <>
+              <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="sm">
+                {[
+                  {
+                    valor: data.meta.total_proyectos,
+                    etiqueta: "Proyectos",
+                    color: "blue",
+                  },
+                  {
+                    valor: data.meta.total_actores,
+                    etiqueta: "Actores",
+                    color: "indigo",
+                  },
+                  {
+                    valor: data.meta.total_provincias,
+                    etiqueta: "Provincias",
+                    color: "yellow",
+                  },
+                  {
+                    valor: data.meta.monto_formateado,
+                    etiqueta: "Cooperación",
+                    color: "green",
+                  },
+                ].map((kpi) => (
+                  <Paper
+                    key={kpi.etiqueta}
+                    p="md"
+                    radius="lg"
+                    withBorder
+                    style={{ textAlign: "center" }}
+                  >
+                    <Text fw={800} size="lg" c={`${kpi.color}.6`}>
+                      {kpi.valor}
+                    </Text>
+                    <Text size="xs" c="dimmed">
+                      {kpi.etiqueta}
+                    </Text>
+                  </Paper>
+                ))}
+              </SimpleGrid>
+
+              {/* Indicador del alcance de la vista */}
+              <Group gap="xs" mt={4}>
+                <Badge
+                  size="xs"
+                  variant="dot"
+                  color={data.meta.vista_global ? "green" : "blue"}
                 >
-                  <Text fw={800} size="lg" c={`${kpi.color}.6`}>
-                    {kpi.valor}
-                  </Text>
-                  <Text size="xs" c="dimmed">
-                    {kpi.etiqueta}
-                  </Text>
-                </Paper>
-              ))}
-            </SimpleGrid>
+                  {data.meta.vista_global
+                    ? "Vista nacional completa"
+                    : data.meta.provincias_usuario.length > 0
+                      ? `Filtrado por ${
+                          data.meta.provincias_usuario.length
+                        } provincia${
+                          data.meta.provincias_usuario.length !== 1 ? "s" : ""
+                        }`
+                      : "Vista completa"}
+                </Badge>
+              </Group>
+            </>
+          )}
+
+          {/* Alerta de alcance geográfico (solo usuarios con provincias asignadas) */}
+          {data &&
+            !data.meta.vista_global &&
+            data.meta.provincias_usuario.length > 0 && (
+              <Alert
+                icon={<IconMapPin size={14} />}
+                color={data.meta.solo_mi_provincia ? "blue" : "orange"}
+                variant="light"
+                radius="md"
+              >
+                <Group gap="xs" wrap="wrap" align="flex-start">
+                  <div style={{ flex: 1 }}>
+                    <Text size="xs" fw={600} mb={4}>
+                      {data.meta.solo_mi_provincia
+                        ? "Vista restringida a tus provincias"
+                        : "Vista con contexto completo"}
+                    </Text>
+                    <Text size="xs">
+                      {data.meta.solo_mi_provincia
+                        ? `Solo ves actores conectados con: ${data.meta.provincias_usuario.join(
+                            ", ",
+                          )}. Las provincias de otros proyectos compartidos no aparecen.`
+                        : `Ves todas las provincias de proyectos donde participas (${data.meta.provincias_usuario.join(
+                            ", ",
+                          )}), incluyendo las de otras regiones.`}
+                    </Text>
+                  </div>
+                  <Group gap={4} mt={2}>
+                    {data.meta.provincias_usuario.map((nombre) => (
+                      <Badge
+                        key={nombre}
+                        size="xs"
+                        variant="filled"
+                        color={data.meta.solo_mi_provincia ? "blue" : "orange"}
+                      >
+                        {nombre}
+                      </Badge>
+                    ))}
+                  </Group>
+                </Group>
+              </Alert>
+            )}
+
+          {data && data.meta.vista_global && (
+            <Alert
+              icon={<IconShieldCheck size={14} />}
+              color="green"
+              variant="light"
+              radius="md"
+            >
+              <Text size="xs">
+                Vista global activada — estás viendo la red completa de todos
+                los actores y provincias del Ecuador.
+              </Text>
+            </Alert>
           )}
 
           {/* Filtros */}
-          <Paper p="md" radius="lg" withBorder>
-            <Group gap="sm" align="flex-end" wrap="wrap">
-              <Select
-                label="Estado del proyecto"
-                placeholder="Todos"
-                size="xs"
-                w={160}
-                clearable
-                data={[
-                  { value: "En gestión", label: "En gestión" },
-                  { value: "En ejecución", label: "En ejecución" },
-                  { value: "Finalizado", label: "Finalizado" },
-                  { value: "Suspendido", label: "Suspendido" },
-                ]}
-                value={filtrosBorrador.estado ?? null}
-                onChange={(v) =>
-                  setFiltrosBorrador({ ...filtrosBorrador, estado: v ?? "" })
-                }
-              />
-              <Select
-                label="Tipo de actor"
-                placeholder="Todos"
-                size="xs"
-                w={160}
-                clearable
-                data={[
-                  "Multilateral",
-                  "Bilateral",
-                  "ONG",
-                  "Privado",
-                  "Academia",
-                  "Gobierno",
-                  "Internacional",
-                ].map((t) => ({ value: t, label: t }))}
-                value={filtrosBorrador.tipo_actor ?? null}
-                onChange={(v) =>
-                  setFiltrosBorrador({
-                    ...filtrosBorrador,
-                    tipo_actor: v ?? "",
-                  })
-                }
-              />
-              <NumberInput
-                label="Mín. proyectos por arista"
-                placeholder="1"
-                size="xs"
-                w={180}
-                min={1}
-                max={20}
-                value={
-                  filtrosBorrador.min_proyectos
-                    ? parseInt(filtrosBorrador.min_proyectos)
-                    : undefined
-                }
-                onChange={(v) =>
-                  setFiltrosBorrador({
-                    ...filtrosBorrador,
-                    min_proyectos: v ? String(v) : "",
-                  })
-                }
-              />
-              <Group gap="xs">
-                <Button
+          <Paper
+            p="md"
+            radius="lg"
+            style={{
+              background: "var(--mantine-color-body)",
+              border: "1px solid var(--mantine-color-gray-3)",
+            }}
+          >
+            <Stack gap="md">
+              {/* Toggle de alcance geográfico — visible solo para usuarios con provincias */}
+              {mostrarToggle && (
+                <div>
+                  <Text
+                    size="xs"
+                    fw={700}
+                    c="dimmed"
+                    tt="uppercase"
+                    mb={6}
+                    style={{ letterSpacing: "0.06em" }}
+                  >
+                    Alcance geográfico
+                  </Text>
+                  <SegmentedControl
+                    size="xs"
+                    fullWidth
+                    color="congope"
+                    value={soloMiProvincia}
+                    onChange={(v) => setSoloMiProvincia(v as "true" | "false")}
+                    data={[
+                      {
+                        value: "true",
+                        label: (
+                          <Group gap={6} justify="center" wrap="nowrap" py={2}>
+                            <IconMapPin size={13} />
+                            <Text size="xs">Solo mis provincias</Text>
+                          </Group>
+                        ),
+                      },
+                      {
+                        value: "false",
+                        label: (
+                          <Group gap={6} justify="center" wrap="nowrap" py={2}>
+                            <IconNetwork size={13} />
+                            <Text size="xs">Contexto completo</Text>
+                          </Group>
+                        ),
+                      },
+                    ]}
+                  />
+                  <Text size="xs" c="dimmed" mt={6}>
+                    {soloMiProvincia === "true"
+                      ? `Mostrando solo actores conectados a: ${
+                          data?.meta.provincias_usuario.join(", ") ?? ""
+                        }`
+                      : "Mostrando todas las provincias de proyectos donde participas, aunque sean de otras regiones."}
+                  </Text>
+                </div>
+              )}
+
+              {/* Separador entre el toggle y los filtros estándar */}
+              {mostrarToggle && <Divider />}
+
+              {/* Filtros estándar: estado, tipo de actor y mínimo de proyectos */}
+              <Group gap="sm" align="flex-end" wrap="wrap">
+                <Select
+                  label="Estado del proyecto"
+                  placeholder="Todos"
                   size="xs"
-                  leftSection={<IconFilter size={13} />}
-                  onClick={aplicarFiltros}
-                >
-                  Aplicar
-                </Button>
-                <Button
+                  w={160}
+                  clearable
+                  data={[
+                    { value: "En gestión", label: "En gestión" },
+                    { value: "En ejecución", label: "En ejecución" },
+                    { value: "Finalizado", label: "Finalizado" },
+                    { value: "Suspendido", label: "Suspendido" },
+                  ]}
+                  value={filtrosBorrador.estado ?? null}
+                  onChange={(v) =>
+                    setFiltrosBorrador({ ...filtrosBorrador, estado: v ?? "" })
+                  }
+                />
+                <Select
+                  label="Tipo de actor"
+                  placeholder="Todos"
                   size="xs"
-                  variant="subtle"
-                  color="gray"
-                  onClick={limpiarFiltros}
-                >
-                  Limpiar
-                </Button>
+                  w={160}
+                  clearable
+                  data={[
+                    "Multilateral",
+                    "Bilateral",
+                    "ONG",
+                    "Privado",
+                    "Academia",
+                    "Gobierno",
+                    "Internacional",
+                  ].map((t) => ({ value: t, label: t }))}
+                  value={filtrosBorrador.tipo_actor ?? null}
+                  onChange={(v) =>
+                    setFiltrosBorrador({
+                      ...filtrosBorrador,
+                      tipo_actor: v ?? "",
+                    })
+                  }
+                />
+                <NumberInput
+                  label="Mín. proyectos por arista"
+                  placeholder="1"
+                  size="xs"
+                  w={180}
+                  min={1}
+                  max={20}
+                  value={
+                    filtrosBorrador.min_proyectos
+                      ? parseInt(filtrosBorrador.min_proyectos)
+                      : undefined
+                  }
+                  onChange={(v) =>
+                    setFiltrosBorrador({
+                      ...filtrosBorrador,
+                      min_proyectos: v ? String(v) : "",
+                    })
+                  }
+                />
+                <Group gap="xs">
+                  <Button
+                    size="xs"
+                    leftSection={<IconFilter size={13} />}
+                    onClick={aplicarFiltros}
+                  >
+                    Aplicar
+                  </Button>
+                  <Button
+                    size="xs"
+                    variant="subtle"
+                    color="gray"
+                    onClick={limpiarFiltros}
+                  >
+                    Limpiar
+                  </Button>
+                </Group>
               </Group>
-            </Group>
+            </Stack>
           </Paper>
 
           {/* Grafo o estado vacío */}

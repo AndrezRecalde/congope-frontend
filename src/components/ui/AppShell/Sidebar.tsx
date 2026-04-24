@@ -81,7 +81,7 @@ const NAV_PRINCIPAL = [
     href: "/analisis/red",
     label: "Red de Cooperación",
     icon: <IconNetwork size={ICON_SIZE} />,
-    permiso: "mapa.ver",
+    permiso: "analisis.ver",
   },
 ];
 
