@@ -24,11 +24,14 @@ export function NavItem({
 }: NavItemProps) {
   const pathname = usePathname();
 
-  // Activo si es la ruta exacta o si es un prefijo
-  // (excepto /dashboard que no debe activarse en sub-rutas)
+  // Activo si es la ruta exacta o si es un prefijo.
+  // Se excluyen rutas padre que tienen sus propias sub-rutas con NavItem:
+  // - /dashboard → no debe activarse en sub-rutas
+  // - /configuracion → sus hijos (/auditoria, /beneficiarios) tienen NavItem propio
+  const EXACT_ONLY_ROUTES = ['/dashboard', '/configuracion'];
   const isActive =
     pathname === href ||
-    (href !== '/dashboard' && pathname.startsWith(href + '/'));
+    (!EXACT_ONLY_ROUTES.includes(href) && pathname.startsWith(href + '/'));
 
   const linkContent = (
     <>
